@@ -1,0 +1,22 @@
+name: Предложение
+description: Новая возможность или улучшение
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу пользователя это решает?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предлагаемое решение
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Границы MVP
+      options:
+        - label: Я проверил раздел «План развития» (docs/future-roadmap.html) — задача не помечена как выходящая за рамки текущей версии

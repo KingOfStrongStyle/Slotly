@@ -1,0 +1,43 @@
+name: Ошибка
+description: Что-то работает не так, как описано в документации
+labels: [bug]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      description: Начиная с запуска приложения.
+      placeholder: |
+        1. Открыть «Услуги»
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемый результат
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Фактический результат
+      description: Текст ошибки из консоли или скриншот.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Модуль
+      options:
+        - Каркас, навигация, lifecycle (Кирилл)
+        - Данные, запись, распознавание жестов (Влад)
+        - UI kit, каталог, профиль, Gesture Lab (Ян)
+        - Документация или CI
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Устройство и версия Android
+      placeholder: Эмулятор API 36 / Pixel 7, Android 16
