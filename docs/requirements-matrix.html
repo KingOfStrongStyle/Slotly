@@ -22,6 +22,7 @@
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html">Лабораторная №1</a></li>
 <li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
 </ul>
 </nav>
 </aside>
@@ -71,6 +72,29 @@
 <tr><td>NavigationBar, сохранение состояния вкладок</td><td><code>HomeShell</code> + <code>IndexedStack</code></td><td><code>lib/app/home_shell.dart</code></td><td><code>test/app/navigation_test.dart</code></td><td>Переключение вкладок</td><td><span class="badge verified">Verified</span></td></tr>
 <tr><td>Системная кнопка Back</td><td><code>PopScope</code> в <code>HomeShell</code></td><td><code>lib/app/home_shell.dart</code></td><td><code>test/app/navigation_test.dart</code>, <code>profile_screen_test.dart</code></td><td>Back на вкладке «Профиль»</td><td><span class="badge verified">Verified</span></td></tr>
 <tr><td>Увеличенный шрифт без overflow</td><td>Адаптивная вёрстка</td><td><code>lib/core/widgets/responsive.dart</code></td><td><code>test/app/text_scale_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+</tbody>
+</table></div>
+
+<h2>Лабораторная №3</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Реализация</th><th>Файл</th><th>Тест</th><th>Демонстрация</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td>Экраны Gesture Lab и «Ввод талона» доступны из профиля</td><td>Маршруты <code>/gesture-lab</code>, <code>/ticket-check-in</code></td><td><code>lib/app/routes.dart</code></td><td><code>test/features/profile/profile_screen_test.dart</code></td><td>Профиль</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Tap выбирает карточку</td><td><code>TapZone</code></td><td><code>lib/features/gesture_lab/presentation/zones/tap_zone.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>ЛР3, шаг 1; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Double tap — избранное</td><td><code>TapZone</code></td><td><code>lib/features/gesture_lab/presentation/zones/tap_zone.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>ЛР3, шаг 1; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Long press — меню действий</td><td><code>TapZone._openMenu</code></td><td><code>lib/features/gesture_lab/presentation/zones/tap_zone.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>ЛР3, шаг 1</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Horizontal drag: направление и скорость</td><td><code>HorizontalDragZone</code></td><td><code>lib/features/gesture_lab/presentation/zones/drag_zones.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>ЛР3, шаг 2; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Vertical drag: величина перемещения</td><td><code>VerticalDragZone</code></td><td><code>lib/features/gesture_lab/presentation/zones/drag_zones.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>ЛР3, шаг 3; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Pinch/scale меняет масштаб</td><td><code>ScaleZone</code></td><td><code>lib/features/gesture_lab/presentation/zones/scale_zone.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code> (два указателя)</td><td>ЛР3, шаг 4; на эмуляторе вручную не проверялся — adb не передаёт мультитач</td><td><span class="badge partial">Partially verified</span></td></tr>
+<tr><td>Журнал жестов и визуальная обратная связь</td><td><code>GestureLogView</code>, <code>ZoneFrame</code></td><td><code>lib/features/gesture_lab/presentation/gesture_log.dart</code></td><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>ЛР3, шаг 5</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Разделение на зоны из-за Gesture Arena</td><td>4 зоны, <code>IndexedStack</code> без <code>TabBarView</code></td><td><code>lib/features/gesture_lab/presentation/gesture_lab_screen.dart</code></td><td>—</td><td>Объяснение в <a href="lab-3.html">ЛР №3</a></td><td><span class="badge implemented">Implemented</span></td></tr>
+<tr><td>Прикладные жесты в «Моих записях»: tap, long press, horizontal drag</td><td><code>BookingsScreen</code></td><td><code>lib/features/booking/presentation/bookings_screen.dart</code></td><td><code>test/features/booking/bookings_screen_test.dart</code></td><td>ЛР3, шаг 6; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>GesturePad: onPanStart/Update/End, CustomPaint, очистка, отмена штриха</td><td><code>GesturePad</code>, <code>GesturePadController</code></td><td><code>lib/features/gesture_checkin/presentation/widgets/gesture_pad.dart</code></td><td><code>test/features/gesture_checkin/ticket_check_in_screen_test.dart</code></td><td>ЛР3, шаги 7–8; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Нормализация, масштаб, resampling, сравнение, score, отклонение</td><td><code>GestureClassifier</code></td><td><code>lib/features/gesture_checkin/domain/gesture_classifier.dart</code></td><td><code>test/features/gesture_checkin/gesture_classifier_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Шаблоны 0–9 и S</td><td><code>symbolTemplates</code></td><td><code>lib/features/gesture_checkin/data/symbol_templates.dart</code></td><td><code>test/features/gesture_checkin/gesture_classifier_test.dart</code></td><td>Подсказка «?»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Цифра добавляется к номеру, S завершает ввод</td><td><code>TicketEntry</code></td><td><code>lib/features/gesture_checkin/domain/ticket_entry.dart</code></td><td><code>test/features/gesture_checkin/ticket_entry_test.dart</code></td><td>ЛР3, шаг 9; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Проверка номера через MockTicketRepository; найденный и неизвестный талон</td><td><code>MockTicketRepository</code></td><td><code>lib/features/gesture_checkin/data/mock_ticket_repository.dart</code></td><td><code>test/features/gesture_checkin/ticket_check_in_screen_test.dart</code></td><td>ЛР3, шаги 9–10; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Низкая уверенность — «Жест не распознан», повтор</td><td>Состояние ошибки <code>GesturePad</code></td><td><code>lib/features/gesture_checkin/presentation/ticket_check_in_screen.dart</code></td><td><code>test/features/gesture_checkin/ticket_check_in_screen_test.dart</code></td><td>ЛР3, шаг 8; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
 </tbody>
 </table></div>
 <footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>

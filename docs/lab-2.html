@@ -22,6 +22,7 @@
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html">Лабораторная №1</a></li>
 <li><a href="lab-2.html" aria-current="page">Лабораторная №2</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
 </ul>
 </nav>
 </aside>
@@ -44,8 +45,8 @@
 <tr><td>5</td><td>Профиль</td><td>Вкладка «Профиль»</td><td><code>lib/features/profile/presentation/profile_screen.dart</code></td></tr>
 <tr><td>6</td><td>Welcome</td><td>Запуск приложения</td><td><code>lib/features/welcome/welcome_screen.dart</code></td></tr>
 <tr><td>7</td><td>Диагностика</td><td>Профиль → «Диагностика»</td><td><code>lib/features/diagnostics/presentation/diagnostics_screen.dart</code></td></tr>
-<tr><td>8</td><td>Gesture Lab</td><td>Профиль → «Gesture Lab»</td><td>реализуется в рамках лабораторной №3</td></tr>
-<tr><td>9</td><td>Ввод талона</td><td>Профиль → «Ввод талона»</td><td>реализуется в рамках лабораторной №3</td></tr>
+<tr><td>8</td><td>Gesture Lab</td><td>Профиль → «Gesture Lab»</td><td><code>lib/features/gesture_lab/presentation/gesture_lab_screen.dart</code> (подробно в <a href="lab-3.html">ЛР №3</a>)</td></tr>
+<tr><td>9</td><td>Ввод талона</td><td>Профиль → «Ввод талона»</td><td><code>lib/features/gesture_checkin/presentation/ticket_check_in_screen.dart</code> (подробно в <a href="lab-3.html">ЛР №3</a>)</td></tr>
 </tbody>
 </table></div>
 
@@ -56,7 +57,7 @@
         │                                   └─ push → BookingFormScreen(service)
         │                                          └─ после подтверждения: popUntil(first) + вкладка «Записи»
         ├─ [1] BookingsScreen (TabBar: Активные / Отменённые)
-        └─ [2] ProfileScreen ── pushNamed → /diagnostics</code></pre>
+        └─ [2] ProfileScreen ── pushNamed → /diagnostics, /gesture-lab, /ticket-check-in</code></pre>
 <ul>
 <li><strong>NavigationBar</strong> (Material 3) переключает три вкладки. Тела вкладок лежат в <code>IndexedStack</code>, поэтому текст поиска, выбранная категория и прокрутка сохраняются при переключении.</li>
 <li><strong>Один Scaffold на оболочку.</strong> Вкладки не создают собственный <code>Scaffold</code>: у каталога и профиля <code>SliverAppBar</code>, у записей — <code>NestedScrollView</code> со <code>SliverAppBar</code> и <code>TabBar</code>. SnackBar показывается над нижней навигацией.</li>
