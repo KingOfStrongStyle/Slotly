@@ -41,4 +41,24 @@ abstract final class AppStrings {
   static const tabServices = 'Услуги';
   static const tabBookings = 'Записи';
   static const tabProfile = 'Профиль';
+
+  // Welcome
+  static const welcomeDescription =
+      'Выберите услугу, специалиста и удобное время. Запись подтверждается '
+      'сразу, без ожидания звонка администратора.';
+  static const welcomeChooseCategory = 'Что вас интересует?';
+  static const welcomeNoCategory = 'Категория не выбрана — покажем все услуги';
+  static String welcomeSelectedCategory(String label) =>
+      'Выбрано: $label. Каталог откроется с этим фильтром';
+  static const welcomeShowServices = 'Посмотреть услуги';
+
+  // Catalog
+  static const catalogTitle = 'Услуги';
+  static const catalogSearchHint = 'Найти услугу';
+  static const catalogClearSearch = 'Очистить поиск';
+  static String catalogFoundCount(int count) => 'Найдено: $count';
+  static const catalogEmptyTitle = 'Ничего не найдено';
+  static const catalogEmptyMessage =
+      'Попробуйте изменить запрос или выбрать другую категорию.';
+  static const catalogResetFilters = 'Сбросить фильтры';
 }

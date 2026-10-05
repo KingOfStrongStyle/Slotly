@@ -16,7 +16,10 @@ void main() {
     test('formats minutes, hours and mixed values', () {
       expect(Formatters.duration(const Duration(minutes: 45)), '45\u00A0мин');
       expect(Formatters.duration(const Duration(hours: 2)), '2\u00A0ч');
-      expect(Formatters.duration(const Duration(minutes: 90)), '1\u00A0ч 30\u00A0мин');
+      expect(
+        Formatters.duration(const Duration(minutes: 90)),
+        '1\u00A0ч 30\u00A0мин',
+      );
     });
   });
 

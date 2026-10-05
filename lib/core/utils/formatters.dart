@@ -6,8 +6,12 @@ import '../app_strings.dart';
 /// fixed patterns, and this keeps output identical in tests and on devices.
 abstract final class Formatters {
   static const _nbsp = '\u00A0';
-  static const _hoursUnit = '$_nbsp' 'ч';
-  static const _minutesUnit = '$_nbsp' 'мин';
+  static const _hoursUnit =
+      '$_nbsp'
+      'ч';
+  static const _minutesUnit =
+      '$_nbsp'
+      'мин';
 
   /// `5000` -> `5 000 ₸`.
   static String price(int amountKzt) {
