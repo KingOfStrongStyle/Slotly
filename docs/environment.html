@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Окружение разработки — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="environment.html" aria-current="page">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Окружение разработки</h1>
+<p class="lead">Какие инструменты использовались при сборке проекта, как подготовить такое же окружение и какие ограничения были обнаружены.</p>
+
+<h2>Фактически использованные версии</h2>
+<p>Зафиксировано 5 октября 2026 года на macOS 15.6 (Apple Silicon, arm64).</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Компонент</th><th>Версия</th><th>Источник установки</th></tr></thead>
+<tbody>
+<tr><td>Flutter (channel stable)</td><td>3.47.6</td><td>Homebrew cask <code>flutter</code></td></tr>
+<tr><td>Dart</td><td>3.13.5</td><td>в составе Flutter SDK</td></tr>
+<tr><td>DevTools</td><td>2.60.0</td><td>в составе Flutter SDK</td></tr>
+<tr><td>JDK</td><td>OpenJDK 17.0.20.1</td><td>Homebrew <code>openjdk@17</code>, подключён через <code>flutter config --jdk-dir</code></td></tr>
+<tr><td>Android SDK Command-line Tools</td><td>22.0</td><td>Homebrew cask <code>android-commandlinetools</code></td></tr>
+<tr><td>Android SDK Platform</td><td>android-36 (Android 16)</td><td><code>sdkmanager</code></td></tr>
+<tr><td>Android SDK Build-Tools</td><td>36.1.0 и 36.0.0</td><td><code>sdkmanager</code>, 36.0.0 доустановлена Gradle автоматически</td></tr>
+<tr><td>Android SDK Platform-Tools (adb)</td><td>37.0.1</td><td><code>sdkmanager</code></td></tr>
+<tr><td>Android NDK</td><td>28.2.13676358</td><td>доустановлен Gradle при первой сборке</td></tr>
+<tr><td>Android Emulator</td><td>37.2.12</td><td><code>sdkmanager</code></td></tr>
+<tr><td>System image</td><td><code>system-images;android-36;google_apis;arm64-v8a</code></td><td><code>sdkmanager</code></td></tr>
+<tr><td>Android Gradle Plugin</td><td>9.1.0</td><td>шаблон <code>flutter create</code></td></tr>
+<tr><td>Gradle</td><td>9.3.1</td><td>Gradle Wrapper</td></tr>
+<tr><td>Kotlin Gradle Plugin</td><td>2.4.0</td><td>шаблон <code>flutter create</code></td></tr>
+<tr><td>Git</td><td>2.39.5 (Apple Git)</td><td>macOS Command Line Tools</td></tr>
+<tr><td>GitHub CLI</td><td>2.102.0</td><td>Homebrew <code>gh</code></td></tr>
+<tr><td>Homebrew</td><td>6.0.22</td><td>—</td></tr>
+</tbody>
+</table></div>
+
+<h3>Параметры Android-проекта</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+<tbody>
+<tr><td>applicationId / namespace</td><td><code>kz.slotly.mobile</code></td></tr>
+<tr><td>compileSdk / targetSdk</td><td>36</td></tr>
+<tr><td>minSdk</td><td>24 (Android 7.0)</td></tr>
+<tr><td>Java/Kotlin target</td><td>17</td></tr>
+<tr><td>Эмулятор</td><td>AVD <code>slotly_api36</code>, профиль Pixel 7, 1080 × 2400, 420 dpi, 4 ГБ RAM</td></tr>
+</tbody>
+</table></div>
+
+<h2>Состояние до подготовки</h2>
+<p>На машине изначально не было Flutter, Android SDK, подходящей JDK (была только Java 8 из браузерного плагина), GitHub CLI, Android Studio и VS Code. Установлены только компоненты, необходимые для Android-сборки. Глобальные системные пакеты не обновлялись, <code>sudo</code> не использовался.</p>
+
+<h2>Подготовка окружения с нуля (macOS)</h2>
+<pre><code># 1. Инструменты
+brew install openjdk@17 gh
+brew install --cask flutter android-commandlinetools
+
+# 2. Android SDK (лицензии принимаются официальной командой)
+export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+sdkmanager "platform-tools" "emulator" "platforms;android-36" \
+  "build-tools;36.1.0" "system-images;android-36;google_apis;arm64-v8a"
+
+# 3. Подключить SDK и JDK к Flutter
+flutter config --android-sdk "$(brew --prefix)/share/android-commandlinetools" \
+  --jdk-dir "$JAVA_HOME"
+flutter doctor --android-licenses
+
+# 4. Эмулятор
+avdmanager create avd -n slotly_api36 \
+  -k "system-images;android-36;google_apis;arm64-v8a" -d pixel_7
+"$(brew --prefix)/share/android-commandlinetools/emulator/emulator" -avd slotly_api36
+
+# 5. Проверка
+flutter doctor -v
+flutter devices</code></pre>
+
+<h2>Результат flutter doctor</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Пункт</th><th>Статус</th><th>Комментарий</th></tr></thead>
+<tbody>
+<tr><td>Flutter</td><td><span class="badge verified">OK</span></td><td>stable 3.47.6</td></tr>
+<tr><td>Android toolchain</td><td><span class="badge verified">OK</span></td><td>SDK 36.1.0, все лицензии приняты</td></tr>
+<tr><td>Connected device</td><td><span class="badge verified">OK</span></td><td>эмулятор <code>emulator-5554</code> (API 36)</td></tr>
+<tr><td>Xcode</td><td><span class="badge partial">не установлен</span></td><td>не требуется: платформа MVP — Android</td></tr>
+<tr><td>Chrome</td><td><span class="badge partial">не установлен</span></td><td>не требуется: web-сборка не входит в MVP</td></tr>
+</tbody>
+</table></div>
+
+<h2>Редакторы</h2>
+<h3>VS Code</h3>
+<p>В репозитории есть <code>.vscode/extensions.json</code> (рекомендует расширения <code>Dart-Code.dart-code</code> и <code>Dart-Code.flutter</code>), <code>.vscode/settings.json</code> (форматирование при сохранении, длина строки 80) и <code>.vscode/launch.json</code> (конфигурации debug и profile). На машине разработки VS Code не установлен, поэтому расширения не ставились автоматически. После установки VS Code откройте папку проекта и примите предложение установить рекомендуемые расширения.</p>
+<h3>Android Studio</h3>
+<p>Android Studio не требуется для сборки: всё выполняется через Flutter CLI и Gradle. Если участник хочет работать в Android Studio:</p>
+<ol>
+<li>Установить Android Studio с <a href="https://developer.android.com/studio">developer.android.com/studio</a> или командой <code>brew install --cask android-studio</code>.</li>
+<li>Открыть <em>Settings → Plugins → Marketplace</em>, найти <strong>Flutter</strong>, нажать <em>Install</em> (плагин Dart установится вместе с ним) и перезапустить IDE.</li>
+<li>В <em>Settings → Languages &amp; Frameworks → Flutter</em> указать путь к Flutter SDK (вывод <code>flutter doctor -v</code>, строка «Flutter version … at …»).</li>
+<li>Открыть корневую папку проекта (а не папку <code>android/</code>).</li>
+</ol>
+
+<h2>Обнаруженные проблемы и решения</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Проблема</th><th>Решение</th></tr></thead>
+<tbody>
+<tr><td>Системная Java 8 не подходит для Android Gradle Plugin 9</td><td>Установлен OpenJDK 17 через Homebrew и явно указан Flutter (<code>flutter config --jdk-dir</code>), глобальный <code>JAVA_HOME</code> не менялся</td></tr>
+<tr><td><code>avdmanager</code> выводит предупреждение о <code>devices.xml</code> в system image</td><td>Предупреждение не влияет на работу: AVD создаётся и запускается</td></tr>
+<tr><td>Первая Gradle-сборка занимает около 6 минут</td><td>Gradle скачивает зависимости, NDK и Build-Tools 36.0.0; последующие сборки занимают десятки секунд</td></tr>
+<tr><td>GitHub CLI не был авторизован</td><td>См. раздел публикации в <code>PROJECT_TASKS.md</code></td></tr>
+</tbody>
+</table></div>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

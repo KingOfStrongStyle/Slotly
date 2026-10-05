@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Лабораторная работа №1 — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html" aria-current="page">Лабораторная №1</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Лабораторная работа №1</h1>
+<p class="lead">Первое Flutter-приложение, Android как целевая платформа и жизненный цикл приложения.</p>
+
+<div class="callout">
+<p><strong>Ответственные:</strong> каркас приложения, lifecycle и экран диагностики — Кирилл; welcome-экран — Ян; модели и демо-данные каталога — Влад.</p>
+</div>
+
+<h2>Что сдаётся</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Реализация</th><th>Файл</th></tr></thead>
+<tbody>
+<tr><td>Welcome-экран с логотипом, названием и слоганом</td><td>Логотип нарисован <code>CustomPainter</code>, текст «Запись на услуги без звонков»</td><td><code>lib/features/welcome/welcome_screen.dart</code></td></tr>
+<tr><td>Не менее трёх категорий</td><td>Шесть категорий в виде <code>ChoiceChip</code></td><td><code>lib/features/welcome/welcome_screen.dart</code></td></tr>
+<tr><td>StatefulWidget и setState</td><td>Выбранная категория хранится в <code>_WelcomeScreenState</code></td><td><code>lib/features/welcome/welcome_screen.dart</code></td></tr>
+<tr><td>Переход на второй экран</td><td>«Посмотреть услуги» открывает каталог с выбранным фильтром</td><td><code>lib/app/app.dart</code>, <code>lib/app/routes.dart</code></td></tr>
+<tr><td>Экран «Диагностика»</td><td>Текущее состояние, нумерованный журнал, время, описание, очистка, empty state</td><td><code>lib/features/diagnostics/presentation/diagnostics_screen.dart</code></td></tr>
+<tr><td>AppLifecycleListener и dispose</td><td><code>LifecycleLogger</code> создаётся при запуске и освобождает listener в <code>dispose()</code></td><td><code>lib/core/lifecycle/lifecycle_logger.dart</code></td></tr>
+</tbody>
+</table></div>
+
+<h2>1. Первое Flutter-приложение</h2>
+<p>Точка входа — <code>lib/main.dart</code>: функция <code>main()</code> вызывает <code>runApp(SlotlyApp())</code>. Корневой виджет <code>SlotlyApp</code> создаёт зависимости приложения, настраивает Material 3 тему, русскую локализацию и открывает <code>WelcomeScreen</code>.</p>
+<p>Welcome-экран — <code>StatefulWidget</code>. При нажатии на категорию вызывается <code>setState</code>, Flutter заново вызывает <code>build</code>, и выбранный чип подсвечивается, а подпись под чипами меняется:</p>
+<pre><code>void _toggleCategory(ServiceCategory category) {
+  setState(() {
+    _selectedCategory = _selectedCategory == category ? null : category;
+  });
+}</code></pre>
+<p>Кнопка «Посмотреть услуги» передаёт выбранную категорию наружу через callback, а <code>SlotlyApp</code> выполняет <code>Navigator.pushReplacement</code>. Используется именно replacement: после перехода кнопка Back на главном экране закрывает приложение, а не возвращает на приветствие.</p>
+
+<h2>2. Теоретическая часть</h2>
+
+<h3>Android как целевая платформа</h3>
+<p>Android — операционная система для мобильных устройств на основе ядра Linux. Каждое приложение распространяется как APK или AAB, устанавливается системой и запускается в отдельном процессе под собственным Linux-пользователем (песочница). Точкой входа для пользователя служит <code>Activity</code>, описанная в <code>AndroidManifest.xml</code>. Доступ к камере, сети, уведомлениям и другим ресурсам выдаётся через разрешения и системные сервисы.</p>
+<p>Для Slotly целевая платформа задана в <code>android/app/build.gradle.kts</code>: <code>applicationId = "kz.slotly.mobile"</code>, <code>minSdk 24</code> (Android 7.0), <code>targetSdk</code> и <code>compileSdk 36</code> (Android 16).</p>
+
+<h3>Уровни архитектуры Android</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Уровень (снизу вверх)</th><th>Роль</th></tr></thead>
+<tbody>
+<tr><td>Linux kernel</td><td>Процессы и потоки, память, драйверы устройств, сеть, файловые системы, безопасность (UID-изоляция, SELinux), Binder — механизм межпроцессного взаимодействия.</td></tr>
+<tr><td>HAL (Hardware Abstraction Layer)</td><td>Стандартные интерфейсы к оборудованию (камера, сенсоры, аудио), чтобы верхние уровни не зависели от конкретного производителя.</td></tr>
+<tr><td>Native libraries (C/C++)</td><td>Системные библиотеки: libc (Bionic), графика (OpenGL ES, Vulkan), SQLite, медиа-кодеки, WebKit/Chromium и др.</td></tr>
+<tr><td>Android Runtime (ART)</td><td>Исполняет байт-код DEX приложений на Kotlin/Java: AOT- и JIT-компиляция, сборка мусора. Каждое приложение работает в своём экземпляре ART.</td></tr>
+<tr><td>Application framework (Java API framework)</td><td>Activity Manager, Window Manager, View System, Package Manager, Notification Manager, Content Providers — API, через которые приложения используют возможности системы.</td></tr>
+<tr><td>Applications</td><td>Системные и пользовательские приложения, в том числе Slotly.</td></tr>
+</tbody>
+</table></div>
+
+<h3>Как Flutter работает поверх Android</h3>
+<ol>
+<li>Android запускает процесс приложения и создаёт <code>MainActivity</code>. В Slotly это <code>class MainActivity : FlutterActivity()</code> на Kotlin — обычная Android Activity.</li>
+<li><code>FlutterActivity</code> (Android embedder) создаёт <code>FlutterEngine</code> и <code>FlutterView</code> — поверхность, на которой рисует Flutter.</li>
+<li>Flutter Engine (C++, библиотека <code>libflutter.so</code>) запускает Dart-код приложения. В debug-сборке Dart выполняется в JIT-режиме (это даёт hot reload), в release — заранее скомпилирован в машинный код (<code>libapp.so</code>).</li>
+<li>Фреймворк Flutter (Dart) строит дерево виджетов, вычисляет layout и формирует сцену. Engine растеризует её через Impeller (Vulkan или OpenGL ES) прямо в поверхность <code>FlutterView</code>. Системные <code>View</code> Android для кнопок и списков не используются.</li>
+<li>События касания, клавиатура, изменения размеров экрана, доступность и жизненный цикл приходят из Android в embedder и пересылаются в Dart через platform channels. Например, состояние жизненного цикла приходит по каналу <code>flutter/lifecycle</code>.</li>
+</ol>
+
+<h3>Widget, Element и RenderObject</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Слой</th><th>Что это</th><th>Пример в Slotly</th></tr></thead>
+<tbody>
+<tr><td>Widget</td><td>Неизменяемое описание части интерфейса («как должно выглядеть»). Создаётся заново при каждом <code>build</code>, это дешёвая операция.</td><td><code>ServiceCard(service: …)</code>, <code>Text('Slotly')</code></td></tr>
+<tr><td>Element</td><td>Экземпляр виджета в дереве. Хранит позицию в дереве, ссылку на <code>State</code> и решает, можно ли обновить существующий объект (совпали тип и key) или нужно создать новый.</td><td><code>StatefulElement</code> для <code>WelcomeScreen</code> хранит <code>_WelcomeScreenState</code> между перестроениями.</td></tr>
+<tr><td>RenderObject</td><td>Объект, который выполняет layout, отрисовку и hit testing. Живёт долго и обновляется точечно.</td><td><code>RenderParagraph</code> для текста, <code>RenderCustomPaint</code> для логотипа.</td></tr>
+</tbody>
+</table></div>
+<p>Благодаря такому разделению <code>setState</code> пересоздаёт только лёгкие виджеты, а дорогие RenderObject переиспользуются. Это объясняет, почему в <code>IndexedStack</code> вкладки сохраняют состояние: их Element и State не удаляются при переключении.</p>
+
+<h3>Flutter Engine и Android embedder</h3>
+<ul>
+<li><strong>Flutter Engine</strong> — кроссплатформенное ядро на C++: Dart VM/рантайм, рендерер Impeller, раскладка текста, обработка platform channels.</li>
+<li><strong>Android embedder</strong> — код на Java/Kotlin из пакета <code>io.flutter.embedding.android</code>: <code>FlutterActivity</code>, <code>FlutterView</code>, <code>FlutterEngine</code>. Он связывает Engine с Activity, окном, вводом, клавиатурой, accessibility и жизненным циклом Android.</li>
+</ul>
+
+<h3>Почему Flutter не заменяет Android</h3>
+<p>Flutter заменяет только UI-слой и язык прикладной логики. Всё остальное остаётся Android: процесс и песочница Linux, <code>AndroidManifest.xml</code>, Activity и её жизненный цикл, разрешения, ART для Kotlin-кода embedder, системные сервисы и Gradle-сборка APK. Доступ к возможностям ОС (камера, уведомления, файлы) Flutter получает через platform channels и плагины, которые внутри вызывают обычные Android API.</p>
+
+<h2>3. Жизненный цикл</h2>
+<p>Flutter описывает жизненный цикл всего приложения через <code>AppLifecycleState</code>. Это не копия колбэков Activity: состояния обобщены для Android, iOS, desktop и web, а переходы зависят от платформы.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Состояние</th><th>Смысл</th><th>Когда наблюдается на Android</th></tr></thead>
+<tbody>
+<tr><td><code>resumed</code></td><td>Приложение видно и принимает ввод</td><td>Приложение на переднем плане</td></tr>
+<tr><td><code>inactive</code></td><td>Видно, но не принимает ввод</td><td>Открыт экран недавних приложений, шторка, системный диалог; начало сворачивания</td></tr>
+<tr><td><code>hidden</code></td><td>Интерфейс скрыт</td><td>Android такого состояния не присылает: фреймворк добавляет его сам между <code>inactive</code> и <code>paused</code></td></tr>
+<tr><td><code>paused</code></td><td>Приложение в фоне, не видно</td><td>После нажатия Home или переключения на другое приложение</td></tr>
+<tr><td><code>detached</code></td><td>Engine работает без видимого окна</td><td>Activity уничтожена, например при закрытии приложения из списка недавних</td></tr>
+</tbody>
+</table></div>
+<div class="callout warning">
+<p>Соответствие с <code>onResume</code>/<code>onPause</code>/<code>onStop</code>/<code>onDestroy</code> только приблизительное. Если процесс завершается аварийно или убивается системой из-за нехватки памяти, часть событий (в том числе <code>detached</code>) может не прийти. Поэтому сохранять важные данные нужно при переходе в <code>paused</code>, а не надеяться на <code>detached</code>.</p>
+</div>
+
+<h3>Реализация</h3>
+<p><code>LifecycleLogger</code> — <code>ChangeNotifier</code>, который создаётся один раз при старте в <code>AppDependencies</code>. Поэтому события записываются, даже если экран «Диагностика» ещё не открыт.</p>
+<pre><code>LifecycleLogger({this.clock = systemClock}) {
+  final initialState = WidgetsBinding.instance.lifecycleState;
+  if (initialState != null) _record(initialState, isInitial: true);
+  _listener = AppLifecycleListener(onStateChange: _record);
+}
+
+@override
+void dispose() {
+  _listener.dispose();
+  super.dispose();
+}</code></pre>
+<p><code>AppLifecycleListener</code> подписывается на <code>WidgetsBinding</code> при создании. Без вызова <code>dispose()</code> подписка осталась бы активной и вызывала бы <code>notifyListeners</code> у уничтоженного объекта. Это поведение проверяет тест <code>dispose releases the AppLifecycleListener</code>.</p>
+<p>Каждое событие дополнительно пишется в системный лог в debug-сборке, поэтому переходы перед закрытием процесса можно увидеть командой <code>adb logcat -s flutter</code>.</p>
+
+<h3>Фактическая последовательность на эмуляторе</h3>
+<p>Записано 5 октября 2026 года на эмуляторе Android 16 (API 36, arm64) с debug-сборкой Slotly:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Действие</th><th>События в журнале</th></tr></thead>
+<tbody>
+<tr><td>Запуск</td><td>#1 resumed</td></tr>
+<tr><td>Кнопка Home</td><td>#2 inactive → #3 hidden → #4 paused</td></tr>
+<tr><td>Возврат из списка недавних</td><td>#5 hidden → #6 inactive → #7 resumed</td></tr>
+<tr><td>Открытие «Настроек» Android и возврат</td><td>inactive → hidden → paused, затем hidden → inactive → resumed</td></tr>
+<tr><td>Закрытие свайпом в списке недавних</td><td>inactive → hidden → paused → detached (видно в logcat), процесс завершён</td></tr>
+<tr><td>Повторный запуск</td><td>Новый процесс, журнал снова начинается с #1 resumed</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. Сценарий демонстрации</h2>
+<ol>
+<li><strong>Запуск.</strong> Запустить приложение, выбрать категорию на welcome (подпись под чипами меняется — это <code>setState</code>), нажать «Посмотреть услуги». Открыть вкладку «Профиль» → «Диагностика». В журнале есть событие #1.</li>
+<li><strong>Сворачивание.</strong> Нажать Home. Вернуться в приложение: в журнале появились <code>inactive</code>, <code>hidden</code>, <code>paused</code>.</li>
+<li><strong>Возврат из recent apps.</strong> Открыть список недавних приложений и выбрать Slotly: <code>hidden</code>, <code>inactive</code>, <code>resumed</code>.</li>
+<li><strong>Переключение на другое приложение.</strong> Открыть, например, «Настройки».</li>
+<li><strong>Возвращение.</strong> Вернуться в Slotly: видна полная последовательность ухода и возврата, у каждого события номер и время.</li>
+<li><strong>Закрытие и повторный запуск.</strong> Закрыть приложение свайпом в списке недавних и запустить снова. Журнал хранится в памяти, поэтому начинается заново с #1. События перед закрытием показать в терминале: <code>adb logcat -s flutter</code>.</li>
+</ol>
+<p>Кнопка с иконкой корзины очищает журнал. После очистки показывается empty state, а нумерация начинается с #1.</p>
+
+<h2>Тесты</h2>
+<ul>
+<li><code>test/core/lifecycle/lifecycle_logger_test.dart</code> — начальное событие, нумерация, промежуточные состояния через настоящий канал <code>flutter/lifecycle</code>, очистка, освобождение listener.</li>
+<li><code>test/features/diagnostics/diagnostics_screen_test.dart</code> — отображение состояния, журнала и очистка.</li>
+<li><code>test/app/navigation_test.dart</code> — выбор категории на welcome и переход в каталог.</li>
+</ul>
+<pre><code>flutter test test/core/lifecycle test/features/diagnostics test/app</code></pre>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

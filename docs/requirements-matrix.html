@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Матрица требований — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="requirements-matrix.html" aria-current="page">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Матрица требований</h1>
+<p class="lead">Связь каждого требования с реализацией, тестом и сценарием демонстрации.</p>
+<p>Статусы: <span class="badge verified">Verified</span> — проверено автоматическим тестом и/или вручную на эмуляторе; <span class="badge implemented">Implemented</span> — реализовано, но отдельной проверки нет; <span class="badge partial">Partially verified</span> — проверена часть поведения; <span class="badge blocked">Blocked</span> — не выполнено из-за внешнего ограничения.</p>
+
+<h2>Лабораторная №1</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Реализация</th><th>Файл</th><th>Тест</th><th>Демонстрация</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td>Welcome-экран: логотип, название, слоган</td><td><code>WelcomeScreen</code>, <code>SlotlyLogo</code></td><td><code>lib/features/welcome/welcome_screen.dart</code></td><td><code>test/app/navigation_test.dart</code></td><td>Запуск приложения</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Не менее трёх категорий</td><td>6 <code>ChoiceChip</code></td><td><code>lib/features/welcome/welcome_screen.dart</code></td><td><code>test/app/navigation_test.dart</code></td><td>Welcome</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>StatefulWidget + setState</td><td>Выбранная категория в <code>_WelcomeScreenState</code></td><td><code>lib/features/welcome/welcome_screen.dart</code></td><td><code>test/app/navigation_test.dart</code></td><td>Нажатие на категорию меняет подпись</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Переход на второй экран</td><td><code>Navigator.pushReplacement(AppRoutes.home)</code></td><td><code>lib/app/app.dart</code>, <code>lib/app/routes.dart</code></td><td><code>test/app/navigation_test.dart</code></td><td>«Посмотреть услуги»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Запуск на Android</td><td>Debug-сборка на эмуляторе API 36</td><td><code>android/</code></td><td>ручная проверка</td><td><code>flutter run</code></td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Теория Android и Flutter</td><td>Раздел документации</td><td><code>docs/lab-1.html</code></td><td>—</td><td>Ответы на вопросы</td><td><span class="badge implemented">Implemented</span></td></tr>
+<tr><td>Экран «Диагностика»: состояние, журнал, время, описание</td><td><code>DiagnosticsScreen</code></td><td><code>lib/features/diagnostics/presentation/diagnostics_screen.dart</code></td><td><code>test/features/diagnostics/diagnostics_screen_test.dart</code></td><td>Профиль → Диагностика</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Очистка журнала и empty state</td><td>Кнопка в AppBar, <code>EmptyState</code></td><td><code>lib/features/diagnostics/presentation/diagnostics_screen.dart</code></td><td><code>test/features/diagnostics/diagnostics_screen_test.dart</code></td><td>Иконка корзины</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>AppLifecycleListener: resumed, inactive, hidden, paused, detached</td><td><code>LifecycleLogger</code></td><td><code>lib/core/lifecycle/lifecycle_logger.dart</code></td><td><code>test/core/lifecycle/lifecycle_logger_test.dart</code></td><td>Home, Recents, закрытие свайпом</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Освобождение listener через dispose</td><td><code>LifecycleLogger.dispose()</code></td><td><code>lib/core/lifecycle/lifecycle_logger.dart</code></td><td><code>test/core/lifecycle/lifecycle_logger_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+</tbody>
+</table></div>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>
