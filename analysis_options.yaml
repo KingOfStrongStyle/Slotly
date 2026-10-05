@@ -1,0 +1,24 @@
+# Lint rules for Slotly. Based on the official flutter_lints set with a few
+# stricter checks that catch common mistakes in a student team project.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-raw-types: true
+  exclude:
+    - build/**
+    - android/**
+
+linter:
+  rules:
+    - avoid_dynamic_calls
+    - directives_ordering
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_locals
+    - prefer_single_quotes
+    - sort_child_properties_last
+    - unawaited_futures
+    - use_super_parameters
