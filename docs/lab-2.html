@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Лабораторная работа №2 — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html" aria-current="page">Лабораторная №2</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Лабораторная работа №2</h1>
+<p class="lead">Элементы интерфейса, ввод данных, компоновка, маршруты, диалоги, уведомления, списки, вкладки и свайпы на примере сценария записи на услугу.</p>
+
+<div class="callout">
+<p><strong>Ответственные:</strong> каталог, детали услуги, профиль и общие компоненты — Ян; модели, репозиторий, форма записи и валидация — Влад; навигация, маршруты, «Мои записи» и интеграция — Кирилл.</p>
+</div>
+
+<h2>Карта экранов</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>№</th><th>Экран</th><th>Как открыть</th><th>Файл</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Каталог</td><td>Вкладка «Услуги»</td><td><code>lib/features/catalog/presentation/catalog_screen.dart</code></td></tr>
+<tr><td>2</td><td>Детали услуги</td><td>Нажатие на карточку в каталоге</td><td><code>lib/features/catalog/presentation/service_details_screen.dart</code></td></tr>
+<tr><td>3</td><td>Форма записи</td><td>«Записаться» на экране деталей</td><td><code>lib/features/booking/presentation/booking_form_screen.dart</code></td></tr>
+<tr><td>4</td><td>Мои записи</td><td>Вкладка «Записи»</td><td><code>lib/features/booking/presentation/bookings_screen.dart</code></td></tr>
+<tr><td>5</td><td>Профиль</td><td>Вкладка «Профиль»</td><td><code>lib/features/profile/presentation/profile_screen.dart</code></td></tr>
+<tr><td>6</td><td>Welcome</td><td>Запуск приложения</td><td><code>lib/features/welcome/welcome_screen.dart</code></td></tr>
+<tr><td>7</td><td>Диагностика</td><td>Профиль → «Диагностика»</td><td><code>lib/features/diagnostics/presentation/diagnostics_screen.dart</code></td></tr>
+<tr><td>8</td><td>Gesture Lab</td><td>Профиль → «Gesture Lab»</td><td>реализуется в рамках лабораторной №3</td></tr>
+<tr><td>9</td><td>Ввод талона</td><td>Профиль → «Ввод талона»</td><td>реализуется в рамках лабораторной №3</td></tr>
+</tbody>
+</table></div>
+
+<h2>Навигация</h2>
+<pre><code>WelcomeScreen
+  └─ pushReplacement → HomeShell (Scaffold + NavigationBar + IndexedStack)
+        ├─ [0] CatalogScreen ── push → ServiceDetailsScreen(service)
+        │                                   └─ push → BookingFormScreen(service)
+        │                                          └─ после подтверждения: popUntil(first) + вкладка «Записи»
+        ├─ [1] BookingsScreen (TabBar: Активные / Отменённые)
+        └─ [2] ProfileScreen ── pushNamed → /diagnostics</code></pre>
+<ul>
+<li><strong>NavigationBar</strong> (Material 3) переключает три вкладки. Тела вкладок лежат в <code>IndexedStack</code>, поэтому текст поиска, выбранная категория и прокрутка сохраняются при переключении.</li>
+<li><strong>Один Scaffold на оболочку.</strong> Вкладки не создают собственный <code>Scaffold</code>: у каталога и профиля <code>SliverAppBar</code>, у записей — <code>NestedScrollView</code> со <code>SliverAppBar</code> и <code>TabBar</code>. SnackBar показывается над нижней навигацией.</li>
+<li><strong>Системная кнопка Back.</strong> На вкладках «Записи» и «Профиль» Back сначала возвращает на «Услуги» (<code>PopScope</code>), на «Услугах» — закрывает приложение. На вложенных экранах Back закрывает экран.</li>
+<li><strong>Маршруты</strong> описаны в <code>lib/app/routes.dart</code>. Экраны без параметров — именованные маршруты. Экраны с данными получают объект через типизированную фабрику: <code>AppRoutes.serviceDetails(service)</code> создаёт <code>ServiceDetailsScreen(service: service)</code>. Объект <code>Service</code> передаётся через конструктор, без повторного поиска по id.</li>
+</ul>
+
+<h2>Элементы интерфейса и ввод данных</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Элемент</th><th>Где используется</th></tr></thead>
+<tbody>
+<tr><td><code>TextField</code> с очисткой</td><td>Поиск в каталоге: иконка «×» появляется, когда есть текст</td></tr>
+<tr><td><code>FilterChip</code>, <code>ChoiceChip</code></td><td>Категории в каталоге и на welcome, временные слоты</td></tr>
+<tr><td><code>SliverList</code>, <code>ListView</code></td><td>Каталог, «Мои записи», журнал диагностики</td></tr>
+<tr><td>Переиспользуемая карточка</td><td><code>ServiceCard</code> в каталоге, <code>BookingTile</code> в записях</td></tr>
+<tr><td><code>TextFormField</code> с валидатором</td><td>Комментарий к записи, не длиннее 200 символов</td></tr>
+<tr><td><code>AlertDialog</code></td><td>Подтверждение записи и подтверждение отмены</td></tr>
+<tr><td><code>SnackBar</code></td><td>Успешная запись, отмена, очистка журнала, ошибка занятого слота</td></tr>
+<tr><td><code>showModalBottomSheet</code></td><td>Детали записи (tap) и меню действий (long press)</td></tr>
+<tr><td><code>TabBar</code> / <code>TabBarView</code></td><td>Активные и отменённые записи</td></tr>
+<tr><td><code>Dismissible</code></td><td>Свайп влево для запроса отмены</td></tr>
+<tr><td><code>SwitchListTile</code></td><td>Тёмная тема и демо-уведомления в профиле</td></tr>
+</tbody>
+</table></div>
+
+<h2>Каталог</h2>
+<p>Фильтрация — чистая функция <code>filterServices</code> в доменном слое. Поиск не зависит от регистра, игнорирует пробелы по краям и считает «ё» и «е» одной буквой:</p>
+<pre><code>String normalizeSearchText(String value) =&gt;
+    value.trim().toLowerCase().replaceAll('ё', 'е');</code></pre>
+<p>Если ничего не найдено, показывается empty state с кнопкой «Сбросить фильтры».</p>
+
+<h2>Форма записи и валидация</h2>
+<ol>
+<li>Пользователь выбирает специалиста. Если у услуги один специалист, он выбран сразу.</li>
+<li>Дата выбирается в ленте из 14 дней, по умолчанию — сегодня.</li>
+<li>Слоты загружаются через <code>BookingsController.fetchTimeSlots</code>. Занятые слоты зачёркнуты и отключены: их нельзя выбрать.</li>
+<li>Комментарий необязателен. Если он длиннее 200 символов, под полем появляется ошибка.</li>
+<li>Пока данных не хватает, кнопка «Продолжить» отключена, а над ней написано, чего не хватает: «Чтобы продолжить, выберите: специалиста, время».</li>
+<li>Кнопка открывает <code>AlertDialog</code> с итоговыми данными. «Изменить» закрывает диалог без сохранения, «Подтвердить» создаёт запись через репозиторий.</li>
+<li>После успеха пользователь попадает на вкладку «Записи» и видит SnackBar «Вы записаны: …». Если время успели занять, показывается сообщение и расписание перезагружается.</li>
+</ol>
+<p>Правила формы вынесены в класс <code>BookingDraft</code> и проверяются unit-тестами без виджетов. Например, смена специалиста или даты сбрасывает выбранное время, потому что старый слот может отсутствовать в новом расписании.</p>
+
+<h2>Мои записи: списки, вкладки и свайпы</h2>
+<ul>
+<li><strong>Сортировка:</strong> активные — от ближайшей к дальней, отменённые — от последней.</li>
+<li><strong>Tap</strong> открывает нижнюю панель с деталями.</li>
+<li><strong>Long press</strong> открывает меню действий: «Подробнее» и «Отменить запись».</li>
+<li><strong>Swipe влево</strong> показывает красный фон «Отменить» и диалог подтверждения.</li>
+</ul>
+<p>Мгновенного необратимого удаления нет. <code>confirmDismiss</code> всегда возвращает <code>false</code>:</p>
+<pre><code>confirmDismiss: (_) async {
+  await confirmCancel();   // диалог + отмена через контроллер
+  return false;            // Dismissible сам ничего не удаляет
+},</code></pre>
+<p>Если пользователь подтвердил отмену, контроллер меняет статус записи на <code>cancelled</code>, список перестраивается, и карточка переходит на вкладку «Отменённые». Если отказался, карточка возвращается на место. Так обходится известная проблема <code>Dismissible</code>: виджет нельзя оставлять в дереве после <code>onDismissed</code>, а асинхронное обновление данных не успело бы его убрать.</p>
+
+<h2>Состояние и данные</h2>
+<ul>
+<li><code>AppController</code> (<code>ChangeNotifier</code>) — тема, демо-уведомления, текущая вкладка.</li>
+<li><code>BookingsController</code> (<code>ChangeNotifier</code>) — общий список записей, загрузка, создание и отмена.</li>
+<li><code>BookingRepository</code> — контракт источника данных, сейчас реализован <code>InMemoryBookingRepository</code>.</li>
+<li>Экраны подписываются через <code>ListenableBuilder</code> и не изменяют общий список напрямую.</li>
+</ul>
+
+<h2>Адаптивность и доступность</h2>
+<ul>
+<li>На ширине больше 640 dp контент центрируется (<code>responsiveGutter</code>, <code>ResponsiveCenter</code>).</li>
+<li>Размеры не фиксируются по высоте: карточки и чипы растут при увеличенном шрифте. Тест <code>text_scale_test.dart</code> проверяет основные экраны при масштабе шрифта 2.0.</li>
+<li>Кнопки не ниже 48 dp, у карточек и слотов есть <code>Semantics</code> (занятый слот озвучивается как «14:00, Занято»).</li>
+<li>Тёмная тема генерируется из того же seed-цвета.</li>
+</ul>
+
+<h2>Сценарий демонстрации</h2>
+<ol>
+<li>Welcome → «Посмотреть услуги».</li>
+<li>В поиске набрать «СТРИЖ» — остаётся «Мужская стрижка». Набрать «луна» — empty state, «Сбросить фильтры».</li>
+<li>Открыть «Мужская стрижка» → «Записаться». Показать отключённую кнопку и подсказку.</li>
+<li>Выбрать специалиста, «Завтра», показать зачёркнутые слоты, выбрать свободное время.</li>
+<li>«Продолжить» → диалог → «Изменить» (ничего не создано) → снова «Продолжить» → «Подтвердить».</li>
+<li>Открылась вкладка «Записи» и SnackBar. Создать ещё одну запись на более раннюю дату — показать сортировку.</li>
+<li>Tap по записи — детали. Long press — меню действий.</li>
+<li>Свайп влево → «Не отменять» (запись осталась) → снова свайп → «Отменить запись». Показать вкладку «Отменённые».</li>
+<li>Профиль → включить тёмную тему.</li>
+</ol>
+
+<h2>Тесты</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Файл</th><th>Что проверяет</th></tr></thead>
+<tbody>
+<tr><td><code>test/features/catalog/service_filter_test.dart</code></td><td>Поиск без учёта регистра, «ё», категории</td></tr>
+<tr><td><code>test/features/catalog/catalog_screen_test.dart</code></td><td>Поиск, очистка, empty state, категории, открытие деталей</td></tr>
+<tr><td><code>test/features/catalog/service_details_screen_test.dart</code></td><td>Передача Service через конструктор, кнопка «Записаться»</td></tr>
+<tr><td><code>test/features/booking/booking_draft_test.dart</code></td><td>Правила валидации формы</td></tr>
+<tr><td><code>test/features/booking/in_memory_booking_repository_test.dart</code></td><td>Создание, пересечения, прошедшие слоты, отмена, пустое состояние</td></tr>
+<tr><td><code>test/features/booking/bookings_controller_test.dart</code></td><td>Загрузка, сортировка, перенос в отменённые</td></tr>
+<tr><td><code>test/features/booking/booking_form_screen_test.dart</code></td><td>Disabled-кнопка, занятый слот, ошибка комментария, диалог</td></tr>
+<tr><td><code>test/features/booking/bookings_screen_test.dart</code></td><td>Сортировка, свайп с отказом и подтверждением, tap и long press</td></tr>
+<tr><td><code>test/app/booking_flow_test.dart</code></td><td>Полный сценарий записи с SnackBar и записью в списке</td></tr>
+<tr><td><code>test/app/navigation_test.dart</code></td><td>NavigationBar и системная кнопка Back</td></tr>
+<tr><td><code>test/features/profile/profile_screen_test.dart</code></td><td>Тёмная тема, демо-уведомления, переход в диагностику</td></tr>
+</tbody>
+</table></div>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

@@ -21,6 +21,7 @@
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
 </ul>
 </nav>
 </aside>
@@ -43,6 +44,33 @@
 <tr><td>Очистка журнала и empty state</td><td>Кнопка в AppBar, <code>EmptyState</code></td><td><code>lib/features/diagnostics/presentation/diagnostics_screen.dart</code></td><td><code>test/features/diagnostics/diagnostics_screen_test.dart</code></td><td>Иконка корзины</td><td><span class="badge verified">Verified</span></td></tr>
 <tr><td>AppLifecycleListener: resumed, inactive, hidden, paused, detached</td><td><code>LifecycleLogger</code></td><td><code>lib/core/lifecycle/lifecycle_logger.dart</code></td><td><code>test/core/lifecycle/lifecycle_logger_test.dart</code></td><td>Home, Recents, закрытие свайпом</td><td><span class="badge verified">Verified</span></td></tr>
 <tr><td>Освобождение listener через dispose</td><td><code>LifecycleLogger.dispose()</code></td><td><code>lib/core/lifecycle/lifecycle_logger.dart</code></td><td><code>test/core/lifecycle/lifecycle_logger_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+</tbody>
+</table></div>
+
+<h2>Лабораторная №2</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Реализация</th><th>Файл</th><th>Тест</th><th>Демонстрация</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td>Каталог: поиск TextField, очистка</td><td><code>CatalogScreen</code></td><td><code>lib/features/catalog/presentation/catalog_screen.dart</code></td><td><code>test/features/catalog/catalog_screen_test.dart</code></td><td>ЛР2, шаг 2</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Фильтрация без учёта регистра (в т.ч. русский текст)</td><td><code>filterServices</code></td><td><code>lib/features/catalog/domain/service_filter.dart</code></td><td><code>test/features/catalog/service_filter_test.dart</code></td><td>Поиск «СТРИЖ»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Категории, переиспользуемые карточки, SliverList</td><td><code>CategoryFilterBar</code>, <code>ServiceCard</code></td><td><code>lib/features/catalog/presentation/widgets/</code></td><td><code>test/features/catalog/catalog_screen_test.dart</code></td><td>Каталог</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Empty state каталога</td><td><code>EmptyState</code></td><td><code>lib/core/widgets/empty_state.dart</code></td><td><code>test/features/catalog/catalog_screen_test.dart</code></td><td>Поиск «луна»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Детали услуги: графика, цена, длительность, описание, специалисты</td><td><code>ServiceDetailsScreen</code></td><td><code>lib/features/catalog/presentation/service_details_screen.dart</code></td><td><code>test/features/catalog/service_details_screen_test.dart</code></td><td>Нажатие на карточку</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Service передаётся через конструктор маршрута</td><td><code>AppRoutes.serviceDetails(service)</code></td><td><code>lib/app/routes.dart</code></td><td><code>test/app/booking_flow_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Форма: специалист, дата, время, комментарий</td><td><code>BookingFormScreen</code></td><td><code>lib/features/booking/presentation/booking_form_screen.dart</code></td><td><code>test/features/booking/booking_form_screen_test.dart</code></td><td>ЛР2, шаги 3–4</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Валидация, disabled-кнопка, сообщения об ошибках</td><td><code>BookingDraft</code>, <code>_SubmitBar</code></td><td><code>lib/features/booking/domain/booking_draft.dart</code></td><td><code>test/features/booking/booking_draft_test.dart</code>, <code>booking_form_screen_test.dart</code></td><td>Форма без специалиста</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Недоступный слот нельзя выбрать</td><td><code>TimeSlotChip</code>, <code>BookingDraftIssue.timeUnavailable</code></td><td><code>lib/core/widgets/time_slot_chip.dart</code></td><td><code>test/features/booking/booking_form_screen_test.dart</code></td><td>Зачёркнутые слоты</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>AlertDialog перед сохранением, отмена диалога</td><td><code>showBookingConfirmationDialog</code></td><td><code>lib/features/booking/presentation/widgets/booking_confirmation_dialog.dart</code></td><td><code>test/features/booking/booking_form_screen_test.dart</code></td><td>«Изменить» / «Подтвердить»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Создание Booking через repository</td><td><code>BookingRepository</code>, <code>InMemoryBookingRepository</code></td><td><code>lib/features/booking/data/in_memory_booking_repository.dart</code></td><td><code>test/features/booking/in_memory_booking_repository_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>SnackBar и переход к списку записей</td><td><code>AppRoutes._showBookingResult</code></td><td><code>lib/app/routes.dart</code></td><td><code>test/app/booking_flow_test.dart</code></td><td>После подтверждения</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Мои записи: сортировка, empty state</td><td><code>BookingsScreen</code>, <code>BookingsController</code></td><td><code>lib/features/booking/presentation/bookings_screen.dart</code></td><td><code>test/features/booking/bookings_screen_test.dart</code></td><td>Вкладка «Записи»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Tap — сведения, long press — меню действий</td><td><code>showBookingDetailsSheet</code>, <code>showBookingActionsSheet</code></td><td><code>lib/features/booking/presentation/widgets/booking_sheets.dart</code></td><td><code>test/features/booking/bookings_screen_test.dart</code></td><td>ЛР2, шаг 7</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Swipe влево только с подтверждением, без мгновенного удаления</td><td><code>Dismissible</code> + <code>showCancelBookingDialog</code></td><td><code>lib/features/booking/presentation/bookings_screen.dart</code></td><td><code>test/features/booking/bookings_screen_test.dart</code></td><td>ЛР2, шаг 8</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Вкладки (TabBar)</td><td>Активные / Отменённые</td><td><code>lib/features/booking/presentation/bookings_screen.dart</code></td><td><code>test/features/booking/bookings_screen_test.dart</code></td><td>«Отменённые»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Профиль: имя, тема, демо-уведомления, версия</td><td><code>ProfileScreen</code>, <code>AppController</code></td><td><code>lib/features/profile/presentation/profile_screen.dart</code></td><td><code>test/features/profile/profile_screen_test.dart</code></td><td>Вкладка «Профиль»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>NavigationBar, сохранение состояния вкладок</td><td><code>HomeShell</code> + <code>IndexedStack</code></td><td><code>lib/app/home_shell.dart</code></td><td><code>test/app/navigation_test.dart</code></td><td>Переключение вкладок</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Системная кнопка Back</td><td><code>PopScope</code> в <code>HomeShell</code></td><td><code>lib/app/home_shell.dart</code></td><td><code>test/app/navigation_test.dart</code>, <code>profile_screen_test.dart</code></td><td>Back на вкладке «Профиль»</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Увеличенный шрифт без overflow</td><td>Адаптивная вёрстка</td><td><code>lib/core/widgets/responsive.dart</code></td><td><code>test/app/text_scale_test.dart</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
 </tbody>
 </table></div>
 <footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
