@@ -14,11 +14,15 @@ class TemplatePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return CustomPaint(
-      painter: _TemplatePainter(
-        strokes: template.strokes,
-        color: colors.onSurface,
-        startColor: colors.primary,
+    // CustomPaint without a child takes its size from the constraints only;
+    // SizedBox.expand makes it fill the space given by the parent.
+    return SizedBox.expand(
+      child: CustomPaint(
+        painter: _TemplatePainter(
+          strokes: template.strokes,
+          color: colors.onSurface,
+          startColor: colors.primary,
+        ),
       ),
     );
   }

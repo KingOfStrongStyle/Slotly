@@ -448,8 +448,8 @@ class _TemplatesSheet extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: 56,
+                        SizedBox.square(
+                          dimension: 56,
                           child: TemplatePreview(template: template),
                         ),
                         Text(template.label, style: theme.textTheme.labelLarge),

@@ -7,6 +7,7 @@ import 'package:slotly/features/gesture_checkin/domain/gesture_classifier.dart';
 import 'package:slotly/features/gesture_checkin/domain/gesture_point.dart';
 import 'package:slotly/features/gesture_checkin/presentation/ticket_check_in_screen.dart';
 import 'package:slotly/features/gesture_checkin/presentation/widgets/gesture_pad.dart';
+import 'package:slotly/features/gesture_checkin/presentation/widgets/template_preview.dart';
 
 import '../../helpers/gesture_shapes.dart';
 import '../../helpers/test_app.dart';
@@ -155,5 +156,9 @@ void main() {
     for (final label in ['0', '5', '9', finishSymbol]) {
       expect(find.text(label), findsWidgets);
     }
+    final previews = find.byType(TemplatePreview);
+    expect(previews, findsNWidgets(symbolTemplates.length));
+    // A zero-sized canvas would draw every template as a single dot.
+    expect(tester.getSize(previews.first), const Size(56, 56));
   });
 }
