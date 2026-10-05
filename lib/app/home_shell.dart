@@ -39,6 +39,8 @@ class HomeShell extends StatelessWidget {
         appController: controller,
         onOpenDiagnostics: () =>
             Navigator.of(context).pushNamed(AppRoutes.diagnostics),
+        onOpenGestureLab: () =>
+            Navigator.of(context).pushNamed(AppRoutes.gestureLab),
       ),
     ];
 

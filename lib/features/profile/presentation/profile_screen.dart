@@ -13,10 +13,12 @@ class ProfileScreen extends StatelessWidget {
     super.key,
     required this.appController,
     required this.onOpenDiagnostics,
+    required this.onOpenGestureLab,
   });
 
   final AppController appController;
   final VoidCallback onOpenDiagnostics;
+  final VoidCallback onOpenGestureLab;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +60,13 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: const Text(AppStrings.profileDiagnosticsHint),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: onOpenDiagnostics,
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.gesture),
+                      title: const Text(AppStrings.gestureLabTitle),
+                      subtitle: const Text(AppStrings.gestureLabHint),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: onOpenGestureLab,
                     ),
                     const SectionTitle(AppStrings.profileAboutSection),
                     ListTile(

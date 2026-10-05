@@ -198,4 +198,54 @@ abstract final class AppStrings {
   static const cancelDialogConfirm = 'Отменить запись';
   static const bookingCancelled = 'Запись отменена';
   static const bookingCancelFailed = 'Не удалось отменить запись';
+
+  // Gesture Lab
+  static const gestureLabTitle = 'Gesture Lab';
+  static const gestureLabHint = 'Стандартные жесты Flutter';
+  static const gestureLabClearLog = 'Очистить журнал';
+  static const gestureLabLogTitle = 'Журнал жестов';
+  static const gestureLabLogEmpty =
+      'Выполните жест в зоне выше — событие появится здесь.';
+  static const gestureZoneTaps = 'Касания';
+  static const gestureZoneHorizontal = 'Горизонтальный drag';
+  static const gestureZoneVertical = 'Вертикальный drag';
+  static const gestureZoneScale = 'Pinch / масштаб';
+  static const gestureCardTitle = 'Демо-карточка';
+  static const gestureCardHint =
+      'Tap — выбрать, double tap — в избранное, long press — меню';
+  static const gestureCardSelected = 'Выбрана';
+  static const gestureCardNotSelected = 'Не выбрана';
+  static const gestureCardFavorite = 'В избранном';
+  static const gestureMenuTitle = 'Действия с карточкой';
+  static const gestureMenuSelect = 'Выбрать';
+  static const gestureMenuUnselect = 'Снять выбор';
+  static const gestureMenuFavorite = 'Добавить в избранное';
+  static const gestureMenuUnfavorite = 'Убрать из избранного';
+  static const gestureMenuReset = 'Сбросить состояние';
+  static const gestureHorizontalHint = 'Проведите пальцем влево или вправо';
+  static const gestureVerticalHint = 'Проведите пальцем вверх или вниз';
+  static const gestureScaleHint =
+      'Сведите или разведите два пальца. На эмуляторе: удерживайте Cmd '
+      '(macOS) или Ctrl и тяните мышью.';
+  static const gestureScaleReset = 'Сбросить масштаб';
+  static const gestureDirectionLeft = 'влево';
+  static const gestureDirectionRight = 'вправо';
+  static const gestureDirectionUp = 'вверх';
+  static const gestureDirectionDown = 'вниз';
+  static String gestureDirection(String direction) => 'Направление: $direction';
+  static String gestureVelocity(int value) => 'Скорость: $value dp/с';
+  static String gestureOffset(int value) => 'Смещение: $value dp';
+  static String gestureScale(String value) => 'Масштаб: $value×';
+  static const gestureLogTap = 'Tap: карточка выбрана';
+  static const gestureLogTapUnselect = 'Tap: выбор снят';
+  static const gestureLogDoubleTapOn = 'Double tap: добавлено в избранное';
+  static const gestureLogDoubleTapOff = 'Double tap: убрано из избранного';
+  static const gestureLogLongPress = 'Long press: открыто меню действий';
+  static String gestureLogMenuAction(String action) => 'Меню: $action';
+  static String gestureLogHorizontal(String direction, int velocity) =>
+      'Горизонтальный drag: $direction, $velocity dp/с';
+  static String gestureLogVertical(String direction, int distance) =>
+      'Вертикальный drag: $direction на $distance dp';
+  static String gestureLogScale(String scale) => 'Pinch: масштаб $scale×';
+  static const gestureLogScaleReset = 'Масштаб сброшен';
 }

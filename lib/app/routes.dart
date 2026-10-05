@@ -7,6 +7,7 @@ import '../features/booking/presentation/booking_form_screen.dart';
 import '../features/catalog/domain/service.dart';
 import '../features/catalog/presentation/service_details_screen.dart';
 import '../features/diagnostics/presentation/diagnostics_screen.dart';
+import '../features/gesture_lab/presentation/gesture_lab_screen.dart';
 import 'app_controller.dart';
 import 'app_scope.dart';
 import 'home_shell.dart';
@@ -21,10 +22,13 @@ import 'home_shell.dart';
 abstract final class AppRoutes {
   static const homeName = '/home';
   static const diagnostics = '/diagnostics';
+  static const gestureLab = '/gesture-lab';
 
   static Map<String, WidgetBuilder> get named => {
     diagnostics: (context) =>
         DiagnosticsScreen(logger: AppScope.of(context).lifecycleLogger),
+    gestureLab: (context) =>
+        GestureLabScreen(clock: AppScope.of(context).clock),
   };
 
   static Route<void> home({ServiceCategory? initialCategory}) {
