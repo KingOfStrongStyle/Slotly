@@ -14,32 +14,80 @@
 <nav aria-label="Разделы документации">
 <div class="nav-group">Начало</div><ul>
 <li><a href="index.html" aria-current="page">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
 <li><a href="environment.html">Окружение</a></li>
 </ul>
 <div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
 <li><a href="requirements-matrix.html">Матрица требований</a></li>
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html">Лабораторная №1</a></li>
 <li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
 <li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
 </ul>
 </nav>
 </aside>
 <main>
 <h1>Slotly: документация проекта</h1>
-<p class="lead">Учебный MVP мобильного сервиса онлайн-записи и электронной очереди для локального бизнеса на Flutter + Dart.</p>
+<p class="lead">Учебный MVP мобильного сервиса онлайн-записи и электронной очереди для локального бизнеса. Flutter + Dart, Android, Material 3.</p>
 
-<div class="cards">
-<div class="card"><h3><a href="lab-1.html">Лабораторная №1</a></h3><p>Первое Flutter-приложение, архитектура Android, жизненный цикл и экран диагностики.</p></div>
-<div class="card"><h3><a href="lab-2.html">Лабораторная №2</a></h3><p>Каталог, форма записи, диалоги, SnackBar, списки, вкладки и свайпы.</p></div>
-<div class="card"><h3><a href="lab-3.html">Лабораторная №3</a></h3><p>Gesture Lab, жесты в записях и рукописный ввод номера талона.</p></div>
-<div class="card"><h3><a href="requirements-matrix.html">Матрица требований</a></h3><p>Связь требований с кодом, тестами и демонстрацией.</p></div>
-<div class="card"><h3><a href="environment.html">Окружение</a></h3><p>Версии инструментов и подготовка рабочего места на macOS.</p></div>
+<div class="callout">
+<p><strong>Версия 0.1.0.</strong> Все проверки финальной сборки пройдены: формат, анализатор, 105 автоматических тестов, интеграционный тест на эмуляторе, debug- и release-сборка. Подробности — в разделе <a href="testing.html">«Тестирование»</a>.</p>
 </div>
 
-<h2>Как открыть документацию</h2>
-<p>Все страницы — обычные HTML-файлы без внешних зависимостей. Откройте <code>docs/index.html</code> в браузере двойным щелчком или командой <code>open docs/index.html</code>.</p>
+<h2>С чего начать</h2>
+<div class="cards">
+<div class="card"><h3><a href="project-overview.html">Обзор проекта</a></h3><p>Идея, цели, возможности, скриншоты реального приложения, учебный план.</p></div>
+<div class="card"><h3><a href="demo-scenario.html">Сценарий демонстрации</a></h3><p>Пошаговый показ всех лабораторных на эмуляторе.</p></div>
+<div class="card"><h3><a href="defense.html">Защита</a></h3><p>Выступление на 7–10 минут, передача слова, запасной план, вопросы.</p></div>
+<div class="card"><h3><a href="requirements-matrix.html">Матрица требований</a></h3><p>Каждое требование → файл, тест, демонстрация, статус.</p></div>
+</div>
+
+<h2>Лабораторные и самостоятельная работа</h2>
+<div class="cards">
+<div class="card"><h3><a href="lab-1.html">Лабораторная №1</a></h3><p>Первое приложение, архитектура Android, Flutter поверх Android, жизненный цикл, диагностика.</p></div>
+<div class="card"><h3><a href="lab-2.html">Лабораторная №2</a></h3><p>Каталог, форма записи, диалоги, SnackBar, списки, вкладки, свайпы, профиль.</p></div>
+<div class="card"><h3><a href="independent-work.html">Самостоятельная работа</a></h3><p>Интерактивный прототип из 8 фреймов, UI kit, SVG для Figma.</p></div>
+<div class="card"><h3><a href="lab-3.html">Лабораторная №3</a></h3><p>Gesture Lab, жесты в записях, рукописный ввод талона и алгоритм распознавания.</p></div>
+</div>
+
+<h2>Техническая документация</h2>
+<div class="cards">
+<div class="card"><h3><a href="architecture.html">Архитектура</a></h3><p>Структура, слои, потоки данных, состояние, зависимости, точки расширения.</p></div>
+<div class="card"><h3><a href="architecture-decisions.html">Архитектурные решения</a></h3><p>14 решений с контекстом и последствиями.</p></div>
+<div class="card"><h3><a href="environment.html">Окружение</a></h3><p>Версии инструментов и подготовка macOS с нуля.</p></div>
+<div class="card"><h3><a href="testing.html">Тестирование</a></h3><p>Результаты, покрытие, состав тестов, CI.</p></div>
+<div class="card"><h3><a href="future-roadmap.html">План развития</a></h3><p>Backend, роли, мультитенантность, уведомления, iOS, публикация.</p></div>
+</div>
+
+<h2>Команда</h2>
+<div class="cards">
+<div class="card"><h3><a href="team/kirill.html">Кирилл</a></h3><p>Каркас, навигация, lifecycle и диагностика, «Мои записи», CI и сборка.</p></div>
+<div class="card"><h3><a href="team/vlad.html">Влад</a></h3><p>Модели, репозиторий, форма записи, распознавание жестов, ввод талона.</p></div>
+<div class="card"><h3><a href="team/yan.html">Ян</a></h3><p>UI kit и прототип, welcome, каталог, детали, профиль, Gesture Lab.</p></div>
+</div>
+
+<h2>Быстрый старт</h2>
+<pre><code>flutter pub get
+flutter run                 # нужен запущенный эмулятор или телефон
+flutter test                # все unit-, widget- и golden-тесты
+open docs/index.html        # эта документация
+open design/prototype/index.html   # интерактивный прототип</code></pre>
+<p>Все страницы — обычные HTML-файлы без внешних зависимостей и CDN; их можно открыть двойным щелчком или распечатать (есть стили для печати).</p>
 <footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
 </main>
 </div>

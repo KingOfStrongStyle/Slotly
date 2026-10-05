@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ян: UI kit, экраны и Gesture Lab — Slotly</title>
+<link rel="stylesheet" href="../assets/docs.css">
+<link rel="icon" href="../assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="../index.html"><img src="../assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../project-overview.html">Обзор проекта</a></li>
+<li><a href="../environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="../architecture.html">Архитектура</a></li>
+<li><a href="../architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="../requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="../lab-1.html">Лабораторная №1</a></li>
+<li><a href="../lab-2.html">Лабораторная №2</a></li>
+<li><a href="../independent-work.html">Самостоятельная работа</a></li>
+<li><a href="../lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="../testing.html">Тестирование</a></li>
+<li><a href="../demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="../defense.html">Защита</a></li>
+<li><a href="../future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="../team/kirill.html">Кирилл</a></li>
+<li><a href="../team/vlad.html">Влад</a></li>
+<li><a href="../team/yan.html" aria-current="page">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Ян: UI kit, экраны и Gesture Lab</h1>
+<p class="lead">Персональная страница для изучения, проверки и защиты модуля. Описывает зону ответственности и сопровождения; авторство отдельных коммитов см. в Git-истории.</p>
+
+<h2>1. Зона ответственности</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Задача</th><th>Условные баллы</th></tr></thead>
+<tbody>
+<tr><td>UI kit и дизайн-прототип: токены, компоненты, 8 фреймов, кликабельный сценарий, файлы для Figma (самостоятельная работа)</td><td>5</td></tr>
+<tr><td>Экраны: welcome, каталог, детали услуги, профиль; общие виджеты, иллюстрации, логотип, тексты интерфейса</td><td>4</td></tr>
+<tr><td>Gesture Lab: зоны жестов, журнал, визуальная обратная связь</td><td>4</td></tr>
+<tr><td>Адаптивность, доступность, UX ошибок и пустых состояний; widget- и golden-тесты ключевых экранов</td><td>3</td></tr>
+<tr><td><strong>Итого</strong></td><td><strong>16</strong></td></tr>
+</tbody>
+</table></div>
+<p>Баллы — внутренняя оценка баланса трудоёмкости, а не прогноз оценки преподавателя.</p>
+
+<h2>2–3. Связанные файлы и их назначение</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Файл</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td><code>lib/core/app_strings.dart</code></td><td>Все тексты интерфейса на русском</td></tr>
+<tr><td><code>lib/core/widgets/empty_state.dart</code></td><td>Пустое состояние с иконкой, объяснением и действием</td></tr>
+<tr><td><code>lib/core/widgets/info_row.dart</code></td><td>Строка «иконка — подпись — значение»</td></tr>
+<tr><td><code>lib/core/widgets/section_title.dart</code></td><td>Заголовок секции (с семантикой header)</td></tr>
+<tr><td><code>lib/core/widgets/time_slot_chip.dart</code></td><td>Временной слот: доступен, выбран, занят</td></tr>
+<tr><td><code>lib/core/widgets/slotly_logo.dart</code></td><td>Логотип на <code>CustomPainter</code></td></tr>
+<tr><td><code>lib/core/widgets/responsive.dart</code></td><td>Центрирование контента на широких экранах</td></tr>
+<tr><td><code>lib/features/welcome/welcome_screen.dart</code></td><td>Welcome, выбор категории через <code>setState</code></td></tr>
+<tr><td><code>lib/features/catalog/presentation/catalog_screen.dart</code></td><td>Каталог: поиск, категории, список, empty state</td></tr>
+<tr><td><code>lib/features/catalog/presentation/service_details_screen.dart</code></td><td>Детали услуги</td></tr>
+<tr><td><code>lib/features/catalog/presentation/service_category_style.dart</code></td><td>Название и иконка категории (UI-слой)</td></tr>
+<tr><td><code>lib/features/catalog/presentation/widgets/service_card.dart</code>, <code>service_artwork.dart</code>, <code>category_filter_bar.dart</code></td><td>Карточка, иллюстрация услуги, лента чипов</td></tr>
+<tr><td><code>lib/features/profile/presentation/profile_screen.dart</code></td><td>Профиль, настройки, учебные инструменты, «О приложении»</td></tr>
+<tr><td><code>lib/features/gesture_lab/presentation/gesture_lab_screen.dart</code></td><td>Экран, вкладки зон, журнал</td></tr>
+<tr><td><code>lib/features/gesture_lab/presentation/zones/*.dart</code></td><td>Зоны: касания, горизонтальный и вертикальный drag, масштаб</td></tr>
+<tr><td><code>lib/features/gesture_lab/presentation/gesture_log.dart</code></td><td>Модель и список событий жестов</td></tr>
+<tr><td><code>design/</code></td><td>Прототип, UI kit, SVG для Figma, генератор</td></tr>
+<tr><td><code>test/goldens/</code>, <code>test/flutter_test_config.dart</code></td><td>Golden-тесты и сравнение эталонов с допуском</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. Архитектурный поток данных</h2>
+<pre><code>WelcomeScreen ─ setState(_selectedCategory) ─ onShowServices(category) ─► маршрут
+CatalogScreen(services, initialCategory, onServiceSelected)
+   ├─ TextField.onChanged ─ setState ─► filterServices(...) (domain, Влад)
+   ├─ CategoryFilterBar.onSelected ─ setState
+   └─ ServiceCard.onTap ─► onServiceSelected(service) ─► AppRoutes.serviceDetails(service)
+ProfileScreen(appController, onOpen…) ─ SwitchListTile ─► AppController.setDarkMode
+GestureLabScreen
+   └─ TapZone / HorizontalDragZone / VerticalDragZone / ScaleZone
+        ─ onEvent(kind, message) ─► _record ─ setState ─► GestureLogView</code></pre>
+<p>Экраны получают данные и действия через конструктор и не знают, откуда пришли данные и куда ведёт навигация.</p>
+
+<h2>5. Основные алгоритмы и решения</h2>
+<h3>Адаптивность</h3>
+<pre><code>double responsiveGutter(double width) =&gt;
+    math.max(AppSpacing.l, (width - AppSpacing.maxContentWidth) / 2);</code></pre>
+<p>На телефоне отступ 16 dp, на планшете контент центрируется колонкой 640 dp. Высоты не фиксируются, поэтому при шрифте ×2 текст переносится, а не обрезается (тест <code>text_scale_test.dart</code>).</p>
+<h3>Иллюстрация услуги</h3>
+<p><code>ServiceArtwork</code> рисует фон одного из трёх контейнерных цветов схемы и два-три полупрозрачных круга (вариант задаёт <code>Service.artworkVariant</code>), сверху — иконка категории. Без сетевых и сторонних изображений.</p>
+<h3>Gesture Lab и Gesture Arena</h3>
+<p>Каждая зона — отдельный <code>GestureDetector</code> без конфликтующих колбэков. Вкладки переключают <code>IndexedStack</code>, а не <code>TabBarView</code>, потому что <code>TabBarView</code> сам реагирует на горизонтальный свайп. Масштаб: <code>scale = clamp(scaleAtStart × details.scale, 0.5, 3.0)</code>; одиночный pan с масштабом 1 не логируется.</p>
+
+<h2>6. Как запустить модуль</h2>
+<pre><code>flutter run -d emulator-5554           # welcome, каталог, детали, профиль, Gesture Lab
+open design/prototype/index.html       # прототип
+python3 design/tools/build_prototype.py # пересобрать прототип и SVG</code></pre>
+
+<h2>7. Как проверить модуль</h2>
+<pre><code>flutter test test/features/catalog test/features/profile test/features/gesture_lab \
+  test/goldens test/app/text_scale_test.dart
+# намеренное обновление эталонов после изменения дизайна:
+flutter test --update-goldens test/goldens</code></pre>
+
+<h2>8. Тесты модуля</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Файл</th><th>Что проверяет</th></tr></thead>
+<tbody>
+<tr><td><code>test/features/catalog/catalog_screen_test.dart</code></td><td>Поиск, очистка, empty state, категории, открытие деталей</td></tr>
+<tr><td><code>test/features/catalog/service_details_screen_test.dart</code></td><td>Данные услуги из конструктора, «Записаться»</td></tr>
+<tr><td><code>test/features/profile/profile_screen_test.dart</code></td><td>Тёмная тема, уведомления, переходы в инструменты</td></tr>
+<tr><td><code>test/features/gesture_lab/gesture_lab_screen_test.dart</code></td><td>Tap, double tap, long press, drag, pinch, очистка журнала</td></tr>
+<tr><td><code>test/goldens/key_screens_golden_test.dart</code></td><td>Welcome, карточка услуги, empty state каталога, записи в тёмной теме</td></tr>
+<tr><td><code>test/app/text_scale_test.dart</code></td><td>Основные экраны без overflow при шрифте ×2</td></tr>
+</tbody>
+</table></div>
+
+<h2>9. Сценарий демонстрации</h2>
+<ol>
+<li>Прототип: пройти сценарий, включить кликабельные зоны, открыть UI kit.</li>
+<li>Приложение: welcome, каталог, поиск «СТРИЖ», пустой поиск, сброс, детали.</li>
+<li>Профиль: тёмная тема, «О Slotly».</li>
+<li>Gesture Lab: tap → double tap → long press → горизонтальный drag → вертикальный drag → pinch (Cmd/Ctrl + мышь) → журнал → очистка.</li>
+<li>Показать golden-эталоны в <code>test/goldens/goldens/</code> и объяснить тестовый шрифт.</li>
+</ol>
+
+<h2>10. Короткая защита (от первого лица)</h2>
+<div class="speech">
+<p>Я отвечаю за интерфейс. Сначала я сделал дизайн-прототип: восемь экранов основного сценария, переходы между ними и UI kit — цвета, шрифты, отступы и компоненты в состояниях: обычном, нажатом, отключённом и с ошибкой. Цвета взяты из той же Material 3 схемы, что и в приложении, поэтому прототип совпадает с реальными экранами — это видно на странице самостоятельной работы, где они стоят рядом.</p>
+<p>В приложении на мне welcome, каталог, детали и профиль. Каталог ищет без учёта регистра, а если ничего не нашлось — объясняет это и предлагает сбросить фильтры. Все тексты собраны в одном файле, чтобы потом подключить локализацию.</p>
+<p>Gesture Lab показывает шесть стандартных жестов. Я разделил их на зоны, потому что некоторые жесты на одном элементе конфликтуют в Gesture Arena, а Flutter вообще запрещает pan вместе со scale. Каждое действие сразу видно визуально и попадает в журнал.</p>
+</div>
+
+<h2>11. Вероятные вопросы преподавателя</h2>
+<ol>
+<li>Чем StatefulWidget отличается от StatelessWidget на примере welcome?</li>
+<li>Как реализована очистка поиска и empty state?</li>
+<li>Почему вкладки не создают свой Scaffold?</li>
+<li>Как интерфейс работает при увеличенном шрифте?</li>
+<li>Что такое Gesture Arena и почему жесты в разных зонах?</li>
+<li>Почему одиночный tap срабатывает с задержкой?</li>
+<li>Как сделан pinch и как показать его на эмуляторе?</li>
+<li>Как прототип связан с кодом приложения?</li>
+<li>Зачем golden-тесты и почему текст в них — прямоугольники?</li>
+<li>Как обеспечена доступность?</li>
+</ol>
+
+<h2>12. Краткие ответы</h2>
+<ol>
+<li>StatefulWidget хранит изменяемое состояние в объекте State; <code>setState</code> перестраивает виджет. Welcome хранит выбранную категорию.</li>
+<li>Иконка «×» появляется, когда в поле есть текст, и вызывает <code>clear()</code>; если <code>filterServices</code> вернул пустой список — <code>EmptyState</code> с кнопкой сброса.</li>
+<li>Оболочка — единственный Scaffold; вкладки используют <code>SliverAppBar</code>. Так SnackBar и навигация работают единообразно.</li>
+<li>Нет фиксированных высот, текст переносится; тест проверяет экраны при масштабе 2.0.</li>
+<li>Механизм выбора победителя среди распознавателей одного касания; pan+scale на одном детекторе запрещены, drag в двух направлениях конфликтуют.</li>
+<li>При наличии <code>onDoubleTap</code> фреймворк ждёт ~300 мс второго касания.</li>
+<li><code>onScaleStart/Update/End</code>, масштаб ограничен 0,5–3×. На эмуляторе — удерживать Cmd (macOS) или Ctrl и тянуть мышью.</li>
+<li>Генератор прототипа использует те же значения цветов, радиусов и отступов, что <code>AppTheme</code>; иллюстрации повторяют <code>ServiceArtwork</code>.</li>
+<li>Они ловят случайные изменения компоновки и цветов. Тестовый шрифт одинаков на всех ОС, поэтому эталоны стабильны.</li>
+<li>Касания ≥ 48 dp, <code>Semantics</code> у карточек, слотов и поля рисования, контраст Material 3, занятый слот озвучивается как «Занято».</li>
+</ol>
+
+<h2>13. Типичные ошибки</h2>
+<ul>
+<li>Фиксировать высоту карточки — при большом шрифте появится overflow.</li>
+<li>Использовать <code>TabBarView</code> вместе с горизонтальным drag.</li>
+<li>Задать pan и scale на одном <code>GestureDetector</code>.</li>
+<li><code>CustomPaint</code> без ребёнка в контейнере без размеров — холст получает нулевой размер (мы поймали это на миниатюрах шаблонов).</li>
+<li>Обновлять golden-эталоны, не посмотрев на изменения.</li>
+<li>Писать тексты прямо в виджетах вместо <code>AppStrings</code>.</li>
+</ul>
+
+<h2>14. Если демонстрация не работает</h2>
+<ul>
+<li>Pinch мышью не получается — показать widget-тест pinch и объяснить ограничение adb.</li>
+<li>Прототип не открывается кликом — открыть через браузер: <em>Файл → Открыть</em> → <code>design/prototype/index.html</code>.</li>
+<li>Golden-тест упал после изменения темы — посмотреть <code>test/goldens/failures/</code>, при намеренном изменении обновить эталоны.</li>
+</ul>
+
+<h2>15. Развитие модуля</h2>
+<ul>
+<li>Перенос UI kit в Figma с компонентами и вариантами, синхронизация токенов.</li>
+<li>Локализация через ARB, казахский и английский языки.</li>
+<li>Планшетная раскладка каталога в две колонки.</li>
+<li>Анимации переходов между карточкой и деталями (Hero) без перегрузки интерфейса.</li>
+</ul>
+
+<h2>16. Перед защитой прочитать и проверить</h2>
+<ul>
+<li>☐ Прочитать <code>catalog_screen.dart</code>, <code>welcome_screen.dart</code>, <code>gesture_lab_screen.dart</code> и зоны.</li>
+<li>☐ Открыть прототип и UI kit, пройти сценарий.</li>
+<li>☐ Прочитать <a href="../independent-work.html">самостоятельную работу</a>, раздел Gesture Lab в <a href="../lab-3.html">ЛР №3</a>, ADR-07, ADR-10, ADR-14.</li>
+<li>☐ Потренировать pinch мышью в эмуляторе.</li>
+<li>☐ Запустить тесты из раздела 7.</li>
+</ul>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сценарий демонстрации — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html" aria-current="page">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Сценарий демонстрации</h1>
+<p class="lead">Пошаговый показ всех требований на эмуляторе. Полный сценарий занимает около 10 минут; сокращённая версия для защиты — на странице <a href="defense.html">«Защита»</a>.</p>
+
+<h2>Подготовка (за 15 минут до показа)</h2>
+<ol>
+<li>Запустить эмулятор: <code>"$(brew --prefix)/share/android-commandlinetools/emulator/emulator" -avd slotly_api36</code> или из Android Studio (Device Manager).</li>
+<li>Проверить устройство: <code>flutter devices</code> — в списке есть <code>emulator-5554</code>.</li>
+<li>Из корня проекта: <code>flutter run</code>. Дождаться экрана Welcome.</li>
+<li>Во втором окне терминала открыть журнал: <code>adb logcat -s flutter</code>.</li>
+<li>Открыть в браузере <code>docs/index.html</code> и <code>design/prototype/index.html</code>.</li>
+<li>Убедиться, что в «Моих записях» пусто: при каждом запуске данные начинаются заново.</li>
+</ol>
+
+<h2>Лабораторная №1</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Шаг</th><th>Действие</th><th>Ожидаемый результат</th></tr></thead>
+<tbody>
+<tr><td>1.1</td><td>Показать Welcome</td><td>Логотип, «Slotly», «Запись на услуги без звонков», шесть категорий</td></tr>
+<tr><td>1.2</td><td>Нажать «Барбершоп», затем ещё раз</td><td>Чип выделяется и снимается, подпись под чипами меняется — это <code>setState</code></td></tr>
+<tr><td>1.3</td><td>Выбрать «Стоматология», нажать «Посмотреть услуги»</td><td>Открывается каталог с фильтром «Стоматология»</td></tr>
+<tr><td>1.4</td><td>Профиль → «Диагностика»</td><td>Текущее состояние <code>resumed</code>, событие #1</td></tr>
+<tr><td>1.5</td><td>Нажать Home, вернуться в приложение</td><td>В журнале <code>inactive</code>, <code>hidden</code>, <code>paused</code>, затем <code>hidden</code>, <code>inactive</code>, <code>resumed</code></td></tr>
+<tr><td>1.6</td><td>Открыть список недавних приложений прямо из Slotly и вернуться в него</td><td><code>inactive</code> (приложение видно в списке, но не получает ввод), затем <code>resumed</code></td></tr>
+<tr><td>1.7</td><td>Переключиться на «Настройки» Android и вернуться</td><td>Полная последовательность ухода и возврата, у каждого события номер и время</td></tr>
+<tr><td>1.8</td><td>Нажать иконку корзины</td><td>Журнал очищен, empty state, SnackBar «Журнал очищен»</td></tr>
+<tr><td>1.9</td><td>Закрыть приложение свайпом в недавних, запустить снова</td><td>В logcat перед закрытием — <code>paused</code> и <code>detached</code>; после запуска журнал снова с #1</td></tr>
+</tbody>
+</table></div>
+
+<h2>Лабораторная №2</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Шаг</th><th>Действие</th><th>Ожидаемый результат</th></tr></thead>
+<tbody>
+<tr><td>2.1</td><td>Welcome → «Посмотреть услуги» без категории</td><td>Каталог, «Найдено: 11»</td></tr>
+<tr><td>2.2</td><td>В поиске набрать «СТРИЖ»</td><td>Одна карточка «Мужская стрижка» (регистр не важен)</td></tr>
+<tr><td>2.3</td><td>Набрать «луна»</td><td>«Ничего не найдено», кнопка «Сбросить фильтры»</td></tr>
+<tr><td>2.4</td><td>«Сбросить фильтры», нажать «Мужская стрижка»</td><td>Детали: иллюстрация, цена, длительность, описание, два специалиста</td></tr>
+<tr><td>2.5</td><td>«Записаться»</td><td>Кнопка «Продолжить» отключена, подсказка «выберите: специалиста, время»</td></tr>
+<tr><td>2.6</td><td>Выбрать «Арман С.», «Завтра»</td><td>Слоты загружены, занятые зачёркнуты; нажатие на занятый ничего не делает</td></tr>
+<tr><td>2.7</td><td>Выбрать свободное время, набрать комментарий длиннее 200 символов (можно вставить)</td><td>Ошибка под полем, кнопка снова отключена; сократить комментарий</td></tr>
+<tr><td>2.8</td><td>«Продолжить» → «Изменить»</td><td>Диалог закрылся, запись не создана</td></tr>
+<tr><td>2.9</td><td>«Продолжить» → «Подтвердить»</td><td>Вкладка «Записи», SnackBar «Вы записаны…»</td></tr>
+<tr><td>2.10</td><td>Записаться на другую услугу на более раннее время</td><td>Список отсортирован по дате</td></tr>
+<tr><td>2.11</td><td>Нажать на запись; долго нажать на запись</td><td>Нижняя панель с деталями; меню «Подробнее / Отменить запись»</td></tr>
+<tr><td>2.12</td><td>Свайп влево → «Не отменять»</td><td>Карточка вернулась на место</td></tr>
+<tr><td>2.13</td><td>Свайп влево → «Отменить запись»</td><td>SnackBar «Запись отменена», запись на вкладке «Отменённые» с пометкой</td></tr>
+<tr><td>2.14</td><td>Профиль → «Тёмная тема»</td><td>Всё приложение в тёмной схеме</td></tr>
+<tr><td>2.15</td><td>На вкладке «Профиль» нажать системную Back</td><td>Возврат на «Услуги», приложение не закрылось</td></tr>
+</tbody>
+</table></div>
+
+<h2>Самостоятельная работа</h2>
+<ol>
+<li>Открыть <code>design/prototype/index.html</code>, пройти сценарий от Welcome до «Моих записей».</li>
+<li>Включить «Показать кликабельные зоны», затем «Все 8 фреймов».</li>
+<li>Открыть <code>ui-kit.html</code>: цвета, состояния кнопки и поля, правила.</li>
+<li>Показать папку <code>design/figma-import/</code> и инструкцию импорта.</li>
+<li>Сравнить фрейм «Специалист и время» со скриншотом формы на странице <a href="independent-work.html">самостоятельной работы</a>.</li>
+</ol>
+
+<h2>Лабораторная №3</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Шаг</th><th>Действие</th><th>Ожидаемый результат</th></tr></thead>
+<tbody>
+<tr><td>3.1</td><td>Профиль → Gesture Lab, нажать на карточку</td><td>Через ~0,3 с рамка выделения и запись «Tap» в журнале</td></tr>
+<tr><td>3.2</td><td>Double tap</td><td>Сердце заполнено, «Double tap: добавлено в избранное»</td></tr>
+<tr><td>3.3</td><td>Long press</td><td>Меню действий; выбрать пункт — запись в журнале</td></tr>
+<tr><td>3.4</td><td>Вкладка «Горизонтальный drag», провести вправо, затем быстро влево</td><td>Направление и скорость в dp/с</td></tr>
+<tr><td>3.5</td><td>«Вертикальный drag», провести вниз</td><td>Смещение в dp</td></tr>
+<tr><td>3.6</td><td>«Pinch / масштаб»: удерживая Cmd (macOS) / Ctrl, тянуть мышью в окне эмулятора</td><td>Логотип масштабируется 0,5×–3×, «Pinch: масштаб …» в журнале</td></tr>
+<tr><td>3.7</td><td>Профиль → «Ввод талона» → «?»</td><td>Подсказка с 13 шаблонами 0–9 и S</td></tr>
+<tr><td>3.8</td><td>Нарисовать горизонтальную черту, «Распознать»</td><td>«Жест не распознан…», красная рамка</td></tr>
+<tr><td>3.9</td><td>«Очистить поле»; нарисовать «1», «Распознать»; «7», «Распознать»</td><td>Номер «17», уверенность в процентах</td></tr>
+<tr><td>3.10</td><td>Нарисовать «S», «Распознать»</td><td>«Талон 17 найден», демо-клиент, услуга, двое впереди</td></tr>
+<tr><td>3.11</td><td>«Новый ввод»: «9», «9», «S»</td><td>«Талон 99 не найден»</td></tr>
+</tbody>
+</table></div>
+
+<h2>Проверка качества в терминале</h2>
+<pre><code>dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+flutter test integration_test -d emulator-5554
+flutter build apk --debug</code></pre>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

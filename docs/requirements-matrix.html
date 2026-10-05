@@ -14,15 +14,30 @@
 <nav aria-label="Разделы документации">
 <div class="nav-group">Начало</div><ul>
 <li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
 <li><a href="environment.html">Окружение</a></li>
 </ul>
 <div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
 <li><a href="requirements-matrix.html" aria-current="page">Матрица требований</a></li>
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html">Лабораторная №1</a></li>
 <li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
 <li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
 </ul>
 </nav>
 </aside>
@@ -95,6 +110,41 @@
 <tr><td>Цифра добавляется к номеру, S завершает ввод</td><td><code>TicketEntry</code></td><td><code>lib/features/gesture_checkin/domain/ticket_entry.dart</code></td><td><code>test/features/gesture_checkin/ticket_entry_test.dart</code></td><td>ЛР3, шаг 9; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
 <tr><td>Проверка номера через MockTicketRepository; найденный и неизвестный талон</td><td><code>MockTicketRepository</code></td><td><code>lib/features/gesture_checkin/data/mock_ticket_repository.dart</code></td><td><code>test/features/gesture_checkin/ticket_check_in_screen_test.dart</code></td><td>ЛР3, шаги 9–10; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
 <tr><td>Низкая уверенность — «Жест не распознан», повтор</td><td>Состояние ошибки <code>GesturePad</code></td><td><code>lib/features/gesture_checkin/presentation/ticket_check_in_screen.dart</code></td><td><code>test/features/gesture_checkin/ticket_check_in_screen_test.dart</code></td><td>ЛР3, шаг 8; эмулятор</td><td><span class="badge verified">Verified</span></td></tr>
+</tbody>
+</table></div>
+
+<h2>Самостоятельная работа</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Реализация</th><th>Файл</th><th>Тест / проверка</th><th>Демонстрация</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td>8 состояний прототипа</td><td>SVG-фреймы и HTML-прототип</td><td><code>design/prototype/index.html</code>, <code>design/figma-import/frames/</code></td><td>Скрипт проверки графа переходов: 8/8 фреймов достижимы</td><td><a href="independent-work.html">Самостоятельная работа</a></td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Кликабельный основной сценарий</td><td>Hotspots + JS-навигация</td><td><code>design/prototype/index.html</code></td><td>Каждый переход основного сценария имеет кликабельную зону</td><td>Прототип в браузере</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Состояния default, pressed, disabled, error</td><td>Компоненты UI kit и живые HTML-примеры</td><td><code>design/prototype/ui-kit.html</code>, <code>design/figma-import/components/</code></td><td>Просмотр растеризованных SVG</td><td>UI kit</td><td><span class="badge implemented">Implemented</span></td></tr>
+<tr><td>Светлая схема, типографика, отступы, радиусы, иконки, правила</td><td>UI kit</td><td><code>design/prototype/ui-kit.html</code>, <code>design/README.md</code></td><td>Значения сверены с <code>ColorScheme.fromSeed</code></td><td>UI kit</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Карточка услуги, временной слот, нижняя навигация</td><td>SVG-компоненты</td><td><code>design/figma-import/components/</code></td><td>—</td><td>UI kit</td><td><span class="badge implemented">Implemented</span></td></tr>
+<tr><td>SVG для Figma и инструкция импорта</td><td>8 фреймов + 6 компонентов</td><td><code>design/figma-import/README.md</code></td><td>XML-валидация всех SVG (<code>xmllint</code>)</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Реальный Figma-проект</td><td>Не создавался: доступа к Figma не было</td><td>—</td><td>—</td><td>—</td><td><span class="badge blocked">Blocked</span></td></tr>
+<tr><td>Прототип соответствует приложению</td><td>Общие токены, сравнение со скриншотами</td><td><code>design/tools/build_prototype.py</code></td><td>Визуальное сравнение</td><td><a href="independent-work.html">таблица сравнения</a></td><td><span class="badge verified">Verified</span></td></tr>
+</tbody>
+</table></div>
+
+<h2>Качество, документация и поставка</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Реализация</th><th>Файл</th><th>Тест / проверка</th><th>Демонстрация</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td>Unit-, widget-, golden-тесты проходят</td><td>105 тестов</td><td><code>test/</code></td><td><code>flutter test</code>: 105 passed</td><td><a href="testing.html">Тестирование</a></td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Покрытие domain и data ≥ 80 %</td><td>—</td><td><code>tool/coverage_summary.dart</code></td><td>92,8 %</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Integration test</td><td>Сценарий записи</td><td><code>integration_test/app_test.dart</code></td><td>Пройден на эмуляторе API 36</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>analyze без ошибок, формат</td><td>Строгие lint-правила</td><td><code>analysis_options.yaml</code></td><td>No issues found; 0 изменений формата</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Debug APK собирается</td><td>—</td><td><code>android/</code></td><td><code>flutter build apk --debug</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Release APK</td><td>Подпись debug-ключом шаблона</td><td><code>android/app/build.gradle.kts</code></td><td><code>flutter build apk --release</code>, запуск на эмуляторе</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Нет исключений, overflow, setState after dispose</td><td>—</td><td>—</td><td>Ручной прогон с логом <code>flutter run</code></td><td><a href="demo-scenario.html">Сценарий</a></td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>GitHub Actions</td><td>Формат, анализ, тесты, APK</td><td><code>.github/workflows/flutter-ci.yml</code></td><td>YAML валиден; на GitHub ещё не запускался</td><td>—</td><td><span class="badge partial">Partially verified</span></td></tr>
+<tr><td>HTML-документация открывается локально, ссылки работают</td><td>16 обязательных страниц + самостоятельная работа</td><td><code>docs/</code></td><td>Скрипт проверки внутренних ссылок и изображений</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Скриншоты реального приложения</td><td>18 скриншотов</td><td><code>docs/assets/screenshots/</code></td><td>Сняты с эмулятора через <code>adb screencap</code></td><td><a href="project-overview.html">Обзор</a></td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Нет секретов, keystore, local.properties, абсолютных путей</td><td><code>.gitignore</code></td><td>—</td><td>Поиск по рабочему дереву и истории Git</td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Теги этапов</td><td><code>lab-1</code>, <code>lab-2</code>, <code>lab-3</code>, <code>v0.1.0</code></td><td>—</td><td><code>git tag -n</code></td><td>—</td><td><span class="badge verified">Verified</span></td></tr>
+<tr><td>Публикация в GitHub (private)</td><td>—</td><td>—</td><td>Требует авторизации GitHub CLI владельцем</td><td>—</td><td><span class="badge blocked">Blocked</span></td></tr>
 </tbody>
 </table></div>
 <footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>

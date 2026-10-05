@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>План развития — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html" aria-current="page">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>План развития</h1>
+<p class="lead">Что нужно, чтобы учебный MVP стал коммерческим продуктом, и какие текущие границы модулей это позволяют. Ничего из перечисленного в MVP не реализовано.</p>
+
+<h2>Этап 1. Backend и данные</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Направление</th><th>Решение</th><th>Опора в текущем коде</th></tr></thead>
+<tbody>
+<tr><td>API</td><td>Django + Django REST Framework, версия API в URL (<code>/api/v1/</code>), OpenAPI-схема через drf-spectacular</td><td>Контракты <code>BookingRepository</code>, <code>TicketRepository</code></td></tr>
+<tr><td>База данных</td><td>PostgreSQL; таблицы <code>business</code>, <code>service</code>, <code>specialist</code>, <code>schedule_rule</code>, <code>booking</code>, <code>ticket</code></td><td>Поля моделей <code>Service</code>, <code>Booking</code>, <code>Ticket</code></td></tr>
+<tr><td>Защита от двойной записи</td><td>Уникальное ограничение / exclusion constraint на интервал специалиста в PostgreSQL, ответ <code>409 Conflict</code></td><td><code>SlotUnavailableException</code> уже обрабатывается формой</td></tr>
+<tr><td>Расписание сотрудников</td><td>Правила рабочего времени, перерывы, отпуска; слоты считает сервер</td><td>Метод <code>fetchTimeSlots</code>; <code>DemoSchedule</code> заменяется ответом API</td></tr>
+</tbody>
+</table></div>
+
+<h3>Набросок API-контракта</h3>
+<pre><code>GET  /api/v1/businesses/{id}/services/                 → [Service]
+GET  /api/v1/services/{id}/slots/?specialist=&amp;date=     → [{start_at, is_available}]
+GET  /api/v1/me/bookings/                               → [Booking]
+POST /api/v1/me/bookings/  {service_id, specialist_id, start_at, comment}
+                                                        → 201 Booking | 409 slot_unavailable
+POST /api/v1/me/bookings/{id}/cancel/                   → 200 Booking (status=cancelled)
+GET  /api/v1/queue/tickets/{number}/                    → 200 Ticket | 404</code></pre>
+
+<h3>Миграция InMemoryBookingRepository на HTTP</h3>
+<ol>
+<li>Добавить пакет <code>http</code> (или <code>dio</code>, если понадобятся интерсепторы авторизации).</li>
+<li>Создать <code>lib/features/booking/data/http_booking_repository.dart</code>: <code>class HttpBookingRepository implements BookingRepository</code>.</li>
+<li>Добавить преобразование JSON ↔ модели (<code>fromJson</code>/<code>toJson</code> рядом с DTO в <code>data/</code>, доменные модели остаются чистыми).</li>
+<li>Преобразовать ответы API в доменные исключения: 409 → <code>SlotUnavailableException</code>, 404 → <code>BookingNotFoundException</code>.</li>
+<li>В <code>AppDependencies</code> добавить фабрику <code>AppDependencies.production(apiBaseUrl)</code>; демо-фабрику оставить для тестов и демонстраций.</li>
+<li>Экраны, <code>BookingsController</code> и тесты экранов не меняются; добавляются тесты HTTP-слоя с подменённым клиентом.</li>
+</ol>
+
+<h2>Этап 2. Пользователи и бизнесы</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Направление</th><th>Решение</th><th>Опора в текущем коде</th></tr></thead>
+<tbody>
+<tr><td>Роли</td><td>Клиент (запись), сотрудник (своё расписание, отметка визита), владелец (услуги, сотрудники, настройки)</td><td>Отдельные модули в <code>features/</code>; клиентская часть уже выделена</td></tr>
+<tr><td>Авторизация</td><td>Вход по телефону с одноразовым кодом, токены (JWT или сессионные), хранение токена в защищённом хранилище</td><td>Демо-профиль в <code>ProfileScreen</code> заменяется данными пользователя</td></tr>
+<tr><td>Мультитенантность</td><td>Каждая запись в БД принадлежит <code>business_id</code>; изоляция на уровне запросов DRF и проверка прав; при росте — PostgreSQL Row Level Security</td><td>Репозитории принимают контекст бизнеса без изменения экранов</td></tr>
+<tr><td>Подписка для бизнеса</td><td>Тарифы по числу сотрудников, пробный период, биллинг на стороне сервера</td><td>Не затрагивает клиентское приложение</td></tr>
+</tbody>
+</table></div>
+
+<h2>Этап 3. Удобство клиента</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Направление</th><th>Решение</th><th>Опора в текущем коде</th></tr></thead>
+<tbody>
+<tr><td>Напоминания и push</td><td>Firebase Cloud Messaging или аналог; напоминание за час и за сутки, отправка с сервера</td><td>Переключатель «Демо-уведомления» в <code>AppController</code></td></tr>
+<tr><td>Календари</td><td>Добавление записи в календарь устройства, экспорт .ics</td><td><code>Booking.startAt</code>, <code>endAt</code></td></tr>
+<tr><td>Перенос записи</td><td>Новое действие в меню long press</td><td><code>showBookingActionsSheet</code>, <code>BookingAction</code></td></tr>
+<tr><td>Офлайн-режим</td><td>Локальный кэш (SQLite/drift), очередь отложенных операций, синхронизация при появлении сети, разрешение конфликтов сервером</td><td>Репозиторий скрывает источник данных от экранов</td></tr>
+<tr><td>Локализация</td><td>ARB-файлы, <code>flutter gen-l10n</code>, казахский и английский языки</td><td>Все строки в <code>AppStrings</code></td></tr>
+<tr><td>Распознавание талона</td><td>Пользовательские шаблоны, больше вариантов написания; при необходимости — компактная модель на устройстве</td><td><code>GestureClassifier</code> принимает любой список шаблонов</td></tr>
+</tbody>
+</table></div>
+
+<h2>Этап 4. Бизнес-инструменты</h2>
+<ul>
+<li>Аналитика загрузки: заполненность слотов по дням и сотрудникам, отмены, повторные визиты — на сервере, отдельный веб-кабинет владельца.</li>
+<li>Электронная очередь на месте: экран вызова талонов на планшете, статусы <code>waiting → called → completed</code> уже есть в <code>TicketStatus</code>.</li>
+</ul>
+
+<h2>Этап 5. Платформы и поставка</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Направление</th><th>Решение</th></tr></thead>
+<tbody>
+<tr><td>iOS</td><td><code>flutter create --platforms ios .</code>, Xcode, подпись, проверка жестов и lifecycle на iOS (там свои переходы состояний)</td></tr>
+<tr><td>Release-подпись Android</td><td>Keystore вне репозитория, параметры через секреты CI, <code>key.properties</code> уже в <code>.gitignore</code></td></tr>
+<tr><td>CI/CD публикации</td><td>Сборка AAB в GitHub Actions по тегу, загрузка во внутреннее тестирование Google Play (fastlane или Gradle Play Publisher)</td></tr>
+<tr><td>Мониторинг</td><td>Сбор крашей и логов, чтобы видеть ошибки у реальных пользователей</td></tr>
+<tr><td>Flavors</td><td>Окружения dev / staging / prod с разными API</td></tr>
+</tbody>
+</table></div>
+
+<h2>Какие границы модулей это позволяют</h2>
+<ul>
+<li><strong>Репозитории</strong> отделяют экраны от источника данных — backend подключается без переписывания UI.</li>
+<li><strong>Доменные модели и правила</strong> (<code>BookingDraft</code>, <code>TicketEntry</code>, <code>GestureClassifier</code>) не зависят от Flutter и переиспользуются при любых изменениях интерфейса.</li>
+<li><strong>AppDependencies</strong> — одно место выбора реализаций для разных окружений.</li>
+<li><strong>Feature-first папки</strong> позволяют добавлять роли сотрудника и владельца как новые модули.</li>
+<li><strong>AppStrings</strong> и Material 3 тема из одного seed-цвета упрощают локализацию и брендирование под конкретный бизнес.</li>
+</ul>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

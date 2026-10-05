@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тестирование — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html" aria-current="page">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Тестирование</h1>
+<p class="lead">Какие проверки есть, как их запускать и какие результаты получены при финальной проверке MVP.</p>
+
+<h2>Результаты финальной проверки</h2>
+<p>Выполнено 5 октября 2026 года на macOS 15.6, Flutter 3.47.6, эмулятор Android 16 (API 36).</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Проверка</th><th>Команда</th><th>Результат</th></tr></thead>
+<tbody>
+<tr><td>Форматирование</td><td><code>dart format --output=none --set-exit-if-changed .</code></td><td><span class="badge verified">OK</span> 92 файла, 0 изменений</td></tr>
+<tr><td>Статический анализ</td><td><code>flutter analyze</code></td><td><span class="badge verified">OK</span> No issues found</td></tr>
+<tr><td>Unit, widget и golden</td><td><code>flutter test</code></td><td><span class="badge verified">OK</span> 105 тестов прошли за 7,8 с (вместе с компиляцией)</td></tr>
+<tr><td>Golden</td><td><code>flutter test test/goldens</code></td><td><span class="badge verified">OK</span> 4 из 4</td></tr>
+<tr><td>Покрытие</td><td><code>flutter test --coverage</code> + <code>dart run tool/coverage_summary.dart</code></td><td><span class="badge verified">OK</span> см. таблицу ниже</td></tr>
+<tr><td>Интеграционный тест</td><td><code>flutter test integration_test -d emulator-5554</code></td><td><span class="badge verified">OK</span> 1 из 1 на эмуляторе API 36</td></tr>
+<tr><td>Debug APK</td><td><code>flutter build apk --debug</code></td><td><span class="badge verified">OK</span> <code>build/app/outputs/flutter-apk/app-debug.apk</code></td></tr>
+<tr><td>Release APK</td><td><code>flutter build apk --release</code></td><td><span class="badge verified">OK</span> 52,9 МБ, установлен и запущен на эмуляторе. Подписан debug-ключом из шаблона Flutter, для публикации не предназначен</td></tr>
+<tr><td>Ручной прогон</td><td><code>flutter run</code> + сценарий из <a href="demo-scenario.html">демонстрации</a></td><td><span class="badge verified">OK</span> в консоли нет исключений, overflow и <code>setState() called after dispose</code></td></tr>
+<tr><td>CI на GitHub</td><td><code>.github/workflows/flutter-ci.yml</code></td><td><span class="badge partial">Не запускался</span> — запустится после первой публикации репозитория</td></tr>
+</tbody>
+</table></div>
+
+<h2>Покрытие кода</h2>
+<p>Фактический вывод <code>tool/coverage_summary.dart</code> (строки, <code>coverage/lcov.info</code>):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Слой</th><th>Покрытие</th><th>Строки</th></tr></thead>
+<tbody>
+<tr><td>domain + data (<code>features/*/domain</code>, <code>features/*/data</code>)</td><td><strong>92,8 %</strong></td><td>295 / 318</td></tr>
+<tr><td>core (lifecycle, utils, widgets, strings)</td><td>95,9 %</td><td>211 / 220</td></tr>
+<tr><td>app (оболочка, маршруты, тема, контроллер)</td><td>98,1 %</td><td>159 / 162</td></tr>
+<tr><td>presentation (экраны и виджеты)</td><td>95,9 %</td><td>1356 / 1414</td></tr>
+<tr><td><strong>весь <code>lib/</code></strong></td><td><strong>95,6 %</strong></td><td>2021 / 2114</td></tr>
+</tbody>
+</table></div>
+<p>Цель «не менее 80 % для domain и data» выполнена. Ниже 80 % остаются только небольшие файлы, где не вызываются <code>toString</code>, <code>==</code> и <code>hashCode</code> (например, <code>service.dart</code>, <code>time_slot.dart</code>, <code>gesture_point.dart</code>) — отдельные тесты ради них не писались. UI-покрытие оценивается по ключевым сценариям, а не по проценту.</p>
+
+<h2>Состав тестов</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Тип</th><th>Количество</th><th>Что проверяют</th></tr></thead>
+<tbody>
+<tr><td>Unit (<code>test()</code>)</td><td>60</td><td>Форматтеры, контроллер, модели, фильтрация, черновик записи, репозиторий, контроллер записей, классификатор, ввод талона, описания lifecycle</td></tr>
+<tr><td>Unit на binding (<code>testWidgets</code> без UI)</td><td>4</td><td><code>LifecycleLogger</code>: нумерация, синтез переходов, очистка, dispose</td></tr>
+<tr><td>Widget</td><td>37</td><td>Экраны и сценарии: каталог, детали, форма, мои записи, профиль, навигация, Gesture Lab, ввод талона, крупный шрифт</td></tr>
+<tr><td>Golden</td><td>4</td><td>Welcome, карточка услуги, empty state каталога, empty state записей в тёмной теме</td></tr>
+<tr><td>Integration</td><td>1</td><td>Запись от welcome до «Моих записей» на эмуляторе</td></tr>
+</tbody>
+</table></div>
+
+<h2>Соответствие требованиям к тестам</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Требование</th><th>Тест</th></tr></thead>
+<tbody>
+<tr><td>Фильтрация услуг</td><td><code>service_filter_test.dart</code></td></tr>
+<tr><td>Создание, сортировка, отмена записи; пустой репозиторий</td><td><code>in_memory_booking_repository_test.dart</code>, <code>bookings_controller_test.dart</code>, <code>booking_test.dart</code></td></tr>
+<tr><td>Нумерация lifecycle-событий</td><td><code>lifecycle_logger_test.dart</code></td></tr>
+<tr><td>Нормализация, resampling, сравнение, 0–9, S, отклонение неизвестного жеста</td><td><code>gesture_classifier_test.dart</code></td></tr>
+<tr><td>Проверка mock-талона</td><td><code>ticket_entry_test.dart</code></td></tr>
+<tr><td>Welcome и переход в каталог</td><td><code>navigation_test.dart</code></td></tr>
+<tr><td>Поиск, empty state, открытие деталей</td><td><code>catalog_screen_test.dart</code>, <code>service_details_screen_test.dart</code></td></tr>
+<tr><td>Валидация формы, AlertDialog, подтверждение</td><td><code>booking_form_screen_test.dart</code></td></tr>
+<tr><td>SnackBar и запись в списке</td><td><code>booking_flow_test.dart</code></td></tr>
+<tr><td>Свайп: запрос, отказ, подтверждение</td><td><code>bookings_screen_test.dart</code></td></tr>
+<tr><td>NavigationBar и тема</td><td><code>navigation_test.dart</code>, <code>profile_screen_test.dart</code></td></tr>
+<tr><td>Gesture Lab feedback</td><td><code>gesture_lab_screen_test.dart</code></td></tr>
+<tr><td>Состояние ошибки GesturePad</td><td><code>ticket_check_in_screen_test.dart</code></td></tr>
+<tr><td>Golden: welcome, карточка, empty state</td><td><code>key_screens_golden_test.dart</code></td></tr>
+<tr><td>Integration: запуск → каталог → услуга → форма → подтверждение → «Мои записи»</td><td><code>integration_test/app_test.dart</code></td></tr>
+</tbody>
+</table></div>
+
+<h2>Детерминированность</h2>
+<ul>
+<li><strong>Время.</strong> Экраны и репозиторий получают <code>Clock</code>; в тестах «сейчас» — понедельник, 5 октября 2026, 09:00 (<code>test/helpers/test_app.dart</code>).</li>
+<li><strong>Размер экрана.</strong> Widget-тесты используют поверхность Pixel 7 (411 × 914 dp), golden — 360 × 780 при плотности 1.</li>
+<li><strong>Демо-расписание.</strong> Занятость слотов вычисляется формулой, а не случайно.</li>
+<li><strong>Шум в тестах распознавания.</strong> <code>Random</code> с фиксированным seed.</li>
+<li><strong>Шрифт golden.</strong> Встроенный тестовый шрифт <code>FlutterTest</code>; допуск 0,5 % пикселей на различия сглаживания macOS и Linux.</li>
+</ul>
+
+<h2>Ошибки, найденные тестами и проверками</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Ошибка</th><th>Как найдена</th><th>Исправление</th></tr></thead>
+<tbody>
+<tr><td><code>AppBar</code> внутри <code>Column</code> на вкладке записей ломал layout и блокировал нажатия</td><td><code>navigation_test.dart</code> и ручной прогон на эмуляторе</td><td><code>NestedScrollView</code> + <code>SliverAppBar</code></td></tr>
+<tr><td>Индикатор отправки формы не сбрасывался</td><td><code>booking_form_screen_test.dart</code> (pumpAndSettle timeout)</td><td>Сброс в <code>finally</code></td></tr>
+<tr><td>Кружок вертикального drag перекрывал подпись</td><td>Скриншот на эмуляторе</td><td>Подпись вынесена под область движения</td></tr>
+<tr><td>Миниатюры шаблонов рисовались точкой</td><td>Скриншот на эмуляторе</td><td><code>SizedBox.expand</code> + проверка размера в тесте</td></tr>
+<tr><td>Повёрнутая «5» распознавалась как «S»</td><td>Калибровка на искажённых шаблонах</td><td>Шаблон «5» с более выраженными углами, метрика «максимум двух направлений»</td></tr>
+</tbody>
+</table></div>
+
+<h2>Как запускать</h2>
+<pre><code># всё, кроме интеграционного теста
+flutter test
+
+# покрытие
+flutter test --coverage
+dart run tool/coverage_summary.dart
+
+# только golden; обновление эталонов — только намеренно
+flutter test test/goldens
+flutter test --update-goldens test/goldens
+
+# интеграционный тест (нужен запущенный эмулятор или телефон)
+flutter test integration_test -d emulator-5554</code></pre>
+<p>Интеграционный тест после прогона удаляет приложение с устройства — для дальнейшей демонстрации снова выполните <code>flutter run</code>.</p>
+
+<h2>Непрерывная интеграция</h2>
+<p><code>.github/workflows/flutter-ci.yml</code> запускается на push в <code>main</code> и на каждый pull request: Java 17, Flutter 3.47.6 (кэш), <code>pub get</code>, проверка формата, <code>flutter analyze</code>, <code>flutter test --coverage</code>, сводка покрытия, сборка debug APK и загрузка его как артефакта. При падении golden-тестов загружаются картинки различий. <code>continue-on-error</code> не используется, эталоны в CI не обновляются.</p>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

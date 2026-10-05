@@ -14,15 +14,30 @@
 <nav aria-label="Разделы документации">
 <div class="nav-group">Начало</div><ul>
 <li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
 <li><a href="environment.html">Окружение</a></li>
 </ul>
 <div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
 <li><a href="requirements-matrix.html">Матрица требований</a></li>
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html" aria-current="page">Лабораторная №1</a></li>
 <li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
 <li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
 </ul>
 </nav>
 </aside>
@@ -144,7 +159,8 @@ void dispose() {
 <tbody>
 <tr><td>Запуск</td><td>#1 resumed</td></tr>
 <tr><td>Кнопка Home</td><td>#2 inactive → #3 hidden → #4 paused</td></tr>
-<tr><td>Возврат из списка недавних</td><td>#5 hidden → #6 inactive → #7 resumed</td></tr>
+<tr><td>Возврат из списка недавних (после Home)</td><td>#5 hidden → #6 inactive → #7 resumed</td></tr>
+<tr><td>Открытие списка недавних прямо из приложения и возврат</td><td>inactive, затем resumed — приложение остаётся видимым, поэтому hidden и paused не приходят</td></tr>
 <tr><td>Открытие «Настроек» Android и возврат</td><td>inactive → hidden → paused, затем hidden → inactive → resumed</td></tr>
 <tr><td>Закрытие свайпом в списке недавних</td><td>inactive → hidden → paused → detached (видно в logcat), процесс завершён</td></tr>
 <tr><td>Повторный запуск</td><td>Новый процесс, журнал снова начинается с #1 resumed</td></tr>

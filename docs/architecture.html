@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Архитектура — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html" aria-current="page">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Архитектура</h1>
+<p class="lead">Прагматичная feature-first структура: каждая функция приложения лежит в своей папке, общие части вынесены в <code>app/</code> и <code>core/</code>. Слоёв ровно столько, сколько нужно для тестирования и будущей замены демо-данных на backend.</p>
+
+<h2>Структура каталогов</h2>
+<pre><code>lib/
+  main.dart                     точка входа: runApp(SlotlyApp())
+  app/                          каркас приложения
+    app.dart                    MaterialApp, тема, локализация, владение зависимостями
+    app_scope.dart              AppDependencies + InheritedWidget AppScope
+    app_controller.dart         тема, демо-уведомления, текущая вкладка
+    home_shell.dart             Scaffold + NavigationBar + IndexedStack
+    routes.dart                 маршруты и связи между экранами
+    theme.dart                  Material 3 тема, AppSpacing, AppRadii
+  core/
+    app_strings.dart            все русские тексты интерфейса
+    lifecycle/                  LifecycleLogger, LifecycleEvent
+    utils/                      Clock, форматирование цены, длительности, дат
+    widgets/                    UI kit: EmptyState, InfoRow, TimeSlotChip, SlotlyLogo, …
+  features/
+    welcome/                    приветственный экран
+    catalog/
+      domain/                   Service, Specialist, ServiceCategory, filterServices
+      data/                     demoServices — демонстрационный каталог
+      presentation/             каталог, детали, карточка, иллюстрации
+    booking/
+      domain/                   Booking, TimeSlot, BookingDraft, BookingRepository
+      data/                     InMemoryBookingRepository, DemoSchedule
+      presentation/             BookingsController, форма записи, «Мои записи»
+    profile/presentation/       профиль и настройки
+    diagnostics/presentation/   экран жизненного цикла
+    gesture_lab/presentation/   демонстрация стандартных жестов
+    gesture_checkin/
+      domain/                   GesturePoint, GestureTemplate, GestureClassifier, TicketEntry
+      data/                     шаблоны 0–9 и S, MockTicketRepository
+      presentation/             GesturePad, экран «Ввод талона»</code></pre>
+
+<h2>Слои и правила зависимостей</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Слой</th><th>Что содержит</th><th>От чего может зависеть</th></tr></thead>
+<tbody>
+<tr><td><code>domain/</code></td><td>Модели, правила, контракты репозиториев, алгоритмы (фильтрация, валидация, распознавание)</td><td>Только Dart (и <code>dart:ui</code> для <code>AppLifecycleState</code>). Никаких виджетов.</td></tr>
+<tr><td><code>data/</code></td><td>Реализации контрактов и демо-данные</td><td><code>domain/</code></td></tr>
+<tr><td><code>presentation/</code></td><td>Экраны, виджеты, контроллеры состояния</td><td><code>domain/</code>, <code>core/</code>; данные получает через конструктор</td></tr>
+<tr><td><code>core/</code></td><td>Общие виджеты, строки, утилиты, lifecycle</td><td>Flutter SDK, <code>app/theme.dart</code></td></tr>
+<tr><td><code>app/</code></td><td>Сборка приложения: зависимости, маршруты, тема</td><td>Все модули</td></tr>
+</tbody>
+</table></div>
+<p>Экраны не создают свои источники данных и не знают о маршрутах друг друга. Например, <code>CatalogScreen</code> получает <code>List&lt;Service&gt;</code> и колбэк <code>onServiceSelected</code>, а куда вести пользователя, решает <code>routes.dart</code>. Поэтому каждый экран тестируется отдельно с любыми данными.</p>
+
+<h2>Поток данных: создание записи</h2>
+<pre><code>BookingFormScreen                     (presentation, Влад)
+  │ BookingDraft.withSpecialist / withDay / withSlot      правила формы (domain)
+  │ showBookingConfirmationDialog → true
+  ▼
+BookingsController.book(request)      (presentation, ChangeNotifier)
+  ▼
+BookingRepository.createBooking       (domain: контракт)
+  ▼
+InMemoryBookingRepository             (data: проверка слота, создание Booking)
+  ▲
+  │ notifyListeners()
+BookingsScreen ← ListenableBuilder    (presentation, Кирилл) — новая запись в списке
+AppRoutes._showBookingResult          (app) — вкладка «Записи» + SnackBar</code></pre>
+
+<h2>Поток данных: распознавание талона</h2>
+<pre><code>GesturePad (onPanStart / onPanUpdate / onPanEnd)
+  ▼ GesturePadController.toGestureStrokes()      Offset → GesturePoint
+GestureClassifier.recognize(strokes)              нормализация → resampling → сравнение
+  ▼ GestureRecognitionResult(label, confidence, isAccepted)
+TicketEntry.apply(result)                         цифра / S / ошибка
+  ▼ при S
+TicketRepository.findByNumber(number)             MockTicketRepository
+  ▼
+TicketCheckInScreen: карточка найденного талона или сообщение об ошибке</code></pre>
+
+<h2>Состояние</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Состояние</th><th>Где хранится</th><th>Механизм</th></tr></thead>
+<tbody>
+<tr><td>Тема, демо-уведомления, текущая вкладка</td><td><code>AppController</code></td><td><code>ChangeNotifier</code> + <code>ListenableBuilder</code></td></tr>
+<tr><td>Записи пользователя</td><td><code>BookingsController</code></td><td><code>ChangeNotifier</code>; экраны только читают и вызывают методы</td></tr>
+<tr><td>Журнал жизненного цикла</td><td><code>LifecycleLogger</code></td><td><code>ChangeNotifier</code> + <code>AppLifecycleListener</code></td></tr>
+<tr><td>Текст поиска, выбранная категория</td><td><code>_CatalogScreenState</code></td><td><code>setState</code> — локальное состояние экрана</td></tr>
+<tr><td>Черновик записи</td><td><code>_BookingFormScreenState</code> → <code>BookingDraft</code></td><td><code>setState</code> + неизменяемая модель</td></tr>
+<tr><td>Штрихи на поле ввода</td><td><code>GesturePadController</code></td><td><code>ChangeNotifier</code>, перерисовка через <code>CustomPainter(repaint:)</code></td></tr>
+<tr><td>Журнал Gesture Lab</td><td><code>_GestureLabScreenState</code></td><td><code>setState</code></td></tr>
+</tbody>
+</table></div>
+<p>Правило: общие данные приложения живут в контроллерах, локальные данные одного экрана — в его <code>State</code>. BLoC, Riverpod и service locator не используются: для трёх общих объектов состояния стандартного <code>ChangeNotifier</code> достаточно.</p>
+
+<h2>Внедрение зависимостей</h2>
+<p><code>AppDependencies</code> (<code>lib/app/app_scope.dart</code>) создаётся один раз в <code>SlotlyApp</code> и освобождается в его <code>dispose</code>. Это единственное место, где выбираются реализации:</p>
+<pre><code>factory AppDependencies.demo({Clock clock = systemClock}) {
+  final bookings = BookingsController(InMemoryBookingRepository(clock: clock));
+  unawaited(bookings.load());
+  return AppDependencies(
+    clock: clock,
+    appController: AppController(),
+    services: demoServices,
+    lifecycleLogger: LifecycleLogger(clock: clock),
+    bookings: bookings,
+    tickets: const MockTicketRepository(),
+    gestureClassifier: GestureClassifier(templates: symbolTemplates),
+  );
+}</code></pre>
+<p><code>AppScope</code> — простой <code>InheritedWidget</code>, через который маршруты достают зависимости и передают их в конструкторы экранов. Тесты подставляют свою фабрику: <code>SlotlyApp(createDependencies: createTestDependencies)</code> с фиксированными часами.</p>
+
+<h2>Навигация</h2>
+<ul>
+<li><code>WelcomeScreen</code> → <code>pushReplacement</code> → <code>HomeShell</code>.</li>
+<li><code>HomeShell</code>: один <code>Scaffold</code>, <code>NavigationBar</code> и <code>IndexedStack</code> с тремя вкладками.</li>
+<li>Вложенные экраны открываются поверх оболочки через <code>Navigator.push</code>: <code>AppRoutes.serviceDetails(service)</code>, <code>AppRoutes.bookingForm(service)</code> и именованные маршруты <code>/diagnostics</code>, <code>/gesture-lab</code>, <code>/ticket-check-in</code>.</li>
+<li>Системная кнопка Back: на вложенном экране — закрывает его; на вкладке «Записи» или «Профиль» — возвращает на «Услуги»; на «Услугах» — закрывает приложение.</li>
+</ul>
+
+<h2>Зависимости</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Пакет</th><th>Версия</th><th>Назначение</th><th>Почему нужен</th><th>Почему не стандартный SDK</th><th>Лицензия</th></tr></thead>
+<tbody>
+<tr><td><code>flutter</code></td><td>SDK 3.47.6</td><td>UI-фреймворк</td><td>Основа приложения</td><td>—</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>flutter_localizations</code></td><td>SDK 3.47.6</td><td>Русские тексты стандартных виджетов Material</td><td>Подсказки «Назад», диалоги, TabBar и другие системные подписи на русском</td><td>Это часть Flutter SDK, отдельной установки не требует</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>flutter_test</code> (dev)</td><td>SDK 3.47.6</td><td>Unit-, widget- и golden-тесты</td><td>Автоматическая проверка</td><td>Часть SDK</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>integration_test</code> (dev)</td><td>SDK 3.47.6</td><td>Тест на эмуляторе</td><td>Проверка сценария записи на реальном устройстве</td><td>Часть SDK</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>flutter_lints</code> (dev)</td><td>^6.0.0 (lock: 6.0.0)</td><td>Официальный набор lint-правил</td><td>Единый стиль и ранний поиск ошибок</td><td>SDK не включает набор правил по умолчанию</td><td>BSD-3-Clause</td></tr>
+</tbody>
+</table></div>
+<p>Сторонних runtime-пакетов нет. Форматирование дат и цен написано вручную (<code>lib/core/utils/formatters.dart</code>, около 60 строк) вместо <code>intl</code>; графика нарисована <code>CustomPainter</code> вместо <code>flutter_svg</code>; состояние — на <code>ChangeNotifier</code> вместо state-management библиотек. Точные версии транзитивных пакетов зафиксированы в <code>pubspec.lock</code>.</p>
+
+<h2>Точки расширения</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Сейчас</th><th>Позже</th><th>Что меняется</th></tr></thead>
+<tbody>
+<tr><td><code>InMemoryBookingRepository</code></td><td><code>HttpBookingRepository</code> (Django/DRF)</td><td>Новый класс в <code>booking/data/</code> и одна строка в <code>AppDependencies</code>. Экраны и контроллер не меняются.</td></tr>
+<tr><td><code>MockTicketRepository</code></td><td>API электронной очереди</td><td>Реализация <code>TicketRepository</code></td></tr>
+<tr><td><code>demoServices</code></td><td>Каталог с сервера</td><td>Контракт <code>ServiceRepository</code> по образцу <code>BookingRepository</code></td></tr>
+<tr><td><code>DemoSchedule</code></td><td>Расписание сотрудников из backend</td><td>Слоты считает сервер, <code>fetchTimeSlots</code> остаётся тем же</td></tr>
+<tr><td><code>AppStrings</code></td><td>ARB-файлы и <code>flutter gen-l10n</code></td><td>Замена констант на <code>AppLocalizations.of(context)</code></td></tr>
+<tr><td>Настройки в памяти</td><td>Сохранение между запусками</td><td>Хранилище внутри <code>AppController</code></td></tr>
+</tbody>
+</table></div>
+<p>Подробные решения и их причины — в разделе <a href="architecture-decisions.html">«Архитектурные решения»</a>, план развития — в <a href="future-roadmap.html">«План развития»</a>.</p>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

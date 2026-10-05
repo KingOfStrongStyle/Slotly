@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Влад: данные, запись и распознавание жестов — Slotly</title>
+<link rel="stylesheet" href="../assets/docs.css">
+<link rel="icon" href="../assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="../index.html"><img src="../assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="../index.html">Главная</a></li>
+<li><a href="../project-overview.html">Обзор проекта</a></li>
+<li><a href="../environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="../architecture.html">Архитектура</a></li>
+<li><a href="../architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="../requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="../lab-1.html">Лабораторная №1</a></li>
+<li><a href="../lab-2.html">Лабораторная №2</a></li>
+<li><a href="../independent-work.html">Самостоятельная работа</a></li>
+<li><a href="../lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="../testing.html">Тестирование</a></li>
+<li><a href="../demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="../defense.html">Защита</a></li>
+<li><a href="../future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="../team/kirill.html">Кирилл</a></li>
+<li><a href="../team/vlad.html" aria-current="page">Влад</a></li>
+<li><a href="../team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Влад: данные, запись и распознавание жестов</h1>
+<p class="lead">Персональная страница для изучения, проверки и защиты модуля. Описывает зону ответственности и сопровождения; авторство отдельных коммитов см. в Git-истории.</p>
+
+<h2>1. Зона ответственности</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Задача</th><th>Условные баллы</th></tr></thead>
+<tbody>
+<tr><td>Модели <code>Service</code>, <code>Specialist</code>, <code>Booking</code>, <code>TimeSlot</code>, <code>Ticket</code>; демо-каталог; поиск и фильтрация; форматтеры</td><td>4</td></tr>
+<tr><td><code>BookingRepository</code>, <code>InMemoryBookingRepository</code>, <code>DemoSchedule</code>, <code>BookingsController</code>; форма записи, <code>BookingDraft</code> и валидация</td><td>4</td></tr>
+<tr><td>Распознавание: <code>GesturePoint</code>, <code>GestureTemplate</code>, нормализация, resampling, сравнение, шаблоны 0–9 и S, калибровка порогов</td><td>5</td></tr>
+<tr><td>Ввод талона: <code>GesturePad</code>, <code>TicketEntry</code>, <code>MockTicketRepository</code>, экран и подсказка шаблонов</td><td>3</td></tr>
+<tr><td><strong>Итого</strong></td><td><strong>16</strong></td></tr>
+</tbody>
+</table></div>
+<p>Баллы — внутренняя оценка баланса трудоёмкости, а не прогноз оценки преподавателя.</p>
+
+<h2>2–3. Связанные файлы и их назначение</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Файл</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td><code>lib/features/catalog/domain/service.dart</code></td><td><code>Service</code>, <code>Specialist</code>, <code>ServiceCategory</code></td></tr>
+<tr><td><code>lib/features/catalog/domain/service_filter.dart</code></td><td><code>filterServices</code>: поиск без учёта регистра и «ё», фильтр категории</td></tr>
+<tr><td><code>lib/features/catalog/data/demo_services.dart</code></td><td>11 демонстрационных услуг и вымышленные специалисты</td></tr>
+<tr><td><code>lib/core/utils/formatters.dart</code></td><td>Цена «6 000 ₸», длительность «1 ч 30 мин», даты по-русски</td></tr>
+<tr><td><code>lib/features/booking/domain/booking.dart</code></td><td><code>Booking</code>, <code>BookingStatus</code>, сортировка, пересечение интервалов</td></tr>
+<tr><td><code>lib/features/booking/domain/time_slot.dart</code></td><td>Слот времени и его доступность</td></tr>
+<tr><td><code>lib/features/booking/domain/booking_draft.dart</code></td><td>Черновик формы и список проблем валидации</td></tr>
+<tr><td><code>lib/features/booking/domain/booking_repository.dart</code></td><td>Контракт репозитория, <code>BookingRequest</code>, исключения</td></tr>
+<tr><td><code>lib/features/booking/data/demo_schedule.dart</code></td><td>Часы работы и детерминированная «занятость» слотов</td></tr>
+<tr><td><code>lib/features/booking/data/in_memory_booking_repository.dart</code></td><td>Слоты, создание с проверкой пересечений, отмена</td></tr>
+<tr><td><code>lib/features/booking/presentation/bookings_controller.dart</code></td><td>Общее состояние записей (<code>ChangeNotifier</code>)</td></tr>
+<tr><td><code>lib/features/booking/presentation/booking_form_screen.dart</code></td><td>Форма записи, загрузка слотов, отправка</td></tr>
+<tr><td><code>lib/features/booking/presentation/widgets/specialist_selector.dart</code>, <code>date_selector.dart</code>, <code>booking_confirmation_dialog.dart</code></td><td>Выбор специалиста, лента дат, AlertDialog подтверждения</td></tr>
+<tr><td><code>lib/features/gesture_checkin/domain/gesture_point.dart</code>, <code>gesture_template.dart</code></td><td>Точка, штрих, шаблон, результат распознавания</td></tr>
+<tr><td><code>lib/features/gesture_checkin/domain/gesture_classifier.dart</code></td><td>Алгоритм распознавания</td></tr>
+<tr><td><code>lib/features/gesture_checkin/data/symbol_templates.dart</code></td><td>Шаблоны 0–9 и S из отрезков и дуг</td></tr>
+<tr><td><code>lib/features/gesture_checkin/domain/ticket.dart</code>, <code>ticket_repository.dart</code>, <code>ticket_entry.dart</code></td><td>Талон, контракт поиска, логика ввода номера</td></tr>
+<tr><td><code>lib/features/gesture_checkin/data/mock_ticket_repository.dart</code></td><td>Демо-очередь: талоны 7, 17, 42, 305</td></tr>
+<tr><td><code>lib/features/gesture_checkin/presentation/widgets/gesture_pad.dart</code></td><td>Поле для рисования (<code>CustomPaint</code> + pan-жесты) и его контроллер</td></tr>
+<tr><td><code>lib/features/gesture_checkin/presentation/widgets/template_preview.dart</code></td><td>Миниатюра шаблона для подсказки</td></tr>
+<tr><td><code>lib/features/gesture_checkin/presentation/ticket_check_in_screen.dart</code></td><td>Экран «Ввод талона»</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. Архитектурный поток данных</h2>
+<pre><code>Запись:
+BookingFormScreen ──setState──► BookingDraft (withSpecialist / withDay / withSlot / withComment)
+        │ fetchTimeSlots ──► BookingsController ──► BookingRepository ──► InMemoryBookingRepository
+        │                                                              (DemoSchedule + пересечения)
+        │ «Продолжить» → AlertDialog → BookingsController.book(draft.toRequest())
+        ▼
+   onBooked(booking) → маршрут (Кирилл) → «Мои записи»
+
+Талон:
+GesturePad ─► GesturePadController.toGestureStrokes() ─► GestureClassifier.recognize()
+   ─► GestureRecognitionResult ─► TicketEntry.apply() ─► (S) TicketRepository.findByNumber()</code></pre>
+
+<h2>5. Основные алгоритмы</h2>
+<h3>Поиск</h3>
+<pre><code>String normalizeSearchText(String value) =&gt;
+    value.trim().toLowerCase().replaceAll('ё', 'е');</code></pre>
+<h3>Доступность слота</h3>
+<p>Слот доступен, если начинается не раньше чем через 30 минут, не помечен демо-расписанием как занятый (<code>(сумма кодов id специалиста + день + час) % 4 == 0</code>) и не пересекается с активной записью того же специалиста. Пересечение интервалов: <code>a.start &lt; b.end &amp;&amp; b.start &lt; a.end</code>.</p>
+<h3>Распознавание</h3>
+<ol>
+<li>Bounding box всех точек.</li>
+<li>Центр рамки → (0, 0).</li>
+<li>Деление на длинную сторону (одинаково по x и y).</li>
+<li>Resampling: 48 точек через равные расстояния вдоль пути, без точек в разрывах между штрихами.</li>
+<li>Расстояние до шаблона = max(среднее расстояние от точек рисунка до ближайших точек шаблона, то же в обратную сторону).</li>
+<li><code>confidence = clamp(1 − distance / 0.2, 0, 1)</code>.</li>
+<li>Лучший шаблон — минимальное расстояние.</li>
+<li>Отказ, если <code>confidence &lt; 0.55</code> или путь короче 30 px.</li>
+</ol>
+<p>Пороги: искажённые копии шаблонов (поворот ±12°, растяжение 20 %, шум) — расстояние до 0.07; посторонние фигуры — от 0.099. Подробно — в <a href="../lab-3.html">ЛР №3</a>.</p>
+
+<h2>6. Как запустить модуль</h2>
+<pre><code>flutter run -d emulator-5554
+# Услуги → карточка → «Записаться»; Профиль → «Ввод талона»</code></pre>
+
+<h2>7. Как проверить модуль</h2>
+<pre><code>flutter test test/features/booking test/features/catalog/service_filter_test.dart \
+  test/features/gesture_checkin test/core/formatters_test.dart
+flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart   # domain + data ≥ 80 %</code></pre>
+
+<h2>8. Тесты модуля</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Файл</th><th>Что проверяет</th></tr></thead>
+<tbody>
+<tr><td><code>test/features/catalog/service_filter_test.dart</code></td><td>Регистр, «ё», пробелы, категории, комбинация, полнота демо-данных</td></tr>
+<tr><td><code>test/core/formatters_test.dart</code></td><td>Цена, длительность, даты</td></tr>
+<tr><td><code>test/features/booking/booking_test.dart</code></td><td>Сортировка, <code>copyWith</code>, пересечения</td></tr>
+<tr><td><code>test/features/booking/booking_draft_test.dart</code></td><td>Валидация, сброс времени, недоступный слот, длинный комментарий</td></tr>
+<tr><td><code>test/features/booking/in_memory_booking_repository_test.dart</code></td><td>Пустое состояние, слоты, прошлое время, создание, отказы, длинный визит, отмена</td></tr>
+<tr><td><code>test/features/booking/bookings_controller_test.dart</code></td><td>Загрузка, сортировка, перенос в отменённые</td></tr>
+<tr><td><code>test/features/booking/booking_form_screen_test.dart</code></td><td>Disabled-кнопка, занятый слот, ошибка комментария, диалог</td></tr>
+<tr><td><code>test/features/gesture_checkin/gesture_classifier_test.dart</code></td><td>Нормализация, resampling, расстояние, 0–9 и S, искажения, отказ</td></tr>
+<tr><td><code>test/features/gesture_checkin/ticket_entry_test.dart</code></td><td>Цифры, S, пустой и длинный номер, демо-талоны</td></tr>
+<tr><td><code>test/features/gesture_checkin/ticket_check_in_screen_test.dart</code></td><td>Рисование, ошибка, отмена штриха, найденный и неизвестный талон</td></tr>
+</tbody>
+</table></div>
+
+<h2>9. Сценарий демонстрации</h2>
+<ol>
+<li>«Мужская стрижка» → «Записаться»: кнопка отключена, подсказка о недостающих полях.</li>
+<li>Выбрать специалиста и «Завтра»: занятые слоты зачёркнуты, нажатие ничего не делает.</li>
+<li>Сменить специалиста — выбранное время сбрасывается.</li>
+<li>Выбрать время → «Продолжить» → «Изменить» → «Продолжить» → «Подтвердить».</li>
+<li>Профиль → «Ввод талона» → «?»: шаблоны.</li>
+<li>Черта → «Жест не распознан», «Очистить поле».</li>
+<li>«1», «7», «S» → талон 17 найден; «Новый ввод»: «9», «9», «S» → не найден.</li>
+<li>В терминале: <code>flutter test test/features/gesture_checkin</code>.</li>
+</ol>
+
+<h2>10. Короткая защита (от первого лица)</h2>
+<div class="speech">
+<p>Я отвечаю за данные и логику. Модели — обычные неизменяемые классы на Dart без Flutter. Источник записей скрыт за контрактом <code>BookingRepository</code>; сейчас его реализует хранилище в памяти, а позже его заменит HTTP-реализация — экраны при этом не меняются.</p>
+<p>Правила формы записи лежат в <code>BookingDraft</code>: без специалиста и времени продолжить нельзя, смена специалиста или даты сбрасывает время, занятый слот не принимается, комментарий ограничен 200 символами. Поэтому их легко проверить unit-тестами.</p>
+<p>Для третьей лабораторной я сделал распознавание рукописного номера без ML. Рисунок приводится к единому размеру и 48 точкам, затем сравнивается с шаблонами цифр и буквы S. Если даже лучший шаблон далеко — показываем «Жест не распознан». Пороги я подобрал на искажённых копиях шаблонов и на посторонних фигурах, и это закреплено тестами. Это не универсальный распознаватель почерка: он рассчитан на подготовленные шаблоны и близкие к ним рисунки.</p>
+</div>
+
+<h2>11. Вероятные вопросы преподавателя</h2>
+<ol>
+<li>Зачем нужен <code>BookingRepository</code>, если данные в памяти?</li>
+<li>Почему методы репозитория асинхронные?</li>
+<li>Как работает поиск по-русски без учёта регистра?</li>
+<li>Как определяется, что слот занят?</li>
+<li>Почему смена специалиста сбрасывает время?</li>
+<li>Почему цена хранится в <code>int</code>?</li>
+<li>Зачем нормализация и resampling?</li>
+<li>Почему расстояние — максимум двух средних, а не одно среднее?</li>
+<li>Как выбраны пороги 0.2 и 0.55?</li>
+<li>Почему не нейросеть?</li>
+</ol>
+
+<h2>12. Краткие ответы</h2>
+<ol>
+<li>Это граница между экранами и источником данных: backend подключается новой реализацией без изменения UI.</li>
+<li>Сетевая реализация будет асинхронной; экраны уже обрабатывают ожидание и ошибки.</li>
+<li><code>trim()</code>, <code>toLowerCase()</code> (Dart работает с Unicode) и замена «ё» на «е».</li>
+<li>Слот недоступен, если он в прошлом (с запасом 30 мин), помечен демо-расписанием или пересекается с активной записью того же специалиста.</li>
+<li>У другого специалиста другое расписание — старое время может быть занято или не существовать.</li>
+<li>Деньги не хранят в <code>double</code> из-за ошибок округления; тенге — целые.</li>
+<li>Чтобы размер, положение и скорость рисования не влияли на сравнение: остаётся только форма.</li>
+<li>Неполный рисунок (как «3» по отношению к «8») близок к шаблону в одну сторону, но далёк в другую; максимум это учитывает.</li>
+<li>На шаблонах: искажённые копии дают расстояние до 0.07, посторонние фигуры — от 0.099; граница принятия 0.09.</li>
+<li>Для 11 символов шаблонов достаточно, алгоритм объясним, работает офлайн и без обучающих данных.</li>
+</ol>
+
+<h2>13. Типичные ошибки</h2>
+<ul>
+<li>Масштабировать x и y по отдельности — «1» превращается в квадрат и путается с другими цифрами.</li>
+<li>Соединять точки разных штрихов при resampling — появляются линии «в воздухе».</li>
+<li>Делить на ноль при рамке нулевого размера (точка).</li>
+<li>Хранить цену в <code>double</code>.</li>
+<li>Изменять общий список записей прямо из экрана, минуя контроллер.</li>
+<li>Не проверять <code>mounted</code> после <code>await</code> в форме.</li>
+</ul>
+
+<h2>14. Если демонстрация не работает</h2>
+<ul>
+<li>Нет свободных слотов «Сегодня» вечером — выберите «Завтра».</li>
+<li>Цифра не распознаётся — откройте «?», рисуйте крупно, близко к шаблону, одним росчерком (для «4» — двумя).</li>
+<li>S распознаётся как 5 — рисуйте S с плавными изгибами, а 5 — с прямой верхней чертой и углом.</li>
+<li>Мышью рисовать неудобно — покажите <code>flutter test test/features/gesture_checkin</code>.</li>
+</ul>
+
+<h2>15. Развитие модуля</h2>
+<ul>
+<li><code>HttpBookingRepository</code> по контракту из <a href="../future-roadmap.html">плана развития</a>.</li>
+<li>Расписание сотрудников и слоты с сервера, перенос записи.</li>
+<li>Пользовательские шаблоны и автоматическое распознавание по паузе после штриха.</li>
+<li>Настоящая электронная очередь с вызовом талонов.</li>
+</ul>
+
+<h2>16. Перед защитой прочитать и проверить</h2>
+<ul>
+<li>☐ Прочитать целиком <code>booking_draft.dart</code>, <code>in_memory_booking_repository.dart</code>, <code>gesture_classifier.dart</code>, <code>ticket_entry.dart</code>.</li>
+<li>☐ Прочитать раздел алгоритма в <a href="../lab-3.html">ЛР №3</a> и ADR-02, ADR-05, ADR-11.</li>
+<li>☐ Пройти сценарий записи и ввода талона на эмуляторе.</li>
+<li>☐ Запустить тесты из раздела 7.</li>
+<li>☐ Уметь объяснить на доске шаги 1–8 алгоритма на примере цифры «1».</li>
+</ul>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

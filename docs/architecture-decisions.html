@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Архитектурные решения — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html" aria-current="page">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Архитектурные решения</h1>
+<p class="lead">Короткие записи в формате «контекст — решение — последствия». Каждое решение можно пересмотреть, когда изменится контекст.</p>
+
+<h2>ADR-01. Feature-first структура вместо слоёв верхнего уровня</h2>
+<p><strong>Контекст.</strong> Три участника работают над разными функциями. Структура «все модели в одной папке, все экраны в другой» заставляет каждого трогать общие папки.</p>
+<p><strong>Решение.</strong> Папка на функцию (<code>catalog</code>, <code>booking</code>, <code>gesture_checkin</code>, …) с подпапками <code>domain</code>, <code>data</code>, <code>presentation</code> только там, где они нужны. У <code>welcome</code>, <code>profile</code>, <code>diagnostics</code>, <code>gesture_lab</code> нет данных — у них только <code>presentation</code>.</p>
+<p><strong>Последствия.</strong> Зона ответственности участника почти совпадает с папками. Пустых слоёв «для порядка» нет.</p>
+
+<h2>ADR-02. Контракт BookingRepository и реализация в памяти</h2>
+<p><strong>Контекст.</strong> Backend не входит в MVP, но коммерческая версия будет работать с Django/DRF.</p>
+<p><strong>Решение.</strong> Абстрактный <code>BookingRepository</code> с асинхронными методами и <code>InMemoryBookingRepository</code> для демонстрации. Методы возвращают <code>Future</code>, хотя реализация в памяти отвечает сразу.</p>
+<p><strong>Последствия.</strong> HTTP-реализация подключается заменой одной строки в <code>AppDependencies</code>. Обработка ошибок (<code>SlotUnavailableException</code>) уже встроена в форму. Данные пропадают при закрытии приложения — это ожидаемо для учебного MVP.</p>
+
+<h2>ADR-03. ChangeNotifier вместо библиотек управления состоянием</h2>
+<p><strong>Контекст.</strong> В приложении три общих объекта состояния: настройки, записи, журнал жизненного цикла. Участники и преподаватель не специализируются на Flutter.</p>
+<p><strong>Решение.</strong> <code>ChangeNotifier</code> из Flutter SDK и <code>ListenableBuilder</code>. Локальное состояние экрана — <code>setState</code>.</p>
+<p><strong>Последствия.</strong> Нет зависимостей и кодогенерации, код читается без знания BLoC или Riverpod. При росте числа экранов с общим состоянием стоит пересмотреть решение.</p>
+
+<h2>ADR-04. Простой AppScope вместо service locator</h2>
+<p><strong>Контекст.</strong> Экраны должны получать зависимости так, чтобы их можно было подменить в тестах.</p>
+<p><strong>Решение.</strong> <code>AppDependencies</code> создаётся в <code>SlotlyApp</code> и доступна через <code>InheritedWidget AppScope</code>. Маршруты берут зависимости из scope и передают в конструкторы экранов; сами экраны <code>AppScope</code> не используют.</p>
+<p><strong>Последствия.</strong> Зависимости видны в конструкторе каждого экрана. Нет глобальных синглтонов. Освобождение ресурсов (<code>dispose</code>) происходит в одном месте.</p>
+
+<h2>ADR-05. Нет отдельных use case-классов</h2>
+<p><strong>Контекст.</strong> В «чистой архитектуре» часто создают класс на каждое действие (<code>CreateBookingUseCase</code>), который только вызывает репозиторий.</p>
+<p><strong>Решение.</strong> Бизнес-правила живут в доменных объектах (<code>BookingDraft</code>, <code>TicketEntry</code>, <code>GestureClassifier</code>, <code>filterServices</code>), координация — в контроллере.</p>
+<p><strong>Последствия.</strong> Меньше файлов-посредников. Правила всё равно тестируются без виджетов.</p>
+
+<h2>ADR-06. Service передаётся в маршрут объектом</h2>
+<p><strong>Контекст.</strong> Требование лабораторной: детали получают Service через конструктор.</p>
+<p><strong>Решение.</strong> Типизированные фабрики маршрутов <code>AppRoutes.serviceDetails(service)</code> и <code>AppRoutes.bookingForm(service)</code> вместо <code>pushNamed</code> с нетипизированным <code>arguments</code>. Экраны без параметров — именованные маршруты.</p>
+<p><strong>Последствия.</strong> Ошибка типа видна при компиляции, нет повторного поиска услуги по id. Deep links для этих экранов потребуют отдельной настройки (вне MVP).</p>
+
+<h2>ADR-07. Один Scaffold на нижнюю навигацию, IndexedStack</h2>
+<p><strong>Контекст.</strong> Вкладки должны сохранять состояние; вложенные <code>Scaffold</code> без необходимости не нужны.</p>
+<p><strong>Решение.</strong> <code>HomeShell</code> — единственный <code>Scaffold</code> с <code>NavigationBar</code>. Вкладки используют <code>SliverAppBar</code> внутри своих прокручиваемых областей; «Мои записи» — <code>NestedScrollView</code> с <code>TabBar</code>.</p>
+<p><strong>Последствия.</strong> SnackBar появляется над навигацией. Все три вкладки строятся сразу при открытии оболочки — для трёх лёгких экранов это не проблема.</p>
+<p><em>Найденная ошибка:</em> первая версия ставила <code>AppBar</code> внутрь <code>Column</code>, что ломало layout и блокировало нажатия. Ошибку поймал тест навигации, решение — <code>NestedScrollView</code>.</p>
+
+<h2>ADR-08. Отмена свайпом только через диалог</h2>
+<p><strong>Контекст.</strong> Свайп — быстрое и легко случайное действие, а отмена записи необратима для клиента.</p>
+<p><strong>Решение.</strong> <code>Dismissible.confirmDismiss</code> показывает диалог, вызывает отмену через контроллер и всегда возвращает <code>false</code>. Запись не удаляется, а получает статус <code>cancelled</code> и переходит на вкладку «Отменённые».</p>
+<p><strong>Последствия.</strong> Нет «мгновенного необратимого удаления» и нет ошибки «A dismissed Dismissible widget is still part of the tree». Карточка исчезает без анимации сжатия — приемлемый компромисс.</p>
+
+<h2>ADR-09. Lifecycle logger создаётся при запуске</h2>
+<p><strong>Контекст.</strong> Если подписываться на жизненный цикл только на экране диагностики, ранние события будут потеряны.</p>
+<p><strong>Решение.</strong> <code>LifecycleLogger</code> создаётся в <code>AppDependencies</code>, записывает начальное состояние и все переходы, освобождает <code>AppLifecycleListener</code> в <code>dispose</code>. Журнал хранится в памяти; в debug-сборке события дублируются в logcat.</p>
+<p><strong>Последствия.</strong> После перезапуска процесса журнал начинается с #1; события перед закрытием видны в <code>adb logcat -s flutter</code>.</p>
+
+<h2>ADR-10. Gesture Lab разделён на зоны</h2>
+<p><strong>Контекст.</strong> Pan и scale, а также горизонтальный и вертикальный drag вместе со scale на одном <code>GestureDetector</code> конфликтуют в Gesture Arena или запрещены фреймворком.</p>
+<p><strong>Решение.</strong> Четыре зоны, переключаемые <code>TabBar</code> + <code>IndexedStack</code> (без <code>TabBarView</code>, который сам перехватывает горизонтальные свайпы).</p>
+<p><strong>Последствия.</strong> Каждый жест показывается стабильно. На одной зоне нельзя показать «всё сразу», но это и не требуется.</p>
+
+<h2>ADR-11. Template matching вместо ML</h2>
+<p><strong>Контекст.</strong> Нужно распознать 11 символов, объяснить алгоритм на защите и не тянуть нативные зависимости.</p>
+<p><strong>Решение.</strong> Нормализация, resampling до 48 точек и сравнение облаков точек с шаблонами; расстояние — максимум двух направленных средних. Пороги подобраны на шаблонах и закреплены тестами.</p>
+<p><strong>Последствия.</strong> Работает офлайн, мгновенно и объяснимо. Не является универсальным распознавателем почерка: гарантируется работа на подготовленных шаблонах и близких траекториях.</p>
+
+<h2>ADR-12. Тексты в AppStrings</h2>
+<p><strong>Контекст.</strong> Нужна возможность подключить локализацию позже, но ARB и кодогенерация усложняют учебный проект.</p>
+<p><strong>Решение.</strong> Все пользовательские строки — константы и функции в <code>lib/core/app_strings.dart</code>. Стандартные подписи Material — через <code>flutter_localizations</code> с локалью <code>ru</code>.</p>
+<p><strong>Последствия.</strong> Переход на <code>gen-l10n</code> — механическая замена обращений. Тесты используют те же константы, поэтому смена текста не ломает тесты.</p>
+
+<h2>ADR-13. Минимум зависимостей</h2>
+<p><strong>Решение.</strong> Только пакеты Flutter SDK и <code>flutter_lints</code>. Форматирование дат и цен, логотип, иллюстрации и иконка приложения сделаны собственными средствами.</p>
+<p><strong>Последствия.</strong> Нет риска заброшенных пакетов и лицензионных вопросов. Таблица зависимостей — в разделе <a href="architecture.html">«Архитектура»</a>.</p>
+
+<h2>ADR-14. Golden-тесты с тестовым шрифтом и допуском</h2>
+<p><strong>Контекст.</strong> Эталоны создаются на macOS, CI работает на Linux; системные шрифты различаются.</p>
+<p><strong>Решение.</strong> Golden-тесты используют детерминированный шрифт <code>FlutterTest</code> (глифы рисуются прямоугольниками), фиксированную поверхность 360 × 780 и допуск 0,5 % отличающихся пикселей (<code>test/flutter_test_config.dart</code>). CI не обновляет эталоны.</p>
+<p><strong>Последствия.</strong> Эталоны проверяют компоновку, цвета и отступы, но не начертание текста. Для визуальной проверки текста есть реальные скриншоты в документации.</p>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

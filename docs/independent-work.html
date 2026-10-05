@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Самостоятельная работа: дизайн-прототип — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html" aria-current="page">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Самостоятельная работа: дизайн-прототип</h1>
+<p class="lead">Интерактивный прототип из восьми состояний, UI kit и файлы для импорта в Figma. Ответственный за сопровождение — Ян.</p>
+
+<h2>Что подготовлено</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Артефакт</th><th>Путь</th><th>Как открыть</th></tr></thead>
+<tbody>
+<tr><td>Интерактивный прототип</td><td><code>design/prototype/index.html</code></td><td><a href="../design/prototype/index.html">открыть</a> — двойной щелчок по файлу, сервер не нужен</td></tr>
+<tr><td>UI kit</td><td><code>design/prototype/ui-kit.html</code></td><td><a href="../design/prototype/ui-kit.html">открыть</a></td></tr>
+<tr><td>8 SVG-фреймов для Figma</td><td><code>design/figma-import/frames/</code></td><td>перетащить в Figma</td></tr>
+<tr><td>SVG-компоненты</td><td><code>design/figma-import/components/</code></td><td>импорт на страницу «UI kit»</td></tr>
+<tr><td>Инструкция по импорту</td><td><code>design/figma-import/README.md</code></td><td>Markdown</td></tr>
+<tr><td>Дизайн-направление и токены</td><td><code>design/README.md</code></td><td>Markdown</td></tr>
+<tr><td>Генератор</td><td><code>design/tools/build_prototype.py</code></td><td><code>python3 design/tools/build_prototype.py</code></td></tr>
+</tbody>
+</table></div>
+<div class="callout warning">
+<p>Прямого доступа к Figma при подготовке проекта не было, поэтому Figma-файл и ссылка на него не создавались. SVG-фреймы и компоненты импортируются в Figma вручную по инструкции; связи прототипа в Figma описаны там же таблицей.</p>
+</div>
+
+<h2>Восемь состояний</h2>
+<p>Фреймы 360 × 800 построены из тех же токенов, что и Flutter-тема (<code>lib/app/theme.dart</code>). Справа — реальные скриншоты приложения для сравнения.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>№</th><th>Фрейм прототипа</th><th>Приложение</th><th>Что показывает</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><img src="../design/figma-import/frames/01-welcome.svg" alt="Прототип: Welcome" width="160"></td><td><img src="assets/screenshots/01-welcome.png" alt="Приложение: Welcome" width="160"></td><td>Welcome / onboarding, выбранная категория</td></tr>
+<tr><td>2</td><td><img src="../design/figma-import/frames/02-catalog.svg" alt="Прототип: каталог" width="160"></td><td><img src="assets/screenshots/02-catalog.png" alt="Приложение: каталог" width="160"></td><td>Каталог, чипы категорий, карточки</td></tr>
+<tr><td>3</td><td><img src="../design/figma-import/frames/03-search.svg" alt="Прототип: поиск" width="160"></td><td><img src="assets/screenshots/03-catalog-empty.png" alt="Приложение: пустой поиск" width="160"></td><td>Результаты поиска и empty state</td></tr>
+<tr><td>4</td><td><img src="../design/figma-import/frames/04-details.svg" alt="Прототип: детали" width="160"></td><td><img src="assets/screenshots/04-details.png" alt="Приложение: детали" width="160"></td><td>Детали услуги</td></tr>
+<tr><td>5</td><td><img src="../design/figma-import/frames/05-booking.svg" alt="Прототип: выбор времени" width="160"></td><td><img src="assets/screenshots/05-booking-form.png" alt="Приложение: форма" width="160"></td><td>Специалист, дата, слоты (свободный, выбранный, занятый)</td></tr>
+<tr><td>6</td><td><img src="../design/figma-import/frames/06-confirm.svg" alt="Прототип: подтверждение" width="160"></td><td><img src="assets/screenshots/06-confirm-dialog.png" alt="Приложение: подтверждение" width="160"></td><td>Диалог подтверждения</td></tr>
+<tr><td>7</td><td><img src="../design/figma-import/frames/07-bookings.svg" alt="Прототип: мои записи" width="160"></td><td><img src="assets/screenshots/08-bookings.png" alt="Приложение: мои записи" width="160"></td><td>Мои записи, свайп отмены, SnackBar</td></tr>
+<tr><td>8</td><td><img src="../design/figma-import/frames/08-profile.svg" alt="Прототип: профиль" width="160"></td><td><img src="assets/screenshots/11-profile.png" alt="Приложение: профиль" width="160"></td><td>Профиль и настройки</td></tr>
+</tbody>
+</table></div>
+
+<h2>Кликабельный сценарий</h2>
+<p>В <code>index.html</code> нажатия внутри телефона ведут по основному сценарию: Welcome → «Посмотреть услуги» → Каталог → поле поиска → Результаты → карточка → Детали → «Записаться» → Специалист и время → «Продолжить» → Подтверждение → «Подтвердить» → Мои записи → вкладка «Профиль». Работают стрелки «назад» и нижняя навигация. Кнопка «Показать кликабельные зоны» подсвечивает области нажатия, режим «Все 8 фреймов» показывает их сеткой.</p>
+<p>Проверка графа переходов скриптом: все 8 фреймов достижимы из Welcome, у каждого перехода основного сценария есть кликабельная зона, несуществующих целей нет.</p>
+
+<h2>UI kit</h2>
+<ul>
+<li>Цвета светлой и тёмной схемы с ролями применения.</li>
+<li>Типографика Material 3 и где какая роль используется.</li>
+<li>Шкала отступов 4–32 dp и радиусы 8 / 12 / 16 / 28.</li>
+<li>24 иконки с соответствием константам <code>Icons.*</code> во Flutter.</li>
+<li>Компоненты в состояниях: кнопка (default, pressed, disabled), поле ввода (default, focused, error), временной слот (available, selected, unavailable), карточка услуги (default, pressed), чип (default, selected), нижняя навигация.</li>
+<li>Живые HTML-примеры hover, pressed, focus, disabled и error.</li>
+<li>Правила использования компонентов.</li>
+</ul>
+
+<h2>Соответствие прототипа приложению</h2>
+<ul>
+<li>Цвета, радиусы и отступы — те же константы, что в <code>AppTheme</code>, <code>AppSpacing</code>, <code>AppRadii</code>.</li>
+<li>Иллюстрации услуг повторяют <code>ServiceArtwork</code>: тот же фон по варианту и те же круги.</li>
+<li>Логотип — та же геометрия, что в <code>SlotlyLogo</code> и иконке приложения.</li>
+<li>Отличия: в прототипе упрощённые линейные иконки вместо Material Icons и фиксированная ширина 360 dp (в приложении — ширина устройства).</li>
+</ul>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

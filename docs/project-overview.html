@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Обзор проекта — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html" aria-current="page">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Обзор проекта</h1>
+<p class="lead">Slotly — мобильный сервис онлайн-записи и электронной очереди для локального бизнеса: барбершопов, салонов красоты, стоматологий, клиник, автосервисов и репетиторов.</p>
+
+<h2>Проблема и идея</h2>
+<p>Небольшие компании до сих пор принимают записи по телефону и в мессенджерах. Клиенту приходится звонить в рабочее время и ждать ответа, администратору — вести расписание вручную. Slotly показывает каталог услуг, свободное время специалистов и подтверждает запись сразу. Для очереди на месте клиент вводит номер электронного талона.</p>
+
+<h2>Цели учебного MVP</h2>
+<ol>
+<li>Закрыть требования лабораторных работ №1–3 и самостоятельной работы.</li>
+<li>Получить реально запускающееся и проверенное Android-приложение.</li>
+<li>Сделать код понятным для студентов и преподавателя, которые не специализируются на Flutter.</li>
+<li>Равномерно распределить зоны ответственности между Кириллом, Владом и Яном.</li>
+<li>Заложить расширяемую, но не переусложнённую основу для коммерческой версии.</li>
+</ol>
+
+<h2>Что реализовано</h2>
+<div class="cards">
+<div class="card"><h3>Запись на услугу</h3><p>Каталог с поиском и фильтром, детали, выбор специалиста, даты и времени, валидация, диалог подтверждения, SnackBar.</p></div>
+<div class="card"><h3>Мои записи</h3><p>Активные и отменённые записи, сортировка по дате, детали по нажатию, меню по долгому нажатию, отмена свайпом с подтверждением.</p></div>
+<div class="card"><h3>Профиль</h3><p>Демо-пользователь, светлая и тёмная тема, демо-уведомления, переходы в учебные инструменты, версия.</p></div>
+<div class="card"><h3>Диагностика</h3><p>Текущее состояние жизненного цикла и нумерованный журнал переходов с временем и описанием.</p></div>
+<div class="card"><h3>Gesture Lab</h3><p>Tap, double tap, long press, горизонтальный и вертикальный drag, pinch — в отдельных зонах с журналом.</p></div>
+<div class="card"><h3>Ввод талона</h3><p>Рукописный ввод цифр 0–9 и символа S, объяснимое распознавание по шаблонам, проверка талона.</p></div>
+</div>
+
+<h2>Скриншоты</h2>
+<p>Сняты 5 октября 2026 года с debug-сборки на эмуляторе Android 16 (API 36, Pixel 7). Все данные демонстрационные.</p>
+<div class="screens">
+<figure><img src="assets/screenshots/01-welcome.png" alt="Welcome" loading="lazy"><figcaption>Welcome с выбранной категорией</figcaption></figure>
+<figure><img src="assets/screenshots/02-catalog.png" alt="Каталог" loading="lazy"><figcaption>Каталог</figcaption></figure>
+<figure><img src="assets/screenshots/03-catalog-empty.png" alt="Пустой поиск" loading="lazy"><figcaption>Empty state поиска</figcaption></figure>
+<figure><img src="assets/screenshots/04-details.png" alt="Детали услуги" loading="lazy"><figcaption>Детали услуги</figcaption></figure>
+<figure><img src="assets/screenshots/05-booking-form.png" alt="Форма записи" loading="lazy"><figcaption>Специалист, дата и время</figcaption></figure>
+<figure><img src="assets/screenshots/06-confirm-dialog.png" alt="Подтверждение" loading="lazy"><figcaption>AlertDialog подтверждения</figcaption></figure>
+<figure><img src="assets/screenshots/07-bookings-snackbar.png" alt="SnackBar" loading="lazy"><figcaption>SnackBar после записи</figcaption></figure>
+<figure><img src="assets/screenshots/08-bookings.png" alt="Мои записи" loading="lazy"><figcaption>Мои записи, сортировка по дате</figcaption></figure>
+<figure><img src="assets/screenshots/09-cancel-dialog.png" alt="Отмена свайпом" loading="lazy"><figcaption>Свайп влево → подтверждение</figcaption></figure>
+<figure><img src="assets/screenshots/10-booking-actions.png" alt="Меню действий" loading="lazy"><figcaption>Меню по долгому нажатию</figcaption></figure>
+<figure><img src="assets/screenshots/11-profile.png" alt="Профиль" loading="lazy"><figcaption>Профиль</figcaption></figure>
+<figure><img src="assets/screenshots/12-diagnostics.png" alt="Диагностика" loading="lazy"><figcaption>Журнал жизненного цикла</figcaption></figure>
+<figure><img src="assets/screenshots/13-gesture-lab.png" alt="Gesture Lab" loading="lazy"><figcaption>Gesture Lab</figcaption></figure>
+<figure><img src="assets/screenshots/14-gesture-pad-drawing.png" alt="GesturePad" loading="lazy"><figcaption>GesturePad: штрих «1»</figcaption></figure>
+<figure><img src="assets/screenshots/15-gesture-pad-error.png" alt="Ошибка распознавания" loading="lazy"><figcaption>Жест не распознан</figcaption></figure>
+<figure><img src="assets/screenshots/16-ticket-found.png" alt="Талон найден" loading="lazy"><figcaption>Талон 17 найден</figcaption></figure>
+<figure><img src="assets/screenshots/17-symbol-templates.png" alt="Шаблоны" loading="lazy"><figcaption>Подсказка с шаблонами</figcaption></figure>
+<figure><img src="assets/screenshots/18-catalog-dark.png" alt="Тёмная тема" loading="lazy"><figcaption>Тёмная тема</figcaption></figure>
+</div>
+
+<h2>Технологии</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Область</th><th>Решение</th></tr></thead>
+<tbody>
+<tr><td>Язык и фреймворк</td><td>Dart 3.13, Flutter 3.47 (stable), Material 3</td></tr>
+<tr><td>Платформа MVP</td><td>Android 7.0+ (minSdk 24), targetSdk 36</td></tr>
+<tr><td>Состояние</td><td><code>ChangeNotifier</code>, <code>setState</code></td></tr>
+<tr><td>Навигация</td><td><code>Navigator</code>, <code>NavigationBar</code>, <code>IndexedStack</code></td></tr>
+<tr><td>Данные</td><td>Демонстрационные данные в памяти за контрактами репозиториев</td></tr>
+<tr><td>Тесты</td><td><code>flutter_test</code> (unit, widget, golden), <code>integration_test</code></td></tr>
+<tr><td>CI</td><td>GitHub Actions: формат, анализ, тесты, debug APK</td></tr>
+<tr><td>Дизайн</td><td>HTML-прототип, UI kit, SVG для Figma</td></tr>
+</tbody>
+</table></div>
+
+<h2>Что не входит в MVP</h2>
+<p>Регистрация и авторизация, реальный backend, база данных, платежи, push-уведомления, геолокация и карты, чаты, синхронизация, аналитика, ML-распознавание, мультитенантность. Эти направления описаны в <a href="future-roadmap.html">плане развития</a>; в коде под них оставлены только точки расширения.</p>
+
+<h2>Восьмидневный учебный план</h2>
+<p>Фактически работа выполнена за одну сессию, но история коммитов и теги повторяют эту структуру.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>День</th><th>Этап</th><th>Результат</th><th>Коммиты и теги</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Окружение, проект, Git, тема, модели, дизайн-направление</td><td>Каркас и доменные модели</td><td><code>chore: bootstrap…</code>, <code>feat: add theme, domain models…</code></td></tr>
+<tr><td>2</td><td>Welcome, каталог, демо-услуги, навигация</td><td>Первый рабочий сценарий</td><td><code>feat: add welcome and catalog flow</code></td></tr>
+<tr><td>3</td><td>Lifecycle logger, диагностика, тесты, документация ЛР №1</td><td>Лабораторная №1</td><td>тег <code>lab-1</code></td></tr>
+<tr><td>4</td><td>Детали услуги, форма, репозиторий, валидация</td><td>Запись через репозиторий</td><td><code>feat: implement booking flow</code></td></tr>
+<tr><td>5</td><td>Диалог, SnackBar, «Мои записи», отмена, профиль, адаптивность</td><td>Лабораторная №2</td><td>тег <code>lab-2</code></td></tr>
+<tr><td>6</td><td>Gesture Lab, журнал жестов, обратная связь</td><td>Стандартные жесты</td><td><code>feat: add standard gesture lab</code></td></tr>
+<tr><td>7</td><td>GesturePad, шаблоны, классификатор, MockTicketRepository</td><td>Лабораторная №3</td><td>тег <code>lab-3</code></td></tr>
+<tr><td>8</td><td>Интеграционные и golden-тесты, документация, скриншоты, APK, CI, прототип</td><td>MVP</td><td>тег <code>v0.1.0</code></td></tr>
+</tbody>
+</table></div>
+
+<h2>Команда и зоны ответственности</h2>
+<p>Распределение описывает, кто сопровождает и защищает модуль. Оценка трудоёмкости каждой зоны — условные 16 баллов; это внутренняя оценка баланса, а не прогноз оценки преподавателя.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Участник</th><th>Зона</th><th>Страница</th></tr></thead>
+<tbody>
+<tr><td>Кирилл</td><td>Каркас, навигация, тема, AppController, lifecycle и диагностика, «Мои записи», CI, сборка, архитектурная документация</td><td><a href="team/kirill.html">team/kirill.html</a></td></tr>
+<tr><td>Влад</td><td>Модели, репозиторий, демо-данные, поиск, форма записи, классификатор жестов, ввод талона</td><td><a href="team/vlad.html">team/vlad.html</a></td></tr>
+<tr><td>Ян</td><td>UI kit, прототип, welcome, каталог, детали, профиль, Gesture Lab, адаптивность, widget- и golden-тесты</td><td><a href="team/yan.html">team/yan.html</a></td></tr>
+</tbody>
+</table></div>
+<div class="callout">
+<p><strong>О Git-истории.</strong> Первичная реализация выполнена и закоммичена одним авторизованным пользователем — владельцем репозитория. Распределение выше — это зоны ответственности и будущего сопровождения, а не авторство коммитов. Дальнейшие изменения каждый участник вносит от своего имени через ветки и pull request (см. <code>CONTRIBUTING.md</code>).</p>
+</div>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>
