@@ -41,6 +41,8 @@ class HomeShell extends StatelessWidget {
             Navigator.of(context).pushNamed(AppRoutes.diagnostics),
         onOpenGestureLab: () =>
             Navigator.of(context).pushNamed(AppRoutes.gestureLab),
+        onOpenTicketCheckIn: () =>
+            Navigator.of(context).pushNamed(AppRoutes.ticketCheckIn),
       ),
     ];
 

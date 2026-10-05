@@ -248,4 +248,41 @@ abstract final class AppStrings {
       'Вертикальный drag: $direction на $distance dp';
   static String gestureLogScale(String scale) => 'Pinch: масштаб $scale×';
   static const gestureLogScaleReset = 'Масштаб сброшен';
+
+  // Ticket check-in
+  static const checkInTitle = 'Ввод талона';
+  static const checkInProfileHint = 'Рукописный ввод номера';
+  static const checkInTemplates = 'Как рисовать символы';
+  static const checkInTemplatesHint =
+      'Рисуйте крупно, одним или двумя штрихами. Точка — начало штриха. '
+      'Символ S завершает ввод.';
+  static const checkInNumberLabel = 'Номер талона';
+  static const checkInNumberPlaceholder = '—';
+  static const checkInInstructions =
+      'Нарисуйте цифру и нажмите «Распознать». После номера нарисуйте S.';
+  static const checkInPadHint = 'Рисуйте здесь';
+  static const checkInPadLabel = 'Поле для рукописного ввода';
+  static const checkInRecognize = 'Распознать';
+  static const checkInUndo = 'Отменить штрих';
+  static const checkInClearPad = 'Очистить поле';
+  static const checkInBackspace = 'Стереть цифру';
+  static const checkInReset = 'Новый ввод';
+  static String checkInDigitAdded(String digit, int confidence) =>
+      'Распознано: $digit (уверенность $confidence%)';
+  static String checkInNotRecognized(String? guess, int confidence) =>
+      guess == null
+      ? 'Жест не распознан: слишком короткий штрих. Попробуйте ещё раз.'
+      : 'Жест не распознан. Ближе всего «$guess», но уверенность только '
+            '$confidence%. Попробуйте ещё раз.';
+  static String checkInTooLong(int max) =>
+      'Номер талона не длиннее $max цифр. Нарисуйте S или сотрите цифру.';
+  static const checkInNumberEmpty = 'Сначала введите цифры номера, затем S.';
+  static const checkInSearching = 'Проверяем талон…';
+  static String checkInFound(String number) => 'Талон $number найден';
+  static String checkInNotFound(String number) =>
+      'Талон $number не найден. Проверьте номер и введите заново.';
+  static String checkInPeopleAhead(int count) => 'Перед вами: $count';
+  static const ticketWaiting = 'Ожидает вызова';
+  static const ticketCalled = 'Вас вызывают';
+  static const ticketCompleted = 'Обслуживание завершено';
 }

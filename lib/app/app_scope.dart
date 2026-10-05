@@ -8,6 +8,10 @@ import '../features/booking/data/in_memory_booking_repository.dart';
 import '../features/booking/presentation/bookings_controller.dart';
 import '../features/catalog/data/demo_services.dart';
 import '../features/catalog/domain/service.dart';
+import '../features/gesture_checkin/data/mock_ticket_repository.dart';
+import '../features/gesture_checkin/data/symbol_templates.dart';
+import '../features/gesture_checkin/domain/gesture_classifier.dart';
+import '../features/gesture_checkin/domain/ticket_repository.dart';
 import 'app_controller.dart';
 
 /// Everything the screens need, created once at startup.
@@ -22,6 +26,8 @@ class AppDependencies {
     required this.services,
     required this.lifecycleLogger,
     required this.bookings,
+    required this.tickets,
+    required this.gestureClassifier,
   });
 
   factory AppDependencies.demo({Clock clock = systemClock}) {
@@ -35,6 +41,8 @@ class AppDependencies {
       services: demoServices,
       lifecycleLogger: LifecycleLogger(clock: clock),
       bookings: bookings,
+      tickets: const MockTicketRepository(),
+      gestureClassifier: GestureClassifier(templates: symbolTemplates),
     );
   }
 
@@ -43,6 +51,8 @@ class AppDependencies {
   final List<Service> services;
   final LifecycleLogger lifecycleLogger;
   final BookingsController bookings;
+  final TicketRepository tickets;
+  final GestureClassifier gestureClassifier;
 
   void dispose() {
     bookings.dispose();

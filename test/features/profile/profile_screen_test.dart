@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:slotly/app/app.dart';
 import 'package:slotly/core/app_strings.dart';
 import 'package:slotly/features/diagnostics/presentation/diagnostics_screen.dart';
+import 'package:slotly/features/gesture_checkin/presentation/ticket_check_in_screen.dart';
+import 'package:slotly/features/gesture_lab/presentation/gesture_lab_screen.dart';
 
 import '../../helpers/test_app.dart';
 
@@ -73,5 +75,20 @@ void main() {
     expect(find.byType(DiagnosticsScreen), findsNothing);
     expect(find.text(AppStrings.profileTitle), findsWidgets);
     expect(find.byTooltip('Назад'), findsNothing);
+  });
+
+  testWidgets('opens Gesture Lab and ticket check-in', (tester) async {
+    await _openProfile(tester);
+
+    await tester.tap(find.text(AppStrings.gestureLabTitle));
+    await tester.pumpAndSettle();
+    expect(find.byType(GestureLabScreen), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text(AppStrings.checkInTitle));
+    await tester.tap(find.text(AppStrings.checkInTitle));
+    await tester.pumpAndSettle();
+    expect(find.byType(TicketCheckInScreen), findsOneWidget);
   });
 }

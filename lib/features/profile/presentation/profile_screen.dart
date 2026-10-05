@@ -14,11 +14,13 @@ class ProfileScreen extends StatelessWidget {
     required this.appController,
     required this.onOpenDiagnostics,
     required this.onOpenGestureLab,
+    required this.onOpenTicketCheckIn,
   });
 
   final AppController appController;
   final VoidCallback onOpenDiagnostics;
   final VoidCallback onOpenGestureLab;
+  final VoidCallback onOpenTicketCheckIn;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +69,13 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: const Text(AppStrings.gestureLabHint),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: onOpenGestureLab,
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.draw_outlined),
+                      title: const Text(AppStrings.checkInTitle),
+                      subtitle: const Text(AppStrings.checkInProfileHint),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: onOpenTicketCheckIn,
                     ),
                     const SectionTitle(AppStrings.profileAboutSection),
                     ListTile(
