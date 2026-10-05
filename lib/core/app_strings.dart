@@ -61,4 +61,58 @@ abstract final class AppStrings {
   static const catalogEmptyMessage =
       'Попробуйте изменить запрос или выбрать другую категорию.';
   static const catalogResetFilters = 'Сбросить фильтры';
+
+  // Lifecycle diagnostics
+  static const diagnosticsTitle = 'Диагностика';
+  static const diagnosticsCurrentState = 'Текущее состояние';
+  static const diagnosticsUnknownState = 'Платформа ещё не сообщила состояние';
+  static const diagnosticsJournal = 'Журнал жизненного цикла';
+  static const diagnosticsClear = 'Очистить журнал';
+  static const diagnosticsCleared = 'Журнал очищен';
+  static const diagnosticsHint =
+      'Сверните приложение, откройте список недавних приложений или '
+      'переключитесь на другое приложение, а затем вернитесь сюда.';
+  static const diagnosticsEmptyTitle = 'Событий пока нет';
+  static const diagnosticsEmptyMessage =
+      'Новые события появятся после сворачивания приложения '
+      'или возврата в него.';
+  static const lifecycleLaunchPrefix = 'Начальное состояние при запуске. ';
+  static const lifecycleResumedTitle = 'Активно';
+  static const lifecycleInactiveTitle = 'Неактивно';
+  static const lifecycleHiddenTitle = 'Скрыто';
+  static const lifecyclePausedTitle = 'Приостановлено';
+  static const lifecycleDetachedTitle = 'Отсоединено';
+  static const lifecycleResumedDescription =
+      'Приложение на экране и принимает ввод пользователя.';
+  static const lifecycleInactiveDescription =
+      'Приложение видно, но не принимает ввод: например, открыт список '
+      'недавних приложений или системная шторка.';
+  static const lifecycleHiddenDescription =
+      'Интерфейс скрыт. На Android Flutter добавляет это промежуточное '
+      'состояние между inactive и paused.';
+  static const lifecyclePausedDescription =
+      'Приложение в фоне и не видно пользователю. Система может завершить '
+      'процесс без дополнительных уведомлений.';
+  static const lifecycleDetachedDescription =
+      'Движок Flutter работает без видимого окна: Activity уничтожена или '
+      'приложение закрывается.';
+
+  // Profile
+  static const profileTitle = 'Профиль';
+  static const profileDemoUserName = 'Алия Н.';
+  static const profileDemoUserInitials = 'АН';
+  static const profileDemoUserNote = 'Демонстрационный профиль без авторизации';
+  static const profileSettingsSection = 'Настройки';
+  static const profileDarkTheme = 'Тёмная тема';
+  static const profileDarkThemeHint = 'Переключает светлую и тёмную схему';
+  static const profileNotifications = 'Демо-уведомления';
+  static const profileNotificationsHint =
+      'Напоминание о записи в сообщении после бронирования';
+  static const profileToolsSection = 'Учебные инструменты';
+  static const profileDiagnosticsHint = 'Жизненный цикл приложения';
+  static const profileAboutSection = 'О приложении';
+  static const profileAbout = 'О Slotly';
+  static const profileAboutText =
+      'Учебный MVP сервиса онлайн-записи и электронной очереди для '
+      'локального бизнеса. $demoDataNotice';
 }

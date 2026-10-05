@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../core/lifecycle/lifecycle_logger.dart';
 import '../core/utils/clock.dart';
 import '../features/catalog/data/demo_services.dart';
 import '../features/catalog/domain/service.dart';
@@ -15,6 +16,7 @@ class AppDependencies {
     required this.clock,
     required this.appController,
     required this.services,
+    required this.lifecycleLogger,
   });
 
   factory AppDependencies.demo({Clock clock = systemClock}) {
@@ -22,15 +24,18 @@ class AppDependencies {
       clock: clock,
       appController: AppController(),
       services: demoServices,
+      lifecycleLogger: LifecycleLogger(clock: clock),
     );
   }
 
   final Clock clock;
   final AppController appController;
   final List<Service> services;
+  final LifecycleLogger lifecycleLogger;
 
   void dispose() {
     appController.dispose();
+    lifecycleLogger.dispose();
   }
 }
 

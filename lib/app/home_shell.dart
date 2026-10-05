@@ -4,8 +4,10 @@ import '../core/app_strings.dart';
 import '../core/widgets/empty_state.dart';
 import '../features/catalog/domain/service.dart';
 import '../features/catalog/presentation/catalog_screen.dart';
+import '../features/profile/presentation/profile_screen.dart';
 import 'app_controller.dart';
 import 'app_scope.dart';
+import 'routes.dart';
 
 /// Main screen with the bottom [NavigationBar].
 ///
@@ -35,12 +37,10 @@ class HomeShell extends StatelessWidget {
           message: 'Раздел появится на этапе бронирования.',
         ),
       ),
-      const Center(
-        child: EmptyState(
-          icon: Icons.person_outline,
-          title: AppStrings.tabProfile,
-          message: 'Раздел появится на этапе профиля.',
-        ),
+      ProfileScreen(
+        appController: controller,
+        onOpenDiagnostics: () =>
+            Navigator.of(context).pushNamed(AppRoutes.diagnostics),
       ),
     ];
 
