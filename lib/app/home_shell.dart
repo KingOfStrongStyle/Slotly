@@ -28,7 +28,8 @@ class HomeShell extends StatelessWidget {
       CatalogScreen(
         services: dependencies.services,
         initialCategory: initialCategory,
-        onServiceSelected: (_) {},
+        onServiceSelected: (service) =>
+            Navigator.of(context).push(AppRoutes.serviceDetails(service)),
       ),
       const Center(
         child: EmptyState(

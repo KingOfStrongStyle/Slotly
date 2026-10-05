@@ -4,6 +4,7 @@ import '../../../app/app_controller.dart';
 import '../../../app/theme.dart';
 import '../../../core/app_strings.dart';
 import '../../../core/widgets/responsive.dart';
+import '../../../core/widgets/section_title.dart';
 import '../../../core/widgets/slotly_logo.dart';
 
 /// "Профиль" tab: demo user, local settings and links to the lab tools.
@@ -35,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
                 sliver: SliverList.list(
                   children: [
                     const _UserHeader(),
-                    const _SectionTitle(AppStrings.profileSettingsSection),
+                    const SectionTitle(AppStrings.profileSettingsSection),
                     SwitchListTile(
                       secondary: const Icon(Icons.dark_mode_outlined),
                       title: const Text(AppStrings.profileDarkTheme),
@@ -50,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                       value: appController.demoNotificationsEnabled,
                       onChanged: appController.setDemoNotifications,
                     ),
-                    const _SectionTitle(AppStrings.profileToolsSection),
+                    const SectionTitle(AppStrings.profileToolsSection),
                     ListTile(
                       leading: const Icon(Icons.monitor_heart_outlined),
                       title: const Text(AppStrings.diagnosticsTitle),
@@ -58,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
                       trailing: const Icon(Icons.chevron_right),
                       onTap: onOpenDiagnostics,
                     ),
-                    const _SectionTitle(AppStrings.profileAboutSection),
+                    const SectionTitle(AppStrings.profileAboutSection),
                     ListTile(
                       leading: const Icon(Icons.info_outline),
                       title: const Text(AppStrings.profileAbout),
@@ -119,31 +120,6 @@ class _UserHeader extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.l,
-        AppSpacing.xl,
-        AppSpacing.l,
-        AppSpacing.s,
-      ),
-      child: Text(
-        text,
-        style: theme.textTheme.labelLarge?.copyWith(
-          color: theme.colorScheme.primary,
         ),
       ),
     );

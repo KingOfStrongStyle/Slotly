@@ -9,6 +9,7 @@ class Booking {
     required this.serviceTitle,
     required this.specialist,
     required this.startAt,
+    required this.duration,
     required this.comment,
     required this.status,
     required this.createdAt,
@@ -22,13 +23,20 @@ class Booking {
   final String serviceTitle;
   final Specialist specialist;
   final DateTime startAt;
+  final Duration duration;
 
   /// Empty string when the customer left no comment.
   final String comment;
   final BookingStatus status;
   final DateTime createdAt;
 
+  DateTime get endAt => startAt.add(duration);
+
   bool get isActive => status == BookingStatus.confirmed;
+
+  /// True if this booking and the interval `[start, end)` intersect.
+  bool overlaps(DateTime start, DateTime end) =>
+      startAt.isBefore(end) && start.isBefore(endAt);
 
   Booking copyWith({BookingStatus? status}) => Booking(
     id: id,
@@ -36,6 +44,7 @@ class Booking {
     serviceTitle: serviceTitle,
     specialist: specialist,
     startAt: startAt,
+    duration: duration,
     comment: comment,
     status: status ?? this.status,
     createdAt: createdAt,

@@ -51,5 +51,17 @@ abstract final class Formatters {
   static String timeWithSeconds(DateTime value) =>
       '${time(value)}:${_twoDigits(value.second)}';
 
+  /// `14:00–14:45`.
+  static String timeRange(DateTime start, DateTime end) =>
+      '${time(start)}–${time(end)}';
+
+  /// `Арман С.` -> `АС`.
+  static String initials(String name) => name
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .take(2)
+      .map((part) => part[0].toUpperCase())
+      .join();
+
   static String _twoDigits(int value) => value.toString().padLeft(2, '0');
 }

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 import '../core/lifecycle/lifecycle_logger.dart';
 import '../core/utils/clock.dart';
+import '../features/booking/data/in_memory_booking_repository.dart';
+import '../features/booking/presentation/bookings_controller.dart';
 import '../features/catalog/data/demo_services.dart';
 import '../features/catalog/domain/service.dart';
 import 'app_controller.dart';
@@ -17,14 +21,20 @@ class AppDependencies {
     required this.appController,
     required this.services,
     required this.lifecycleLogger,
+    required this.bookings,
   });
 
   factory AppDependencies.demo({Clock clock = systemClock}) {
+    final bookings = BookingsController(
+      InMemoryBookingRepository(clock: clock),
+    );
+    unawaited(bookings.load());
     return AppDependencies(
       clock: clock,
       appController: AppController(),
       services: demoServices,
       lifecycleLogger: LifecycleLogger(clock: clock),
+      bookings: bookings,
     );
   }
 
@@ -32,8 +42,10 @@ class AppDependencies {
   final AppController appController;
   final List<Service> services;
   final LifecycleLogger lifecycleLogger;
+  final BookingsController bookings;
 
   void dispose() {
+    bookings.dispose();
     appController.dispose();
     lifecycleLogger.dispose();
   }

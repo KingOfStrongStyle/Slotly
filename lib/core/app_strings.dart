@@ -115,4 +115,54 @@ abstract final class AppStrings {
   static const profileAboutText =
       'Учебный MVP сервиса онлайн-записи и электронной очереди для '
       'локального бизнеса. $demoDataNotice';
+
+  // Service details
+  static const detailsPrice = 'Стоимость';
+  static const detailsDuration = 'Длительность';
+  static const detailsCategory = 'Категория';
+  static const detailsAbout = 'Об услуге';
+  static const detailsSpecialists = 'Специалисты';
+  static const detailsBook = 'Записаться';
+
+  // Booking form
+  static const bookingTitle = 'Новая запись';
+  static const bookingSpecialistSection = 'Специалист';
+  static const bookingDateSection = 'Дата';
+  static const bookingTimeSection = 'Время';
+  static const bookingCommentSection = 'Комментарий';
+  static const bookingCommentHint = 'Например: нужна парковка рядом';
+  static const bookingCommentOptional = 'Необязательно';
+  static String bookingCommentTooLong(int max) =>
+      'Комментарий должен быть не длиннее $max символов';
+  static const bookingToday = 'Сегодня';
+  static const bookingTomorrow = 'Завтра';
+  static const bookingChooseSpecialistFirst =
+      'Сначала выберите специалиста — покажем свободное время.';
+  static const bookingNoSlots =
+      'На этот день свободного времени нет. Выберите другую дату.';
+  static const bookingSlotsLoadError =
+      'Не удалось загрузить расписание. Попробуйте ещё раз.';
+  static const bookingRetry = 'Повторить';
+  static const bookingSlotTaken = 'Занято';
+  static const bookingContinue = 'Продолжить';
+  static const bookingMissingPrefix = 'Чтобы продолжить, выберите: ';
+  static const bookingMissingSpecialist = 'специалиста';
+  static const bookingMissingDate = 'дату';
+  static const bookingMissingTime = 'время';
+  static const bookingSlotNoLongerAvailable =
+      'Это время уже заняли. Выберите другое.';
+
+  // Booking confirmation
+  static const confirmTitle = 'Подтвердите запись';
+  static const confirmService = 'Услуга';
+  static const confirmSpecialist = 'Специалист';
+  static const confirmDate = 'Дата';
+  static const confirmTime = 'Время';
+  static const confirmPrice = 'Стоимость';
+  static const confirmComment = 'Комментарий';
+  static const confirmEdit = 'Изменить';
+  static const confirmSubmit = 'Подтвердить';
+  static String bookingCreated(String service, String dateTime) =>
+      'Вы записаны: $service, $dateTime';
+  static const bookingReminderSuffix = '. Напомним за час до визита (демо)';
 }
