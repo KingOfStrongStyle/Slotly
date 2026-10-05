@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/app_strings.dart';
-import '../core/widgets/empty_state.dart';
+import '../features/booking/presentation/bookings_screen.dart';
 import '../features/catalog/domain/service.dart';
 import '../features/catalog/presentation/catalog_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
@@ -31,12 +31,9 @@ class HomeShell extends StatelessWidget {
         onServiceSelected: (service) =>
             Navigator.of(context).push(AppRoutes.serviceDetails(service)),
       ),
-      const Center(
-        child: EmptyState(
-          icon: Icons.event_note_outlined,
-          title: AppStrings.tabBookings,
-          message: 'Раздел появится на этапе бронирования.',
-        ),
+      BookingsScreen(
+        bookings: dependencies.bookings,
+        onBrowseServices: () => controller.selectTab(HomeTab.services),
       ),
       ProfileScreen(
         appController: controller,

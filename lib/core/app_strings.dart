@@ -165,4 +165,37 @@ abstract final class AppStrings {
   static String bookingCreated(String service, String dateTime) =>
       'Вы записаны: $service, $dateTime';
   static const bookingReminderSuffix = '. Напомним за час до визита (демо)';
+
+  // My bookings
+  static const bookingsTitle = 'Мои записи';
+  static String bookingsActiveTab(int count) => 'Активные ($count)';
+  static String bookingsCancelledTab(int count) => 'Отменённые ($count)';
+  static const bookingsGestureHint =
+      'Нажмите для подробностей, удерживайте для действий, '
+      'смахните влево, чтобы отменить.';
+  static const bookingsEmptyTitle = 'У вас пока нет записей';
+  static const bookingsEmptyMessage =
+      'Выберите услугу в каталоге — запись появится здесь.';
+  static const bookingsBrowseServices = 'Выбрать услугу';
+  static const bookingsCancelledEmptyTitle = 'Отменённых записей нет';
+  static const bookingsCancelledEmptyMessage =
+      'Здесь будут записи, которые вы отменили.';
+  static const bookingsLoadErrorTitle = 'Не удалось загрузить записи';
+  static const bookingsLoadErrorMessage = 'Проверьте подключение и повторите.';
+  static const bookingsSwipeToCancel = 'Отменить';
+  static const bookingStatusConfirmed = 'Подтверждена';
+  static const bookingStatusCancelled = 'Отменена';
+  static const bookingDetailsTitle = 'Детали записи';
+  static const bookingDetailsStatus = 'Статус';
+  static const bookingDetailsCreatedAt = 'Создана';
+  static const bookingActionDetails = 'Подробнее';
+  static const bookingActionCancel = 'Отменить запись';
+  static const bookingActionsTitle = 'Действия с записью';
+  static const cancelDialogTitle = 'Отменить запись?';
+  static String cancelDialogMessage(String service, String dateTime) =>
+      '$service, $dateTime. Время освободится для других клиентов.';
+  static const cancelDialogKeep = 'Не отменять';
+  static const cancelDialogConfirm = 'Отменить запись';
+  static const bookingCancelled = 'Запись отменена';
+  static const bookingCancelFailed = 'Не удалось отменить запись';
 }
