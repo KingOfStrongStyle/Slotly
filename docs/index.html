@@ -22,6 +22,15 @@
 <li><a href="architecture.html">Архитектура</a></li>
 <li><a href="architecture-decisions.html">Архитектурные решения</a></li>
 <li><a href="requirements-matrix.html">Матрица требований</a></li>
+<li><a href="seed-data.html">Демо-данные</a></li>
+</ul>
+<div class="nav-group">Продукт</div><ul>
+<li><a href="auth-and-roles.html">Вход и роли</a></li>
+<li><a href="permission-matrix.html">Матрица прав</a></li>
+<li><a href="reviews-and-ratings.html">Отзывы и рейтинги</a></li>
+<li><a href="owner-dashboard.html">Кабинет владельца</a></li>
+<li><a href="analytics.html">Аналитика</a></li>
+<li><a href="notifications.html">Напоминания</a></li>
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="lab-1.html">Лабораторная №1</a></li>
@@ -44,51 +53,57 @@
 </aside>
 <main>
 <h1>Slotly: документация проекта</h1>
-<p class="lead">Учебный MVP мобильного сервиса онлайн-записи и электронной очереди для локального бизнеса. Flutter + Dart, Android, Material 3.</p>
-
-<div class="callout">
-<p><strong>Версия 0.1.0.</strong> Все проверки финальной сборки пройдены: формат, анализатор, 105 автоматических тестов, интеграционный тест на эмуляторе, debug- и release-сборка. Подробности — в разделе <a href="testing.html">«Тестирование»</a>.</p>
-</div>
+<p class="lead">Мобильный сервис онлайн-записи для локального бизнеса с двумя ролями — клиент и владелец организации. Flutter + Dart, Android, Material 3. Учебный MVP, работающий полностью на устройстве.</p>
+<div class="callout"><p>Версия 0.2.0. Финальная проверка: формат и анализатор без замечаний, 344 автоматических прогонов, 8 интеграционных сценариев на эмуляторе, debug- и release-сборка. Подробно — <a href="testing.html">«Тестирование»</a>. Демо-аккаунты — <a href="auth-and-roles.html">«Вход и роли»</a>.</p></div>
 
 <h2>С чего начать</h2>
 <div class="cards">
-<div class="card"><h3><a href="project-overview.html">Обзор проекта</a></h3><p>Идея, цели, возможности, скриншоты реального приложения, учебный план.</p></div>
-<div class="card"><h3><a href="demo-scenario.html">Сценарий демонстрации</a></h3><p>Пошаговый показ всех лабораторных на эмуляторе.</p></div>
-<div class="card"><h3><a href="defense.html">Защита</a></h3><p>Выступление на 7–10 минут, передача слова, запасной план, вопросы.</p></div>
-<div class="card"><h3><a href="requirements-matrix.html">Матрица требований</a></h3><p>Каждое требование → файл, тест, демонстрация, статус.</p></div>
+<div class="card"><h3><a href="project-overview.html">Обзор проекта</a></h3><p>Идея, роли, возможности, скриншоты реального приложения.</p></div>
+<div class="card"><h3><a href="product-evolution-plan.html">План эволюции</a></h3><p>Как лабораторный проект стал продуктом: решения и альтернативы.</p></div>
+<div class="card"><h3><a href="demo-scenario.html">Сценарий демонстрации</a></h3><p>Лабораторные и продуктовые сценарии по шагам.</p></div>
+<div class="card"><h3><a href="defense.html">Защита</a></h3><p>Выступление на 10–12 минут, передача слова, вопросы.</p></div>
+</div>
+
+<h2>Продукт</h2>
+<div class="cards">
+<div class="card"><h3><a href="auth-and-roles.html">Вход и роли</a></h3><p>Демо-вход, сессия, оболочки клиента и владельца.</p></div>
+<div class="card"><h3><a href="permission-matrix.html">Матрица прав</a></h3><p>16 действий × 5 видов пользователей, проверка в слое данных.</p></div>
+<div class="card"><h3><a href="reviews-and-ratings.html">Отзывы и рейтинги</a></h3><p>Отзыв после визита, рейтинг из отзывов.</p></div>
+<div class="card"><h3><a href="owner-dashboard.html">Кабинет владельца</a></h3><p>Записи, услуги и прайс, фото, отзывы.</p></div>
+<div class="card"><h3><a href="analytics.html">Аналитика</a></h3><p>KPI, формулы, графики, доступность.</p></div>
+<div class="card"><h3><a href="notifications.html">Напоминания</a></h3><p>Локальные напоминания, разрешения, ручная проверка.</p></div>
+<div class="card"><h3><a href="seed-data.html">Демо-данные</a></h3><p>Генератор, хранилище, миграции, сброс.</p></div>
 </div>
 
 <h2>Лабораторные и самостоятельная работа</h2>
 <div class="cards">
-<div class="card"><h3><a href="lab-1.html">Лабораторная №1</a></h3><p>Первое приложение, архитектура Android, Flutter поверх Android, жизненный цикл, диагностика.</p></div>
-<div class="card"><h3><a href="lab-2.html">Лабораторная №2</a></h3><p>Каталог, форма записи, диалоги, SnackBar, списки, вкладки, свайпы, профиль.</p></div>
-<div class="card"><h3><a href="independent-work.html">Самостоятельная работа</a></h3><p>Интерактивный прототип из 8 фреймов, UI kit, SVG для Figma.</p></div>
-<div class="card"><h3><a href="lab-3.html">Лабораторная №3</a></h3><p>Gesture Lab, жесты в записях, рукописный ввод талона и алгоритм распознавания.</p></div>
+<div class="card"><h3><a href="lab-1.html">Лабораторная №1</a></h3><p>Welcome, архитектура Android и Flutter, жизненный цикл, диагностика.</p></div>
+<div class="card"><h3><a href="lab-2.html">Лабораторная №2</a></h3><p>Каталог, форма записи, диалоги, списки, вкладки, свайпы, профиль.</p></div>
+<div class="card"><h3><a href="independent-work.html">Самостоятельная работа</a></h3><p>Интерактивный прототип, UI kit, SVG для Figma.</p></div>
+<div class="card"><h3><a href="lab-3.html">Лабораторная №3</a></h3><p>Gesture Lab, рукописный ввод талона, жесты в продукте.</p></div>
 </div>
 
 <h2>Техническая документация</h2>
-<div class="cards">
-<div class="card"><h3><a href="architecture.html">Архитектура</a></h3><p>Структура, слои, потоки данных, состояние, зависимости, точки расширения.</p></div>
-<div class="card"><h3><a href="architecture-decisions.html">Архитектурные решения</a></h3><p>14 решений с контекстом и последствиями.</p></div>
-<div class="card"><h3><a href="environment.html">Окружение</a></h3><p>Версии инструментов и подготовка macOS с нуля.</p></div>
-<div class="card"><h3><a href="testing.html">Тестирование</a></h3><p>Результаты, покрытие, состав тестов, CI.</p></div>
-<div class="card"><h3><a href="future-roadmap.html">План развития</a></h3><p>Backend, роли, мультитенантность, уведомления, iOS, публикация.</p></div>
-</div>
+<ul>
+<li><a href="architecture.html">Архитектура</a> — структура, слои, потоки данных, зависимости, точки расширения.</li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a> — 25 ADR.</li>
+<li><a href="requirements-matrix.html">Матрица требований</a> — требование → файл → тест → демонстрация.</li>
+<li><a href="testing.html">Тестирование</a>, <a href="environment.html">Окружение</a>, <a href="future-roadmap.html">План развития</a>.</li>
+</ul>
 
 <h2>Команда</h2>
 <div class="cards">
-<div class="card"><h3><a href="team/kirill.html">Кирилл</a></h3><p>Каркас, навигация, lifecycle и диагностика, «Мои записи», CI и сборка.</p></div>
-<div class="card"><h3><a href="team/vlad.html">Влад</a></h3><p>Модели, репозиторий, форма записи, распознавание жестов, ввод талона.</p></div>
-<div class="card"><h3><a href="team/yan.html">Ян</a></h3><p>UI kit и прототип, welcome, каталог, детали, профиль, Gesture Lab.</p></div>
+<div class="card"><h3><a href="team/kirill.html">Кирилл Першин</a></h3><p>Интеграция архитектуры, сессия и роли, навигация, права, напоминания, CI, сборка.</p></div>
+<div class="card"><h3><a href="team/vlad.html">Влад Задорожный</a></h3><p>Хранилище, репозитории, seed, отзывы и рейтинг, расчёт аналитики, тесты прав.</p></div>
+<div class="card"><h3><a href="team/yan.html">Ян Тонков</a></h3><p>Дизайн-система, экраны клиента и владельца, галерея, графики, жесты, widget- и golden-тесты.</p></div>
 </div>
 
 <h2>Быстрый старт</h2>
 <pre><code>flutter pub get
-flutter run                 # нужен запущенный эмулятор или телефон
-flutter test                # все unit-, widget- и golden-тесты
-open docs/index.html        # эта документация
-open design/prototype/index.html   # интерактивный прототип</code></pre>
-<p>Все страницы — обычные HTML-файлы без внешних зависимостей и CDN; их можно открыть двойным щелчком или распечатать (есть стили для печати).</p>
+./tool/start_emulator.sh           # или F5 в VS Code
+flutter run -d emulator-5554
+flutter test
+open docs/index.html</code></pre>
 <footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
 </main>
 </div>

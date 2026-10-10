@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отзывы и рейтинги — Slotly</title>
+<link rel="stylesheet" href="assets/docs.css">
+<link rel="icon" href="assets/slotly-logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="index.html"><img src="assets/slotly-logo.svg" alt="">Slotly</a>
+<nav aria-label="Разделы документации">
+<div class="nav-group">Начало</div><ul>
+<li><a href="index.html">Главная</a></li>
+<li><a href="project-overview.html">Обзор проекта</a></li>
+<li><a href="environment.html">Окружение</a></li>
+<li><a href="product-evolution-plan.html">План эволюции продукта</a></li>
+</ul>
+<div class="nav-group">Архитектура</div><ul>
+<li><a href="architecture.html">Архитектура</a></li>
+<li><a href="architecture-decisions.html">Архитектурные решения</a></li>
+<li><a href="requirements-matrix.html">Матрица требований</a></li>
+<li><a href="seed-data.html">Демо-данные</a></li>
+</ul>
+<div class="nav-group">Продукт</div><ul>
+<li><a href="auth-and-roles.html">Вход и роли</a></li>
+<li><a href="permission-matrix.html">Матрица прав</a></li>
+<li><a href="reviews-and-ratings.html" aria-current="page">Отзывы и рейтинги</a></li>
+<li><a href="owner-dashboard.html">Кабинет владельца</a></li>
+<li><a href="analytics.html">Аналитика</a></li>
+<li><a href="notifications.html">Напоминания</a></li>
+</ul>
+<div class="nav-group">Лабораторные</div><ul>
+<li><a href="lab-1.html">Лабораторная №1</a></li>
+<li><a href="lab-2.html">Лабораторная №2</a></li>
+<li><a href="independent-work.html">Самостоятельная работа</a></li>
+<li><a href="lab-3.html">Лабораторная №3</a></li>
+</ul>
+<div class="nav-group">Качество и защита</div><ul>
+<li><a href="testing.html">Тестирование</a></li>
+<li><a href="demo-scenario.html">Сценарий демонстрации</a></li>
+<li><a href="defense.html">Защита</a></li>
+<li><a href="future-roadmap.html">План развития</a></li>
+</ul>
+<div class="nav-group">Команда</div><ul>
+<li><a href="team/kirill.html">Кирилл</a></li>
+<li><a href="team/vlad.html">Влад</a></li>
+<li><a href="team/yan.html">Ян</a></li>
+</ul>
+</nav>
+</aside>
+<main>
+<h1>Отзывы и рейтинги</h1>
+<p class="lead">Оценить место можно только после реального визита, один раз на визит. Рейтинг организации и специалиста никогда не хранится — он каждый раз считается из отзывов.</p>
+
+<h2>Правила</h2>
+<ul>
+<li>Отзыв привязан к записи (<code>bookingId</code>): клиент, организация, услуга и специалист берутся из неё.</li>
+<li>Оставить отзыв можно только на <strong>свою</strong> запись со статусом <strong>«Визит состоялся»</strong> (<code>completed</code>). Статус ставит владелец кнопкой «Визит состоялся» после начала визита; в демо-данных прошедшие визиты уже отмечены.</li>
+<li>Один отзыв на одну запись. После удаления отзыва визит снова можно оценить.</li>
+<li>Оценка 1–5 обязательна, текст — до 1000 символов, необязателен.</li>
+<li>Автор может изменить или удалить свой отзыв; у изменённого отзыва показывается пометка «изменён».</li>
+<li>Владелец может ответить на отзыв своей организации (до 500 символов), но не может изменить оценку или текст клиента.</li>
+</ul>
+<p>Правила — <code>lib/features/reviews/domain/review_rules.dart</code>, проверка — в <code>LocalReviewRepository</code>. Сообщения в UI: «Отзыв можно оставить только один раз и только после завершённого визита».</p>
+
+<h2>Агрегаты</h2>
+<p><code>RatingSummary.of(reviews)</code> — чистая функция: количество, среднее и распределение по звёздам. Без отзывов среднее — <code>null</code> («Нет отзывов»), а не 0. Используется:</p>
+<ul>
+<li>в карточке места каталога и на странице организации: «★ 4,6 · 17 отзывов»;</li>
+<li>для специалиста — по отзывам с его <code>specialistId</code>; рейтинг показывается только при трёх и более отзывах («Мало отзывов для рейтинга»);</li>
+<li>в аналитике владельца — средняя оценка за период и за всё время.</li>
+</ul>
+<p>Почему не хранить средний рейтинг в организации: при каждом создании, изменении и удалении отзыва его пришлось бы пересчитывать, и любая ошибка привела бы к расхождению. На демо-объёме (десятки отзывов) расчёт занимает микросекунды. На сервере (фаза B) агрегат можно материализовать, но источником истины останутся отзывы.</p>
+
+<h2>Экраны</h2>
+<div class="screens">
+<figure><img src="assets/screenshots/v2/05-price-list.png" alt="Рейтинг на странице места"><figcaption>Рейтинг специалистов и распределение</figcaption></figure>
+<figure><img src="assets/screenshots/v2/08-reviews.png" alt="Все отзывы"><figcaption>Все отзывы, сортировка</figcaption></figure>
+<figure><img src="assets/screenshots/v2/13-past.png" alt="Прошедшие визиты"><figcaption>«Оставить отзыв» у прошедшего визита</figcaption></figure>
+<figure><img src="assets/screenshots/v2/14-review-form.png" alt="Форма отзыва"><figcaption>Форма отзыва</figcaption></figure>
+<figure><img src="assets/screenshots/v2/26-owner-reviews.png" alt="Отзывы у владельца"><figcaption>Отзывы у владельца, ответ</figcaption></figure>
+</div>
+<ul>
+<li>Сортировка: «Сначала новые», «Сначала высокие оценки», «Сначала низкие оценки»; при равной оценке — по дате.</li>
+<li>Свой отзыв: долгое нажатие или кнопка «⋮» открывают одно и то же меню «Изменить отзыв / Удалить отзыв». Удаление — только после подтверждения.</li>
+<li>Звёзды формы — отдельные кнопки с подписью «Оценка N из 5» для TalkBack.</li>
+<li>Полоски распределения — обычные виджеты с текстовой подписью «5 звезд: 12 отзывов».</li>
+</ul>
+
+<h2>Тесты</h2>
+<ul>
+<li><code>test/features/reviews/review_repository_test.dart</code> — право на отзыв, один отзыв на запись, валидация, изменение и удаление с пересчётом рейтинга, ответ владельца, <code>RatingSummary</code>.</li>
+<li><code>test/features/reviews/reviews_screen_test.dart</code> — сортировка, долгое нажатие и «⋮», отсутствие меню у чужих отзывов.</li>
+<li><code>test/app/booking_flow_test.dart</code> — отзыв из вкладки «Прошедшие» меняет рейтинг организации; интеграционный сценарий 2 — то же на эмуляторе.</li>
+</ul>
+<p>Отметка «полезный отзыв» не реализована: в MVP она не нужна и не должна смешиваться с избранным.</p>
+<footer class="page-footer">Slotly · учебный MVP · документация проекта. Все данные в приложении демонстрационные.</footer>
+</main>
+</div>
+</body>
+</html>

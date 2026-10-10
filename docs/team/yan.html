@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ян: UI kit, экраны и Gesture Lab — Slotly</title>
+<title>Ян Тонков: дизайн-система, экраны, жесты — Slotly</title>
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="icon" href="../assets/slotly-logo.svg" type="image/svg+xml">
 </head>
@@ -22,6 +22,15 @@
 <li><a href="../architecture.html">Архитектура</a></li>
 <li><a href="../architecture-decisions.html">Архитектурные решения</a></li>
 <li><a href="../requirements-matrix.html">Матрица требований</a></li>
+<li><a href="../seed-data.html">Демо-данные</a></li>
+</ul>
+<div class="nav-group">Продукт</div><ul>
+<li><a href="../auth-and-roles.html">Вход и роли</a></li>
+<li><a href="../permission-matrix.html">Матрица прав</a></li>
+<li><a href="../reviews-and-ratings.html">Отзывы и рейтинги</a></li>
+<li><a href="../owner-dashboard.html">Кабинет владельца</a></li>
+<li><a href="../analytics.html">Аналитика</a></li>
+<li><a href="../notifications.html">Напоминания</a></li>
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="../lab-1.html">Лабораторная №1</a></li>
@@ -43,10 +52,131 @@
 </nav>
 </aside>
 <main>
-<h1>Ян: UI kit, экраны и Gesture Lab</h1>
-<p class="lead">Персональная страница для изучения, проверки и защиты модуля. Описывает зону ответственности и сопровождения; авторство отдельных коммитов см. в Git-истории.</p>
+<h1>Ян Тонков: дизайн-система, экраны, жесты</h1>
+<p class="lead">Ян отвечает за то, как Slotly выглядит и ощущается: дизайн-токены, экраны клиента и владельца, профиль бизнеса и галерею, графики дашборда, жесты в продуктовых сценариях, widget- и golden-тесты. Навигация: «Ян».</p>
+<h2>Отчёт версии 0.2.0</h2>
+<p><em>Документ описывает зону ответственности, изучения и защиты участника. Он не утверждает, кто лично написал каждую строку: фактическое авторство видно в истории Git.</em></p>
+<h3>1. Новая зона ответственности</h3>
+<ul>
+<li>Дизайн-система: токены отступов и радиусов, семантические цвета <code>SlotlyColors</code>, проверенная палитра графиков.</li>
+<li>Клиентские экраны: каталог мест и услуг, карточка организации, страница организации, отзывы, избранное, «Мои записи».</li>
+<li>Экраны владельца: дашборд, записи, услуги и редактор, отзывы, профиль организации и фотографии.</li>
+<li>Галерея: листание, pinch-масштаб со сбросом, закрытие свайпом вниз.</li>
+<li>UI графиков: столбцы, полосы, составная полоса, таблица, подписи для TalkBack.</li>
+<li>Функциональные жесты и их доступные альтернативы; widget- и golden-тесты.</li>
+</ul>
+<h3>2. Изменённые и новые файлы</h3>
+<div class="table-wrap"><table>
+<tr><th>Файл</th><th>Назначение</th></tr>
+<tr><td><code>lib/app/theme.dart</code></td><td>SlotlyColors (рейтинг, успех, предупреждение, палитра графиков) для светлой и тёмной темы</td></tr>
+<tr><td><code>lib/features/catalog/presentation/*</code></td><td>Каталог, OrganizationCard, OrganizationScreen, PhotoGalleryScreen, BusinessPhotoView</td></tr>
+<tr><td><code>lib/features/favorites/presentation/*</code></td><td>FavoriteButton, FavoriteBurst, экран «Избранное»</td></tr>
+<tr><td><code>lib/features/reviews/presentation/*</code></td><td>Звёзды, распределение, ReviewTile с меню, форма отзыва, экран отзывов</td></tr>
+<tr><td><code>lib/features/booking/presentation/*</code></td><td>Три вкладки, двусторонний свайп, детали с кнопками действий, режим переноса</td></tr>
+<tr><td><code>lib/features/analytics/presentation/*</code></td><td>Дашборд, KPI, ChartCard, TimeBarChart, RankedBars, StackedShareBar</td></tr>
+<tr><td><code>lib/features/business/presentation/*</code></td><td>Записи, услуги, редактор услуги, отзывы, профиль организации</td></tr>
+<tr><td><code>lib/core/widgets/rating_badge.dart</code></td><td>Рейтинг одной фразой для TalkBack, перенос при крупном шрифте</td></tr>
+<tr><td><code>test/goldens/*</code></td><td>13 эталонов: вход, каталог, карточка, отзывы, дашборд, редактор, пустые состояния</td></tr>
+<tr><td><code>test/features/catalog/*, reviews/*, business/owner_screens_test.dart</code></td><td>Widget-тесты экранов и жестов</td></tr>
+</table></div>
+<h3>3. Добавленные сущности</h3>
+<ul>
+<li><code>SlotlyColors</code> (ThemeExtension).</li>
+<li><code>OrganizationCard</code>, <code>FavoriteButton</code>, <code>FavoriteBurst</code>, <code>BusinessPhotoView</code>, <code>PhotoGalleryScreen</code>.</li>
+<li><code>RatingBadge</code>, <code>RatingDistribution</code>, <code>StarRow</code>, <code>ReviewTile</code>.</li>
+<li><code>ChartCard</code>, <code>TimeBarChart</code>, <code>RankedBars</code>, <code>StackedShareBar</code>.</li>
+<li><code>OwnerDashboardScreen</code>, <code>OwnerBookingsScreen</code>, <code>OwnerServicesScreen</code>, <code>ServiceEditorScreen</code>, <code>OwnerReviewsScreen</code>, <code>BusinessProfileScreen</code>.</li>
+</ul>
+<h3>4. Архитектурные решения</h3>
+<ul>
+<li>Material 3 и один фирменный акцент; без градиентов и декоративных пятен — нейтральные поверхности и иллюстрации категорий.</li>
+<li>Собственные графики вместо fl_chart; цвета проверены валидатором палитры на дальтонизм (ADR-21).</li>
+<li>Каждому жесту — видимая альтернатива; кнопка-сердце вне зоны double tap (ADR-24).</li>
+<li>Кнопка «Добавить услугу» в Scaffold оболочки: SnackBar поднимает её, а не закрывает.</li>
+<li>Фиксированные вкладки «Мои записи» вместо прокручиваемых — все три видны на 360 dp.</li>
+</ul>
+<h3>5. Почему они подходят MVP</h3>
+<ul>
+<li>Существующая тема уже на Material 3 — токены расширили её, а не заменили.</li>
+<li>Все графики столбчатые: два-три виджета проще поддерживать, чем настраивать библиотеку.</li>
+<li>Альтернативы жестам нужны TalkBack-пользователям и тем, кому неудобен double tap или pinch.</li>
+</ul>
+<h3>6. Как масштабируются до production</h3>
+<ul>
+<li>Токены → полноценная дизайн-система с компонентами в Figma и UI kit.</li>
+<li>Графики → fl_chart при появлении линейных и интерактивных графиков.</li>
+<li>Фото → URL из объектного хранилища, миниатюры с сервера, тот же <code>BusinessPhotoView</code>.</li>
+</ul>
+<h3>7. Рассмотренные альтернативы</h3>
+<div class="table-wrap"><table>
+<tr><th>Альтернатива</th><th>Почему не сейчас</th></tr>
+<tr><td>fl_chart</td><td>Избыточна для столбцов, доступность добавлять вручную</td></tr>
+<tr><td>Прокручиваемый TabBar в «Моих записях»</td><td>Третья вкладка уходила за край экрана — найдено тестом</td></tr>
+<tr><td>Перетаскивание фото (drag & drop)</td><td>Без видимой альтернативы; кнопки «выше/ниже» доступнее</td></tr>
+<tr><td>Первая палитра графиков (бирюза, янтарь, серо-синий, розовый)</td><td>Не прошла проверку на протанопию</td></tr>
+</table></div>
+<h3>8. Тесты модуля</h3>
+<ul>
+<li><code>test/features/catalog/catalog_screen_test.dart</code> — режимы, поиск, double tap и сердце.</li>
+<li><code>test/features/catalog/organization_screen_test.dart</code> — галерея: свайп, pinch, сброс, свайп вниз.</li>
+<li><code>test/features/reviews/reviews_screen_test.dart</code> — сортировка, долгое нажатие и «⋮».</li>
+<li><code>test/features/booking/bookings_screen_test.dart</code> — свайпы, детали, «Я на месте», отзыв.</li>
+<li><code>test/features/business/owner_screens_test.dart</code> — экраны владельца; <code>test/app/text_scale_test.dart</code> — шрифт 200 %.</li>
+<li><code>test/goldens/key_screens_golden_test.dart</code> — 13 эталонов, каждый просмотрен перед фиксацией.</li>
+</ul>
+<h3>9. Как проверить вручную</h3>
+<ol>
+<li>Каталог → двойное касание карточки: сердце и вибрация, кнопка-сердце закрашена; повторный double tap не убирает.</li>
+<li>Страница места → фото → свести пальцы (Cmd + мышь), «Сбросить масштаб», смахнуть вниз.</li>
+<li>«Мои записи» → свайп вправо → экран переноса; влево → диалог отмены.</li>
+<li>Владелец → «Обзор»: 7/30/90 дней, кнопка таблицы, тёмная тема.</li>
+<li>Владелец → «Организация» → «Добавить фото» до пяти, шестое — сообщение; «Переместить выше» делает фото обложкой.</li>
+</ol>
+<h3>10. Демо-аккаунт</h3>
+<ul>
+<li><code>damir / damir-demo</code> — избранное и галерея</li>
+<li><code>aliya / aliya-demo</code> — отзывы и свайпы</li>
+<li><code>north / north-demo</code> — экраны владельца</li>
+</ul>
+<h3>11. Пошаговый сценарий защиты</h3>
+<ol>
+<li>Показать каталог мест и рейтинг; двойное касание и кнопку-сердце.</li>
+<li>Страница организации: галерея с pinch и свайпом вниз, прайс, специалисты, отзывы.</li>
+<li>«Мои записи»: оба свайпа и кнопки в деталях как альтернатива.</li>
+<li>Владелец: услуги с меню по долгому нажатию, редактор с прайсом, фото с лимитом.</li>
+<li>Дашборд: графики, таблица, тёмная тема; объяснить выбор цветов.</li>
+<li>Показать golden-тест и widget-тест жестов.</li>
+</ol>
+<h3>12–13. Вопросы преподавателя и ответы</h3>
+<details><summary>Почему двойное касание не убирает из избранного?</summary><p>Случайное двойное касание не должно удалять; убирают кнопкой.</p></details>
+<details><summary>Почему сердце на карточке вынесено в отдельный слой?</summary><p>Иначе каждое касание ждёт таймаут двойного касания 300 мс; тест это нашёл.</p></details>
+<details><summary>Как доступны графики без зрения?</summary><p>У графика одна понятная подпись (всего и максимум), у полос — подпись каждого значения, и есть табличный вид.</p></details>
+<details><summary>Почему такие цвета статусов?</summary><p>Синий, оранжевый и бирюзовый различимы при всех видах дальтонизма в обеих темах — проверено валидатором; значения подписаны текстом.</p></details>
+<details><summary>Как работает закрытие свайпом вниз?</summary><p>Вертикальный drag двигает фото и закрывает экран при смещении больше 120 px или быстром свайпе; при увеличении жест отключён, чтобы панорамировать фото.</p></details>
+<details><summary>Что видно при крупном шрифте?</summary><p>Все вкладки обеих ролей проверены тестом на 200 %; строка рейтинга переносится.</p></details>
+<details><summary>Почему golden-картинки из квадратиков?</summary><p>Тестовый шрифт не зависит от системы; проверяется компоновка и цвета, а текст — на реальных скриншотах.</p></details>
+<h3>14. Известные ограничения</h3>
+<ul>
+<li>Pinch на эмуляторе — только Cmd + мышь; adb не умеет мультитач.</li>
+<li>Скриншоты сняты на эмуляторе с программной отрисовкой; плавность на телефоне не измерялась.</li>
+<li>HTML-прототип обновлён частично: новые экраны описаны скриншотами, а не кликабельными фреймами.</li>
+</ul>
+<h3>15. Что нельзя называть production-ready</h3>
+<ul>
+<li>Плавность анимаций на реальных устройствах — не измерена.</li>
+<li>Дизайн-систему как библиотеку компонентов: токены и виджеты живут в коде приложения.</li>
+</ul>
+<h3>16. План дальнейшего развития</h3>
+<ul>
+<li>Figma-библиотека компонентов из текущих токенов.</li>
+<li>Замер кадров на телефоне среднего класса и оптимизация каталога.</li>
+<li>Перетаскивание фото как дополнительный жест к кнопкам.</li>
+</ul>
 
-<h2>1. Зона ответственности</h2>
+<h2>Приложение: зона лабораторных (версия 0.1.0)</h2>
+<p>Материал для защиты лабораторных №1–3, актуален вместе с пометками на страницах лабораторных.</p>
+
+<h3>1. Зона ответственности</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Задача</th><th>Условные баллы</th></tr></thead>
 <tbody>
@@ -59,7 +189,7 @@
 </table></div>
 <p>Баллы — внутренняя оценка баланса трудоёмкости, а не прогноз оценки преподавателя.</p>
 
-<h2>2–3. Связанные файлы и их назначение</h2>
+<h3>2–3. Связанные файлы и их назначение</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Файл</th><th>Назначение</th></tr></thead>
 <tbody>
@@ -84,7 +214,7 @@
 </tbody>
 </table></div>
 
-<h2>4. Архитектурный поток данных</h2>
+<h3>4. Архитектурный поток данных</h3>
 <pre><code>WelcomeScreen ─ setState(_selectedCategory) ─ onShowServices(category) ─► маршрут
 CatalogScreen(services, initialCategory, onServiceSelected)
    ├─ TextField.onChanged ─ setState ─► filterServices(...) (domain, Влад)
@@ -96,28 +226,28 @@ GestureLabScreen
         ─ onEvent(kind, message) ─► _record ─ setState ─► GestureLogView</code></pre>
 <p>Экраны получают данные и действия через конструктор и не знают, откуда пришли данные и куда ведёт навигация.</p>
 
-<h2>5. Основные алгоритмы и решения</h2>
-<h3>Адаптивность</h3>
+<h3>5. Основные алгоритмы и решения</h3>
+<h4>Адаптивность</h4>
 <pre><code>double responsiveGutter(double width) =&gt;
     math.max(AppSpacing.l, (width - AppSpacing.maxContentWidth) / 2);</code></pre>
 <p>На телефоне отступ 16 dp, на планшете контент центрируется колонкой 640 dp. Высоты не фиксируются, поэтому при шрифте ×2 текст переносится, а не обрезается (тест <code>text_scale_test.dart</code>).</p>
-<h3>Иллюстрация услуги</h3>
+<h4>Иллюстрация услуги</h4>
 <p><code>ServiceArtwork</code> рисует фон одного из трёх контейнерных цветов схемы и два-три полупрозрачных круга (вариант задаёт <code>Service.artworkVariant</code>), сверху — иконка категории. Без сетевых и сторонних изображений.</p>
-<h3>Gesture Lab и Gesture Arena</h3>
+<h4>Gesture Lab и Gesture Arena</h4>
 <p>Каждая зона — отдельный <code>GestureDetector</code> без конфликтующих колбэков. Вкладки переключают <code>IndexedStack</code>, а не <code>TabBarView</code>, потому что <code>TabBarView</code> сам реагирует на горизонтальный свайп. Масштаб: <code>scale = clamp(scaleAtStart × details.scale, 0.5, 3.0)</code>; одиночный pan с масштабом 1 не логируется.</p>
 
-<h2>6. Как запустить модуль</h2>
+<h3>6. Как запустить модуль</h3>
 <pre><code>flutter run -d emulator-5554           # welcome, каталог, детали, профиль, Gesture Lab
 open design/prototype/index.html       # прототип
 python3 design/tools/build_prototype.py # пересобрать прототип и SVG</code></pre>
 
-<h2>7. Как проверить модуль</h2>
+<h3>7. Как проверить модуль</h3>
 <pre><code>flutter test test/features/catalog test/features/profile test/features/gesture_lab \
   test/goldens test/app/text_scale_test.dart
 # намеренное обновление эталонов после изменения дизайна:
 flutter test --update-goldens test/goldens</code></pre>
 
-<h2>8. Тесты модуля</h2>
+<h3>8. Тесты модуля</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Файл</th><th>Что проверяет</th></tr></thead>
 <tbody>
@@ -130,7 +260,7 @@ flutter test --update-goldens test/goldens</code></pre>
 </tbody>
 </table></div>
 
-<h2>9. Сценарий демонстрации</h2>
+<h3>9. Сценарий демонстрации</h3>
 <ol>
 <li>Прототип: пройти сценарий, включить кликабельные зоны, открыть UI kit.</li>
 <li>Приложение: welcome, каталог, поиск «СТРИЖ», пустой поиск, сброс, детали.</li>
@@ -139,14 +269,14 @@ flutter test --update-goldens test/goldens</code></pre>
 <li>Показать golden-эталоны в <code>test/goldens/goldens/</code> и объяснить тестовый шрифт.</li>
 </ol>
 
-<h2>10. Короткая защита (от первого лица)</h2>
+<h3>10. Короткая защита (от первого лица)</h3>
 <div class="speech">
 <p>Я отвечаю за интерфейс. Сначала я сделал дизайн-прототип: восемь экранов основного сценария, переходы между ними и UI kit — цвета, шрифты, отступы и компоненты в состояниях: обычном, нажатом, отключённом и с ошибкой. Цвета взяты из той же Material 3 схемы, что и в приложении, поэтому прототип совпадает с реальными экранами — это видно на странице самостоятельной работы, где они стоят рядом.</p>
 <p>В приложении на мне welcome, каталог, детали и профиль. Каталог ищет без учёта регистра, а если ничего не нашлось — объясняет это и предлагает сбросить фильтры. Все тексты собраны в одном файле, чтобы потом подключить локализацию.</p>
 <p>Gesture Lab показывает шесть стандартных жестов. Я разделил их на зоны, потому что некоторые жесты на одном элементе конфликтуют в Gesture Arena, а Flutter вообще запрещает pan вместе со scale. Каждое действие сразу видно визуально и попадает в журнал.</p>
 </div>
 
-<h2>11. Вероятные вопросы преподавателя</h2>
+<h3>11. Вероятные вопросы преподавателя</h3>
 <ol>
 <li>Чем StatefulWidget отличается от StatelessWidget на примере welcome?</li>
 <li>Как реализована очистка поиска и empty state?</li>
@@ -160,7 +290,7 @@ flutter test --update-goldens test/goldens</code></pre>
 <li>Как обеспечена доступность?</li>
 </ol>
 
-<h2>12. Краткие ответы</h2>
+<h3>12. Краткие ответы</h3>
 <ol>
 <li>StatefulWidget хранит изменяемое состояние в объекте State; <code>setState</code> перестраивает виджет. Welcome хранит выбранную категорию.</li>
 <li>Иконка «×» появляется, когда в поле есть текст, и вызывает <code>clear()</code>; если <code>filterServices</code> вернул пустой список — <code>EmptyState</code> с кнопкой сброса.</li>
@@ -174,7 +304,7 @@ flutter test --update-goldens test/goldens</code></pre>
 <li>Касания ≥ 48 dp, <code>Semantics</code> у карточек, слотов и поля рисования, контраст Material 3, занятый слот озвучивается как «Занято».</li>
 </ol>
 
-<h2>13. Типичные ошибки</h2>
+<h3>13. Типичные ошибки</h3>
 <ul>
 <li>Фиксировать высоту карточки — при большом шрифте появится overflow.</li>
 <li>Использовать <code>TabBarView</code> вместе с горизонтальным drag.</li>
@@ -184,14 +314,14 @@ flutter test --update-goldens test/goldens</code></pre>
 <li>Писать тексты прямо в виджетах вместо <code>AppStrings</code>.</li>
 </ul>
 
-<h2>14. Если демонстрация не работает</h2>
+<h3>14. Если демонстрация не работает</h3>
 <ul>
 <li>Pinch мышью не получается — показать widget-тест pinch и объяснить ограничение adb.</li>
 <li>Прототип не открывается кликом — открыть через браузер: <em>Файл → Открыть</em> → <code>design/prototype/index.html</code>.</li>
 <li>Golden-тест упал после изменения темы — посмотреть <code>test/goldens/failures/</code>, при намеренном изменении обновить эталоны.</li>
 </ul>
 
-<h2>15. Развитие модуля</h2>
+<h3>15. Развитие модуля</h3>
 <ul>
 <li>Перенос UI kit в Figma с компонентами и вариантами, синхронизация токенов.</li>
 <li>Локализация через ARB, казахский и английский языки.</li>
@@ -199,7 +329,7 @@ flutter test --update-goldens test/goldens</code></pre>
 <li>Анимации переходов между карточкой и деталями (Hero) без перегрузки интерфейса.</li>
 </ul>
 
-<h2>16. Перед защитой прочитать и проверить</h2>
+<h3>16. Перед защитой прочитать и проверить</h3>
 <ul>
 <li>☐ Прочитать <code>catalog_screen.dart</code>, <code>welcome_screen.dart</code>, <code>gesture_lab_screen.dart</code> и зоны.</li>
 <li>☐ Открыть прототип и UI kit, пройти сценарий.</li>

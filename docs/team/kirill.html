@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Кирилл: каркас, lifecycle и интеграция — Slotly</title>
+<title>Кирилл Першин: интеграция, сессия, роли, напоминания — Slotly</title>
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="icon" href="../assets/slotly-logo.svg" type="image/svg+xml">
 </head>
@@ -22,6 +22,15 @@
 <li><a href="../architecture.html">Архитектура</a></li>
 <li><a href="../architecture-decisions.html">Архитектурные решения</a></li>
 <li><a href="../requirements-matrix.html">Матрица требований</a></li>
+<li><a href="../seed-data.html">Демо-данные</a></li>
+</ul>
+<div class="nav-group">Продукт</div><ul>
+<li><a href="../auth-and-roles.html">Вход и роли</a></li>
+<li><a href="../permission-matrix.html">Матрица прав</a></li>
+<li><a href="../reviews-and-ratings.html">Отзывы и рейтинги</a></li>
+<li><a href="../owner-dashboard.html">Кабинет владельца</a></li>
+<li><a href="../analytics.html">Аналитика</a></li>
+<li><a href="../notifications.html">Напоминания</a></li>
 </ul>
 <div class="nav-group">Лабораторные</div><ul>
 <li><a href="../lab-1.html">Лабораторная №1</a></li>
@@ -43,10 +52,139 @@
 </nav>
 </aside>
 <main>
-<h1>Кирилл: каркас, lifecycle и интеграция</h1>
-<p class="lead">Персональная страница для изучения, проверки и защиты модуля. Описывает зону ответственности и сопровождения; авторство отдельных коммитов см. в Git-истории.</p>
+<h1>Кирилл Першин: интеграция, сессия, роли, напоминания</h1>
+<p class="lead">Кирилл отвечает за то, как части Slotly собираются в одно приложение: зависимости, вход и сессия, корень и навигация по ролям, состав проверок прав, локальные напоминания, CI и финальная сборка. Навигация: «Кирилл».</p>
+<h2>Отчёт версии 0.2.0</h2>
+<p><em>Документ описывает зону ответственности, изучения и защиты участника. Он не утверждает, кто лично написал каждую строку: фактическое авторство видно в истории Git.</em></p>
+<h3>1. Новая зона ответственности</h3>
+<ul>
+<li>Интеграция архитектуры: <code>AppDependencies.create</code>, <code>LocalContext</code>, жизненный цикл зависимостей.</li>
+<li>Демо-аутентификация и сессия: вход, восстановление, выход, экран входа.</li>
+<li>Навигация по ролям: корень <code>SlotlyApp</code>, оболочки клиента и владельца, маршруты, deep link из напоминания.</li>
+<li>Композиция прав: класс <code>AccessPolicy</code>, его подключение в репозиториях (правила тестирует Влад).</li>
+<li>Локальные напоминания: планировщик, координатор, Android-настройка, экран статуса.</li>
+<li>CI, сборка APK, архитектурная документация, план эволюции и ADR.</li>
+</ul>
+<h3>2. Изменённые и новые файлы</h3>
+<div class="table-wrap"><table>
+<tr><th>Файл</th><th>Назначение</th></tr>
+<tr><td><code>lib/main.dart</code></td><td>Файловое хранилище, плагин напоминаний, выбор фото</td></tr>
+<tr><td><code>lib/app/app.dart</code></td><td>Корень по сессии, новый Navigator на каждый вход и выход</td></tr>
+<tr><td><code>lib/app/app_scope.dart</code></td><td>AppDependencies.create — единственное место выбора реализаций</td></tr>
+<tr><td><code>lib/app/client_shell.dart, owner_shell.dart</code></td><td>Оболочки ролей, контроллеры сессии, переход из напоминания</td></tr>
+<tr><td><code>lib/app/routes.dart</code></td><td>Типизированные маршруты: организация, запись и перенос, отзывы, отметка, редактор</td></tr>
+<tr><td><code>lib/app/app_controller.dart</code></td><td>Сохранённая тема, вкладки обеих оболочек</td></tr>
+<tr><td><code>lib/core/access/access_policy.dart</code></td><td>AppAction, AccessScope, AccessPolicy, AccessDeniedException</td></tr>
+<tr><td><code>lib/data/local/local_context.dart</code></td><td>База, текущий пользователь, часы и политика для репозиториев</td></tr>
+<tr><td><code>lib/features/auth/**</code></td><td>AppUser, PasswordHasher, AuthRepository, SessionController, LoginScreen, sign_out</td></tr>
+<tr><td><code>lib/features/reminders/**</code></td><td>ReminderPlanner, ReminderService, LocalReminderService, ReminderCoordinator, RemindersScreen</td></tr>
+<tr><td><code>android/app/build.gradle.kts, AndroidManifest.xml</code></td><td>Desugaring, ресиверы напоминаний, POST_NOTIFICATIONS</td></tr>
+<tr><td><code>tool/start_emulator.sh, .vscode/</code></td><td>Запуск эмулятора перед F5</td></tr>
+<tr><td><code>docs/product-evolution-plan.html, architecture*.html, auth-and-roles.html, notifications.html</code></td><td>Решения и описание</td></tr>
+</table></div>
+<h3>3. Добавленные сущности</h3>
+<ul>
+<li><code>AppUser</code>, <code>UserRole</code> — пользователь с ролью и организацией владельца.</li>
+<li><code>SessionController</code> — источник <code>currentUser</code> для репозиториев.</li>
+<li><code>AppAction</code>, <code>AccessPolicy</code> — матрица прав в коде.</li>
+<li><code>LocalContext</code> — общий контекст репозиториев.</li>
+<li><code>PlannedReminder</code>, <code>ReminderKind</code>, <code>ReminderPlanner</code>, <code>ReminderCoordinator</code>, <code>ReminderService</code>.</li>
+<li><code>ClientTab</code>, <code>OwnerTab</code>, <code>ClientShell</code>, <code>OwnerShell</code>.</li>
+</ul>
+<h3>4. Архитектурные решения</h3>
+<ul>
+<li>ChangeNotifier и AppScope сохранены — Riverpod не даёт измеримой пользы (Р1, ADR-03).</li>
+<li>Navigator с корнем по роли вместо go_router; ключ навигатора меняется на каждую сессию (ADR-19).</li>
+<li>Права проверяются в слое данных, UI только скрывает недоступное (ADR-18).</li>
+<li>Напоминания: чистый планировщик, детерминированные id, полная синхронизация, неточные будильники (ADR-22).</li>
+<li>Шесть runtime-зависимостей, каждая за интерфейсом (ADR-23).</li>
+</ul>
+<h3>5. Почему они подходят MVP</h3>
+<ul>
+<li>Код уже был построен на ChangeNotifier и конструкторном DI — новые части встали в ту же схему без переписывания экранов.</li>
+<li>Один deep link и две оболочки не оправдывают декларативный роутер.</li>
+<li>Полная синхронизация напоминаний — несколько записей у клиента, поэтому проще и надёжнее диффа.</li>
+<li>Репозитории получают пользователя функцией <code>currentUser</code> — так же, как сервер читает его из токена.</li>
+</ul>
+<h3>6. Как масштабируются до production</h3>
+<ul>
+<li><code>AuthRepository</code> → серверный вход с access/refresh token, <code>SessionController</code> хранит токены в secure storage.</li>
+<li><code>AccessPolicy</code> → DRF permissions и фильтрация queryset; клиентская политика остаётся для UI.</li>
+<li><code>ReminderService</code> → FCM, серверный планировщик, device token.</li>
+<li><code>AppDependencies.create</code> получает HTTP-реализации; экраны и оболочки не меняются.</li>
+</ul>
+<h3>7. Рассмотренные альтернативы</h3>
+<div class="table-wrap"><table>
+<tr><th>Альтернатива</th><th>Почему не сейчас</th></tr>
+<tr><td>Riverpod / provider</td><td>Перевод рабочих экранов без выигрыша; вернуться при десятках экранов с общими асинхронными данными</td></tr>
+<tr><td>go_router</td><td>Переписать маршруты ради одного deep link; вернуться при web-версии и App Links</td></tr>
+<tr><td>Проверки прав только в UI</td><td>Небезопасно: прямой вызов метода обходит скрытую кнопку</td></tr>
+<tr><td>FCM для напоминаний</td><td>Нужен сервер и Firebase; локальные напоминания достаточны для своих записей</td></tr>
+<tr><td>Точные будильники (SCHEDULE_EXACT_ALARM)</td><td>Отдельное разрешение на Android 14+; вернуться для напоминания «за час»</td></tr>
+</table></div>
+<h3>8. Тесты модуля</h3>
+<ul>
+<li><code>test/features/auth/auth_test.dart</code>, <code>login_screen_test.dart</code> — вход, ошибки, восстановление, выход, хеш.</li>
+<li><code>test/app/navigation_test.dart</code>, <code>app_controller_test.dart</code>, <code>text_scale_test.dart</code> — корень, вкладки, Back, тема, крупный шрифт обеих ролей.</li>
+<li><code>test/features/profile/profile_screen_test.dart</code> — выход с подтверждением, «Назад» после выхода.</li>
+<li><code>test/features/reminders/*</code> — планировщик, координатор, экран разрешения.</li>
+<li><code>integration_test/app_test.dart</code> — сценарии 6, 7, 8.</li>
+</ul>
+<h3>9. Как проверить вручную</h3>
+<ol>
+<li>Войти <code>aliya</code>, закрыть приложение свайпом, открыть снова — сразу каталог клиента.</li>
+<li>Профиль → «Выйти» → подтвердить; «Назад» закрывает приложение, а не возвращает в кабинет.</li>
+<li>Войти <code>damir</code>, Профиль → «Напоминания о записях» → «Разрешить уведомления» → Allow; список напоминаний.</li>
+<li>Перенести запись свайпом вправо — времена в списке напоминаний сменились.</li>
+<li>Сдвинуть часы эмулятора к 17:59 накануне визита (команды на странице «Напоминания») — напоминание в шторке, касание открывает запись.</li>
+</ol>
+<h3>10. Демо-аккаунт</h3>
+<ul>
+<li><code>aliya / aliya-demo</code> — сессия и выход</li>
+<li><code>damir / damir-demo</code> — напоминания</li>
+<li><code>north / north-demo</code> и <code>whiteline / whiteline-demo</code> — две оболочки и изоляция</li>
+</ul>
+<h3>11. Пошаговый сценарий защиты</h3>
+<ol>
+<li>Сказать о границе: всё локально, вход — прототип серверной авторизации.</li>
+<li>Показать вход через демо-аккаунт и разные оболочки для клиента и владельца.</li>
+<li>Перезапустить приложение — сессия восстановлена; выйти — «Назад» не возвращает.</li>
+<li>Открыть <code>access_policy.dart</code> и тест матрицы; показать прямой вызов аналитики чужой организации в интеграционном сценарии 6.</li>
+<li>Показать экран напоминаний, перенести запись, показать новые времена.</li>
+<li>Итог: проверки, CI, ограничения.</li>
+</ol>
+<h3>12–13. Вопросы преподавателя и ответы</h3>
+<details><summary>Почему после выхода нельзя вернуться кнопкой «Назад»?</summary><p>Корень создаёт новый Navigator с новым ключом при каждом входе и выходе: старый стек уничтожается целиком, а не перекрывается.</p></details>
+<details><summary>Откуда репозиторий знает пользователя?</summary><p>Через функцию <code>currentUser</code> в <code>LocalContext</code>; её даёт <code>SessionController</code>. На сервере это будет пользователь из токена.</p></details>
+<details><summary>Что будет, если плагин уведомлений не инициализируется?</summary><p><code>LocalReminderService.create</code> вернёт заглушку в памяти со статусом «Запрещено», приложение запустится.</p></details>
+<details><summary>Почему сначала отменяете все напоминания?</summary><p>Так не остаётся напоминаний отменённых и перенесённых записей; id детерминированы, поэтому новые не дублируются.</p></details>
+<details><summary>Какие разрешения нужны?</summary><p>POST_NOTIFICATIONS (диалог на Android 13+) и RECEIVE_BOOT_COMPLETED для восстановления после перезагрузки; точные будильники не запрашиваем.</p></details>
+<details><summary>Почему напоминание пришло на 2 минуты позже?</summary><p>Неточный режим Android: окно доставки до часа. Это записано в ограничениях.</p></details>
+<details><summary>Чем ваш вход отличается от настоящего?</summary><p>Проверка на устройстве, нет токенов, нет rate limiting и аудита. Production — сервер, Argon2id, refresh token в Keystore.</p></details>
+<h3>14. Известные ограничения</h3>
+<ul>
+<li>Вход и сессия на устройстве; пароли демо-аккаунтов публичны.</li>
+<li>Напоминания неточные по времени, не синхронизируются между устройствами, пропадают после переустановки.</li>
+<li>CI на GitHub ещё не запускался — репозиторий не опубликован.</li>
+<li>iOS не настроен.</li>
+</ul>
+<h3>15. Что нельзя называть production-ready</h3>
+<ul>
+<li>Аутентификацию и проверку прав: они выполняются на клиенте.</li>
+<li>Напоминания как замену push.</li>
+<li>Release APK: подписан debug-ключом.</li>
+</ul>
+<h3>16. План дальнейшего развития</h3>
+<ul>
+<li>Серверный вход и токены; HTTP-реализации репозиториев в <code>AppDependencies</code>.</li>
+<li>FCM и серверный планировщик; точный будильник для «за час».</li>
+<li>Публикация репозитория и первый прогон CI; flavors dev/staging/prod.</li>
+</ul>
 
-<h2>1. Зона ответственности</h2>
+<h2>Приложение: зона лабораторных (версия 0.1.0)</h2>
+<p>Материал для защиты лабораторных №1–3, актуален вместе с пометками на страницах лабораторных.</p>
+
+<h3>1. Зона ответственности</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Задача</th><th>Условные баллы</th></tr></thead>
 <tbody>
@@ -59,7 +197,7 @@
 </table></div>
 <p>Баллы — внутренняя оценка баланса трудоёмкости, а не прогноз оценки преподавателя.</p>
 
-<h2>2–3. Связанные файлы и их назначение</h2>
+<h3>2–3. Связанные файлы и их назначение</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Файл</th><th>Назначение</th></tr></thead>
 <tbody>
@@ -86,7 +224,7 @@
 </tbody>
 </table></div>
 
-<h2>4. Архитектурный поток данных</h2>
+<h3>4. Архитектурный поток данных</h3>
 <pre><code>main() → SlotlyApp
   initState: AppDependencies.demo()   ← единственное место выбора реализаций
      ├─ AppController                 тема / вкладка
@@ -103,10 +241,10 @@
   ──► AppLifecycleListener.onStateChange ──► LifecycleLogger._record
   ──► notifyListeners ──► DiagnosticsScreen (ListenableBuilder)</code></pre>
 
-<h2>5. Основные алгоритмы</h2>
-<h3>Нумерация журнала</h3>
+<h3>5. Основные алгоритмы</h3>
+<h4>Нумерация журнала</h4>
 <p>Номер события = длина журнала + 1, поэтому после очистки нумерация начинается с 1. Первое событие — состояние, которое уже было активно при создании логгера (<code>WidgetsBinding.instance.lifecycleState</code>), оно помечается как начальное.</p>
-<h3>Системная кнопка Back в оболочке</h3>
+<h4>Системная кнопка Back в оболочке</h4>
 <pre><code>PopScope(
   canPop: current == HomeTab.services,
   onPopInvokedWithResult: (didPop, _) {
@@ -114,24 +252,24 @@
   },
   …
 )</code></pre>
-<h3>Отмена свайпом без «висящего» Dismissible</h3>
+<h4>Отмена свайпом без «висящего» Dismissible</h4>
 <p><code>confirmDismiss</code> ждёт диалог и отмену через контроллер и всегда возвращает <code>false</code>. Список перестраивается по данным контроллера, поэтому карточка исчезает, если отмена подтверждена, и возвращается, если нет.</p>
-<h3>После успешной записи</h3>
+<h4>После успешной записи</h4>
 <p><code>AppRoutes._showBookingResult</code> запоминает <code>ScaffoldMessenger</code> и <code>AppController</code>, делает <code>popUntil(isFirst)</code>, переключает вкладку на «Записи» и показывает SnackBar (с напоминанием, если включены демо-уведомления).</p>
 
-<h2>6. Как запустить модуль</h2>
+<h3>6. Как запустить модуль</h3>
 <pre><code>flutter run -d emulator-5554
 # Профиль → «Диагностика»; вкладка «Записи»
 adb logcat -s flutter          # журнал lifecycle в системном логе</code></pre>
 
-<h2>7. Как проверить модуль</h2>
+<h3>7. Как проверить модуль</h3>
 <pre><code>dart format --output=none --set-exit-if-changed .
 flutter analyze
 flutter test test/app test/core/lifecycle test/features/diagnostics test/features/booking/bookings_screen_test.dart
 flutter test integration_test -d emulator-5554
 flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></pre>
 
-<h2>8. Тесты модуля</h2>
+<h3>8. Тесты модуля</h3>
 <div class="table-wrap"><table>
 <thead><tr><th>Файл</th><th>Что проверяет</th></tr></thead>
 <tbody>
@@ -147,7 +285,7 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 </tbody>
 </table></div>
 
-<h2>9. Сценарий демонстрации</h2>
+<h3>9. Сценарий демонстрации</h3>
 <ol>
 <li>Запустить приложение, на welcome выбрать категорию — подпись меняется (<code>setState</code>).</li>
 <li>«Посмотреть услуги» → каталог с фильтром. Показать, что Back на «Услугах» закрыл бы приложение (welcome заменён).</li>
@@ -159,14 +297,14 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 <li>Терминал: <code>flutter test</code> и страница CI в документации.</li>
 </ol>
 
-<h2>10. Короткая защита (от первого лица)</h2>
+<h3>10. Короткая защита (от первого лица)</h3>
 <div class="speech">
 <p>Я отвечаю за каркас приложения и его сборку. Корневой виджет создаёт все зависимости в одном месте — <code>AppDependencies</code> — и освобождает их при закрытии. Экраны получают данные через конструкторы, а связи между экранами описаны в <code>routes.dart</code>, поэтому каждый экран можно протестировать отдельно.</p>
 <p>Для первой лабораторной я сделал журнал жизненного цикла. Логгер создаётся при запуске и подписан через <code>AppLifecycleListener</code>, поэтому ловит даже ранние события. На Android Flutter сам добавляет состояние <code>hidden</code> между <code>inactive</code> и <code>paused</code>; при закрытии из недавних мы видели <code>detached</code> в logcat, но при аварийном завершении его может не быть.</p>
 <p>Во второй лабораторной на мне «Мои записи»: tap открывает детали, долгое нажатие — меню, свайп — только запрос отмены. Запись не удаляется, а получает статус «отменена». И ещё я настроил CI, который на каждый push проверяет формат, анализатор, тесты и собирает APK.</p>
 </div>
 
-<h2>11. Вероятные вопросы преподавателя</h2>
+<h3>11. Вероятные вопросы преподавателя</h3>
 <ol>
 <li>Какие уровни у архитектуры Android и где в них Flutter?</li>
 <li>Чем отличаются Widget, Element и RenderObject?</li>
@@ -180,7 +318,7 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 <li>Что проверяет CI и почему он не обновляет golden-файлы?</li>
 </ol>
 
-<h2>12. Краткие ответы</h2>
+<h3>12. Краткие ответы</h3>
 <ol>
 <li>Linux kernel → HAL → нативные библиотеки и ART → application framework → приложения. Flutter — часть приложения: Activity и embedder на Kotlin/Java, Engine в нативной библиотеке, UI рисует сам.</li>
 <li>Widget — неизменяемое описание; Element — экземпляр в дереве и хранитель State; RenderObject — layout, paint, hit test.</li>
@@ -194,7 +332,7 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 <li>Формат, <code>flutter analyze</code>, все тесты с покрытием и сборку debug APK. Golden-файлы только сравниваются: эталон обновляют намеренно и проверяют глазами.</li>
 </ol>
 
-<h2>13. Типичные ошибки</h2>
+<h3>13. Типичные ошибки</h3>
 <ul>
 <li>Поставить <code>AppBar</code> внутрь <code>Column</code> без ограничения высоты — layout падает, нажатия перестают работать (мы так и поймали ошибку тестом).</li>
 <li>Забыть <code>dispose</code> у listener или контроллера.</li>
@@ -203,7 +341,7 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 <li>Описывать Flutter lifecycle как точную копию <code>onStart/onStop</code>.</li>
 </ul>
 
-<h2>14. Если демонстрация не работает</h2>
+<h3>14. Если демонстрация не работает</h3>
 <ul>
 <li>В журнале только #1: приложение не сворачивалось — нажмите Home и вернитесь; проверьте <code>adb logcat -s flutter</code>.</li>
 <li>Нажатия не работают после изменений в коде: смотрите консоль <code>flutter run</code> на исключения layout.</li>
@@ -211,7 +349,7 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 <li>Нет устройства: скриншоты в <a href="../project-overview.html">обзоре проекта</a> и запуск тестов модуля.</li>
 </ul>
 
-<h2>15. Развитие модуля</h2>
+<h3>15. Развитие модуля</h3>
 <ul>
 <li>Сохранение журнала lifecycle и настроек между запусками.</li>
 <li>Фабрика <code>AppDependencies.production</code> для HTTP-репозиториев и flavors dev/staging/prod.</li>
@@ -219,7 +357,7 @@ flutter test --coverage &amp;&amp; dart run tool/coverage_summary.dart</code></p
 <li>CI/CD: сборка подписанного AAB по тегу и публикация во внутреннее тестирование.</li>
 </ul>
 
-<h2>16. Перед защитой прочитать и проверить</h2>
+<h3>16. Перед защитой прочитать и проверить</h3>
 <ul>
 <li>☐ Прочитать <code>lib/app/*</code>, <code>lifecycle_logger.dart</code>, <code>bookings_screen.dart</code> целиком.</li>
 <li>☐ Прочитать <a href="../lab-1.html">ЛР №1</a> (теория) и <a href="../architecture-decisions.html">ADR</a> 02–04, 07–09.</li>

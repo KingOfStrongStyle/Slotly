@@ -1,161 +1,120 @@
 # Slotly
 
-Учебный MVP мобильного сервиса онлайн-записи и электронной очереди для локального бизнеса: барбершопов, салонов красоты, стоматологий, клиник, автосервисов и репетиторов.
+Учебный MVP мобильного сервиса онлайн-записи для локального бизнеса с двумя ролями: клиент ищет место, записывается, оставляет отзывы и получает напоминания; владелец управляет организацией и видит аналитику своей организации.
 
-Flutter 3.47 · Dart 3.13 · Material 3 · Android 7.0+ · версия 0.1.0
+Flutter 3.47 · Dart 3.13 · Material 3 · Android 7.0+ · версия 0.2.0
 
 <p>
-  <img src="docs/assets/screenshots/01-welcome.png" width="180" alt="Welcome">
-  <img src="docs/assets/screenshots/02-catalog.png" width="180" alt="Каталог">
-  <img src="docs/assets/screenshots/05-booking-form.png" width="180" alt="Форма записи">
-  <img src="docs/assets/screenshots/08-bookings.png" width="180" alt="Мои записи">
+  <img src="docs/assets/screenshots/v2/03-catalog.png" width="180" alt="Каталог мест">
+  <img src="docs/assets/screenshots/v2/05-price-list.png" width="180" alt="Организация">
+  <img src="docs/assets/screenshots/v2/10-bookings.png" width="180" alt="Мои записи">
+  <img src="docs/assets/screenshots/v2/16-reminders.png" width="180" alt="Напоминания">
 </p>
 <p>
-  <img src="docs/assets/screenshots/12-diagnostics.png" width="180" alt="Диагностика">
-  <img src="docs/assets/screenshots/13-gesture-lab.png" width="180" alt="Gesture Lab">
-  <img src="docs/assets/screenshots/16-ticket-found.png" width="180" alt="Ввод талона">
-  <img src="docs/assets/screenshots/18-catalog-dark.png" width="180" alt="Тёмная тема">
+  <img src="docs/assets/screenshots/v2/19-dashboard.png" width="180" alt="Обзор владельца">
+  <img src="docs/assets/screenshots/v2/20-dashboard-charts.png" width="180" alt="Графики">
+  <img src="docs/assets/screenshots/v2/25-service-editor.png" width="180" alt="Редактор услуги">
+  <img src="docs/assets/screenshots/v2/29-dashboard-dark.png" width="180" alt="Тёмная тема">
 </p>
 
-Скриншоты сняты с реального приложения на эмуляторе Android 16. Все услуги, специалисты, клиенты и записи — вымышленные демонстрационные данные.
+Скриншоты сняты с реального приложения на эмуляторе Android 16. Все организации, люди, адреса и записи вымышлены.
 
-## Цели
+> **Граница версии.** Всё работает на устройстве: демо-вход, проверка прав, хранение, аналитика и напоминания. Это прототип серверной системы, а не production-backend и не система безопасности.
 
-- Закрыть требования лабораторных работ №1–3 и самостоятельной работы.
-- Получить реально запускающееся и проверенное Android-приложение.
-- Сделать код понятным для разработчиков без глубокого опыта во Flutter.
-- Равномерно распределить зоны ответственности между тремя участниками.
-- Заложить расширяемую, но не переусложнённую основу для коммерческой версии.
+## Демо-аккаунты
+
+Публичные тестовые данные — специально опубликованы и ничего не защищают.
+
+| Роль | Организация | Логин | Пароль | Что проверять |
+|---|---|---|---|---|
+| Клиент | — | `aliya` | `aliya-demo` | История визитов, отзывы, избранное, перенос |
+| Клиент | — | `damir` | `damir-demo` | Будущие записи, напоминания, «Я на месте» |
+| Владелец | Барбершоп «Северный» | `north` | `north-demo` | Аналитика, услуги и цены, фото, ответы на отзывы |
+| Владелец | Стоматология «Белая линия» | `whiteline` | `whiteline-demo` | Изоляция данных организаций |
+| Клиент | — | `zhanna` | `zhanna-demo` | Дополнительная история |
+| Клиент | — | `ilya` | `ilya-demo` | Дополнительная история |
 
 ## Возможности
 
-| Раздел | Что умеет |
+| Роль | Что умеет |
 |---|---|
-| Welcome | Логотип, слоган, выбор категории (`StatefulWidget` + `setState`), переход в каталог |
-| Каталог | Поиск без учёта регистра, фильтр категорий, карточки, empty state |
-| Детали услуги | Иллюстрация, цена, длительность, описание, специалисты |
-| Запись | Специалист, дата, свободное время, комментарий, валидация, `AlertDialog`, `SnackBar` |
-| Мои записи | Активные и отменённые, сортировка, tap — детали, long press — меню, свайп — отмена с подтверждением |
-| Профиль | Демо-пользователь, светлая/тёмная тема, демо-уведомления, учебные инструменты, версия |
-| Диагностика | Текущее состояние `AppLifecycleState`, нумерованный журнал с временем и описанием |
-| Gesture Lab | Tap, double tap, long press, горизонтальный и вертикальный drag, pinch — в отдельных зонах с журналом |
-| Ввод талона | `GesturePad` (`CustomPaint` + pan-жесты), распознавание 0–9 и S по шаблонам, проверка талона |
+| Клиент | Каталог мест и услуг с поиском и фильтром, рейтинг, страница организации с галереей до 5 фото (pinch, свайп вниз), прайс с вариантами цены, специалисты с рейтингом; запись, перенос, отмена, «Я на месте»; отзыв после визита; избранное (двойное касание или сердце); локальные напоминания |
+| Владелец | Обзор с KPI и графиками за 7/30/90 дней и табличным видом; записи организации, «Визит состоялся», отметка прихода по рукописному номеру талона; услуги, варианты цены, скрытие; ответы на отзывы; профиль организации и фото |
+| Оба | Welcome, вход, тёмная тема (сохраняется), «Для разработчиков»: диагностика жизненного цикла и Gesture Lab |
 
 ## Технологии
 
 | Область | Решение |
 |---|---|
-| UI | Flutter, Material 3, тема из одного seed-цвета |
-| Состояние | `ChangeNotifier`, `setState` |
-| Навигация | `Navigator`, `NavigationBar`, `IndexedStack` |
-| Данные | Контракты `BookingRepository`, `TicketRepository`; реализации в памяти с демо-данными |
-| Локализация | Русский, тексты в `lib/core/app_strings.dart`, `flutter_localizations` |
-| Тесты | `flutter_test` (unit, widget, golden), `integration_test` |
-| CI | GitHub Actions |
-| Зависимости | Только Flutter SDK и `flutter_lints` |
+| UI | Flutter, Material 3, токены темы и `SlotlyColors` |
+| Состояние | `ChangeNotifier`, `LiveQuery`, `setState` |
+| Навигация | `Navigator`, корень по роли, `NavigationBar` + `IndexedStack` |
+| Данные | `AppDatabase` — версионируемый JSON-документ за контрактами репозиториев |
+| Права | `AccessPolicy` в каждом репозитории |
+| Зависимости | `crypto`, `path_provider`, `image_picker`, `flutter_local_notifications`, `timezone`, `flutter_timezone` |
+| Тесты | unit, widget, golden, 8 интеграционных сценариев, замер кадров |
 
 ## Архитектура
 
-Feature-first: каждая функция в своей папке, внутри — `domain` (модели и правила на чистом Dart), `data` (реализации и демо-данные), `presentation` (экраны и контроллеры). Все зависимости создаются в одном месте — `AppDependencies` — и передаются экранам через конструкторы. Подробно: [docs/architecture.html](docs/architecture.html) и [docs/architecture-decisions.html](docs/architecture-decisions.html).
+Feature-first: `domain` (модели и правила на Dart), `data` (репозитории с проверкой прав), `presentation` (экраны и контроллеры); общий слой данных — `lib/data/`, сборка — `lib/app/`. Подробно: [архитектура](docs/architecture.html), [ADR](docs/architecture-decisions.html), [план эволюции](docs/product-evolution-plan.html).
 
 ```
 lib/
   main.dart
-  app/            app.dart, app_scope.dart, app_controller.dart, home_shell.dart, routes.dart, theme.dart
-  core/           app_strings.dart, lifecycle/, utils/, widgets/
-  features/
-    welcome/  catalog/  booking/  profile/  diagnostics/  gesture_lab/  gesture_checkin/
-test/             unit, widget и golden-тесты (+ helpers)
-integration_test/ сценарий записи на устройстве
-design/           прототип, UI kit, SVG для Figma
-docs/             HTML-документация
-tool/             сводка покрытия
+  app/        корень по роли, оболочки клиента и владельца, маршруты, тема
+  core/       access/ (права), state/ (LiveQuery), lifecycle/, utils/, widgets/, app_strings.dart
+  data/       local/ (база, миграции), seed/ (демо-данные)
+  features/   auth  catalog  booking  reviews  favorites  business  analytics  reminders
+              gesture_checkin  welcome  profile  diagnostics  gesture_lab
+test/  integration_test/  test_driver/  design/  docs/  tool/
 ```
 
 ## Быстрый старт
 
-Требования: Flutter 3.47 (stable), JDK 17, Android SDK (platform 36, build-tools), эмулятор или телефон с Android 7.0+. Пошаговая установка на macOS — [docs/environment.html](docs/environment.html).
+Требования: Flutter 3.47 (stable), JDK 17, Android SDK (platform 36), эмулятор или телефон с Android 7.0+. Установка на macOS — [docs/environment.html](docs/environment.html).
 
 ```bash
-git clone <URL репозитория> slotly-mobile
-cd slotly-mobile
 flutter pub get
-flutter doctor -v
-```
-
-### Запуск на эмуляторе
-
-```bash
-# создать AVD один раз
-avdmanager create avd -n slotly_api36 \
-  -k "system-images;android-36;google_apis;arm64-v8a" -d pixel_7
-# запустить эмулятор
-"$ANDROID_HOME/emulator/emulator" -avd slotly_api36
-# запустить приложение
-flutter devices
+./tool/start_emulator.sh                 # поднять эмулятор (в VS Code F5 делает это сам)
 flutter run -d emulator-5554
 ```
 
 ### Команды
 
 ```bash
-dart format --output=none --set-exit-if-changed .   # проверка форматирования
-flutter analyze                                       # статический анализ
-flutter test                                          # unit, widget, golden (105 тестов)
+dart format --output=none --set-exit-if-changed .
+flutter analyze
 flutter test --coverage && dart run tool/coverage_summary.dart
-flutter test integration_test -d emulator-5554        # интеграционный тест
-flutter build apk --debug                             # build/app/outputs/flutter-apk/app-debug.apk
-flutter build apk --release                           # подпись debug-ключом, не для публикации
-open docs/index.html                                  # документация
-open design/prototype/index.html                      # интерактивный прототип
+flutter test integration_test/app_test.dart -d emulator-5554
+flutter drive --profile -d emulator-5554 --driver=test_driver/perf_driver.dart \
+  --target=integration_test/perf_test.dart
+flutter build apk --release              # подпись debug-ключом, не для публикации
+adb shell pm clear kz.slotly.mobile      # сбросить демо-данные на устройстве
+open docs/index.html
+open design/prototype/index.html
 ```
 
-Результаты финальной проверки: формат и анализ без замечаний, 105 тестов проходят, покрытие domain + data — 92,8 %, всего `lib/` — 95,6 %, интеграционный тест пройден на эмуляторе API 36. Подробно — [docs/testing.html](docs/testing.html).
+Финальная проверка 10 октября 2026: формат и анализ без замечаний, 344 прогонов `flutter test`, покрытие domain + data — 94,9 %, всего `lib/` — 93,4 %; 8 интеграционных сценариев на эмуляторе API 36; debug и release APK. Подробно — [docs/testing.html](docs/testing.html).
 
-## Жесты
+## Команда
 
-| Где | Жест | Действие |
+| Участник | Зона версии 0.2.0 | Отчёт |
 |---|---|---|
-| Мои записи | tap | детали записи |
-| Мои записи | long press | меню действий |
-| Мои записи | свайп влево | запрос отмены с подтверждением |
-| Gesture Lab | tap / double tap / long press | выбор / избранное / меню |
-| Gesture Lab | horizontal drag | направление и скорость |
-| Gesture Lab | vertical drag | смещение |
-| Gesture Lab | pinch | масштаб 0,5–3× (на эмуляторе: Cmd/Ctrl + мышь) |
-| Ввод талона | рисование (pan) | цифры 0–9 добавляются к номеру, `S` завершает ввод |
+| Кирилл Першин | интеграция архитектуры, вход и сессия, навигация по ролям, права, напоминания, CI, сборка | [docs/team/kirill.html](docs/team/kirill.html) |
+| Влад Задорожный | хранилище, репозитории, seed, отзывы и рейтинг, аналитика, тесты прав | [docs/team/vlad.html](docs/team/vlad.html) |
+| Ян Тонков | дизайн-система, экраны клиента и владельца, галерея, графики, жесты, widget- и golden-тесты | [docs/team/yan.html](docs/team/yan.html) |
 
-Распознавание — объяснимый template matching без ML: нормализация, 48 точек, сравнение облаков точек с шаблонами, отказ при уверенности ниже 55 %. Работает на подготовленных шаблонах и близких к ним рисунках; это не универсальный распознаватель почерка. Подробно — [docs/lab-3.html](docs/lab-3.html).
-
-## Команда и зоны ответственности
-
-| Участник | Зона | Страница |
-|---|---|---|
-| Кирилл | каркас, навигация, тема, lifecycle и диагностика, «Мои записи», CI, сборка, архитектурная документация | [docs/team/kirill.html](docs/team/kirill.html) |
-| Влад | модели, репозиторий, демо-данные, поиск, форма записи, распознавание жестов, ввод талона | [docs/team/vlad.html](docs/team/vlad.html) |
-| Ян | UI kit, прототип, welcome, каталог, детали, профиль, Gesture Lab, адаптивность, widget- и golden-тесты | [docs/team/yan.html](docs/team/yan.html) |
-
-Трудоёмкость каждой зоны оценена в условные 16 баллов — это внутренняя оценка баланса, а не прогноз оценки. Распределение описывает зоны ответственности и сопровождения; первичная реализация закоммичена владельцем репозитория, фактическое авторство видно в истории Git. Задачи и статус — [PROJECT_TASKS.md](PROJECT_TASKS.md).
-
-## Git-процесс
-
-- Основная ветка — `main`, изменения через ветки `feature/…`, `fix/…`, `docs/…` и pull request.
-- Сообщения коммитов — [Conventional Commits](https://www.conventionalcommits.org/ru/v1.0.0/).
-- Перед коммитом: формат, `flutter analyze`, тесты изменённого модуля.
-- Теги: `lab-1`, `lab-2`, `lab-3` — состояние на момент сдачи каждой лабораторной, `v0.1.0` — финальный MVP.
-
-Подробно — [CONTRIBUTING.md](CONTRIBUTING.md), история изменений — [CHANGELOG.md](CHANGELOG.md).
+Зоны описывают ответственность за изучение, сопровождение и защиту; фактическое авторство видно в истории Git. Задачи — [PROJECT_TASKS.md](PROJECT_TASKS.md), изменения — [CHANGELOG.md](CHANGELOG.md), процесс — [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Известные ограничения
 
-- Данные хранятся в памяти и пропадают при закрытии приложения; настройки темы не сохраняются.
-- Нет авторизации, backend, уведомлений и платежей — это вне границ MVP.
-- Распознавание рукописного ввода рассчитано на шаблоны; например, «Z» может распознаться как «2».
-- Pinch на эмуляторе выполняется мышью с Cmd/Ctrl; `adb shell input` мультитач не поддерживает.
-- Release APK подписан debug-ключом из шаблона Flutter и не предназначен для публикации.
-- Figma-файл не создавался (не было доступа); для импорта подготовлены SVG и инструкция.
-- iOS не настраивался: платформа MVP — Android.
+- Вход, права, данные и аналитика — на устройстве; пароли демо-аккаунтов публичны.
+- Напоминания локальные и неточные по времени (окно Android до часа), не push.
+- Изменения владельца не доходят до клиента на другом устройстве: сервера нет.
+- Плавность измерена только на эмуляторе с программной отрисовкой; на реальном телефоне — не измерялась.
+- Release APK подписан debug-ключом; iOS не настроен; Figma-проект не создан (есть 11 SVG и инструкция).
+- CI на GitHub ещё не запускался: репозиторий не опубликован.
 
 ## План развития
 
-Django/DRF API и PostgreSQL, роли клиента, сотрудника и владельца, мультитенантность, расписания сотрудников, напоминания и push, офлайн-синхронизация, iOS, публикация через CI/CD. Текущие контракты репозиториев позволяют подключить сервер без переписывания экранов. Подробно — [docs/future-roadmap.html](docs/future-roadmap.html).
+Django/DRF и PostgreSQL, серверная авторизация с access/refresh token, серверная проверка прав и мультитенантность, объектное хранилище фото, FCM и серверный планировщик, агрегаты аналитики, аудит, резервное копирование и мониторинг — [docs/future-roadmap.html](docs/future-roadmap.html).
