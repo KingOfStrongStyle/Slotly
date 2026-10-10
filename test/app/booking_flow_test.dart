@@ -1,59 +1,115 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:slotly/app/app.dart';
 import 'package:slotly/core/app_strings.dart';
 import 'package:slotly/core/utils/formatters.dart';
-import 'package:slotly/features/booking/data/demo_schedule.dart';
+import 'package:slotly/core/widgets/time_slot_chip.dart';
 import 'package:slotly/features/booking/presentation/widgets/booking_tile.dart';
-import 'package:slotly/features/catalog/data/demo_services.dart';
+import 'package:slotly/features/catalog/domain/service.dart';
+import 'package:slotly/features/reviews/domain/rating_summary.dart';
 
 import '../helpers/test_app.dart';
 
 void main() {
-  testWidgets('catalog -> details -> form -> confirm -> my bookings', (
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('place -> service -> form -> confirm -> my bookings', (
     tester,
   ) async {
-    usePhoneSurface(tester);
-    final service = demoServices.firstWhere((s) => s.id == 'svc-men-haircut');
-    final specialist = service.availableSpecialists.first;
-    const schedule = DemoSchedule();
-    final freeTime = schedule
-        .startTimes(testNow, service.duration)
-        .firstWhere((t) => !schedule.isTakenByOthers(specialist, t));
+    final deps = await pumpApp(tester, login: 'aliya');
+    final Service service = deps.database.tables.services['svc-beard']!;
 
-    await tester.pumpWidget(
-      const SlotlyApp(createDependencies: createTestDependencies),
+    await tester.tap(find.text('Барбершоп «Северный»'));
+    await tester.pump(kDoubleTapTimeout);
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text(service.title).first);
+    await tapVisible(tester, find.text(AppStrings.detailsBook));
+
+    await tapVisible(
+      tester,
+      find.text(service.availableSpecialists.first.name),
     );
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.welcomeShowServices));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text(service.title));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.detailsBook));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text(specialist.name));
-    await tester.pumpAndSettle();
-    final slot = find.text(Formatters.time(freeTime));
-    await tester.ensureVisible(slot);
-    await tester.pumpAndSettle();
-    await tester.tap(slot);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.bookingContinue));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text(AppStrings.bookingTomorrow));
+    final freeSlot = find
+        .byWidgetPredicate((w) => w is TimeSlotChip && w.isAvailable)
+        .first;
+    final slotLabel = tester.widget<TimeSlotChip>(freeSlot).label;
+    await tapVisible(tester, freeSlot);
+    await tapVisible(tester, find.text(AppStrings.bookingContinue));
     await tester.tap(find.text(AppStrings.confirmSubmit));
     await tester.pumpAndSettle();
 
     expect(find.byType(SnackBar), findsOneWidget);
     expect(
-      find.textContaining(
-        AppStrings.bookingCreated(service.title, Formatters.dateTime(freeTime)),
+      find.textContaining(AppStrings.bookingCreated(service.title, '')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Талон'), findsWidgets);
+    final tile = tester
+        .widgetList<BookingTile>(find.byType(BookingTile))
+        .firstWhere(
+          (t) =>
+              t.booking.serviceId == service.id &&
+              Formatters.time(t.booking.startAt) == slotLabel,
+        );
+    expect(tile.booking.clientId, userOf('aliya').id);
+  });
+
+  testWidgets('a completed visit is reviewed and the rating changes', (
+    tester,
+  ) async {
+    final deps = await pumpApp(tester, login: 'aliya');
+    await openTab(tester, AppStrings.tabBookings);
+
+    final pastTab = find.textContaining('Прошедшие');
+    await tester.tap(pastTab);
+    await tester.pumpAndSettle();
+    final write = find.text(AppStrings.reviewWrite).first;
+    final tile = tester.widget<BookingTile>(
+      find.ancestor(of: write, matching: find.byType(BookingTile)),
+    );
+    final organizationId = tile.booking.organizationId;
+    final before = RatingSummary.of(
+      await deps.reviews.fetchOrganizationReviews(organizationId),
+    );
+
+    await tester.tap(write);
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.reviewFormTitle), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('star-1')));
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byType(TextField),
+      ),
+      'Пришлось ждать',
+    );
+    await tester.tap(find.text(AppStrings.reviewFormSubmit));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.reviewPublished), findsOneWidget);
+    final after = RatingSummary.of(
+      await deps.reviews.fetchOrganizationReviews(organizationId),
+    );
+    expect(after.count, before.count + 1);
+    expect(after.average, lessThan(before.average ?? 5));
+    final written = (await deps.reviews.fetchMyReviews()).first;
+    expect(written.text, 'Пришлось ждать');
+    expect(written.rating, 1);
+    // The booking now says the review is written.
+    expect(
+      find.descendant(
+        of: find.byWidgetPredicate(
+          (w) => w is BookingTile && w.booking.id == tile.booking.id,
+        ),
+        matching: find.text(AppStrings.bookingReviewed),
       ),
       findsOneWidget,
     );
-    final tile = tester.widget<BookingTile>(find.byType(BookingTile));
-    expect(tile.booking.startAt, freeTime);
-    expect(find.text(AppStrings.bookingsActiveTab(1)), findsOneWidget);
   });
 }

@@ -1,35 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:slotly/app/app.dart';
 import 'package:slotly/core/app_strings.dart';
 import 'package:slotly/features/diagnostics/presentation/diagnostics_screen.dart';
 import 'package:slotly/features/gesture_lab/presentation/gesture_lab_screen.dart';
+import 'package:slotly/features/reminders/presentation/reminders_screen.dart';
+import 'package:slotly/features/welcome/welcome_screen.dart';
 
 import '../../helpers/test_app.dart';
 
 Future<void> _openProfile(WidgetTester tester) async {
-  usePhoneSurface(tester);
-  await tester.pumpWidget(
-    const SlotlyApp(createDependencies: createTestDependencies),
-  );
-  await tester.pumpAndSettle();
-  await tester.tap(find.text(AppStrings.welcomeShowServices));
-  await tester.pumpAndSettle();
-  await tester.tap(
-    find.descendant(
-      of: find.byType(NavigationBar),
-      matching: find.text(AppStrings.tabProfile),
-    ),
-  );
-  await tester.pumpAndSettle();
+  await pumpApp(tester, login: 'aliya');
+  await openTab(tester, AppStrings.tabProfile);
 }
 
 void main() {
+  testWidgets('shows the signed-in customer', (tester) async {
+    await _openProfile(tester);
+    expect(find.text('Алия Н.'), findsOneWidget);
+    expect(find.textContaining('aliya'), findsOneWidget);
+    expect(find.text(AppStrings.appVersionLabel), findsOneWidget);
+  });
+
   testWidgets('dark theme switch changes the app theme', (tester) async {
     await _openProfile(tester);
-
-    expect(find.text(AppStrings.profileDemoUserName), findsOneWidget);
-    expect(find.text(AppStrings.appVersionLabel), findsOneWidget);
     expect(
       Theme.of(tester.element(find.byType(NavigationBar))).brightness,
       Brightness.light,
@@ -48,43 +41,51 @@ void main() {
     );
   });
 
-  testWidgets('demo notifications switch toggles', (tester) async {
+  testWidgets('opens reminders, diagnostics and Gesture Lab', (tester) async {
     await _openProfile(tester);
-    final tile = find.widgetWithText(
-      SwitchListTile,
-      AppStrings.profileNotifications,
-    );
 
-    expect(tester.widget<SwitchListTile>(tile).value, isTrue);
-    await tester.tap(tile);
+    await tester.tap(find.text(AppStrings.profileReminders));
     await tester.pumpAndSettle();
-    expect(tester.widget<SwitchListTile>(tile).value, isFalse);
-  });
-
-  testWidgets('opens diagnostics and returns with Back', (tester) async {
-    await _openProfile(tester);
+    expect(find.byType(RemindersScreen), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text(AppStrings.diagnosticsTitle));
     await tester.pumpAndSettle();
     expect(find.byType(DiagnosticsScreen), findsOneWidget);
-
     // System Back button, as on an Android device.
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.byType(DiagnosticsScreen), findsNothing);
-    expect(find.text(AppStrings.profileTitle), findsWidgets);
-    expect(find.byTooltip('Назад'), findsNothing);
-  });
 
-  testWidgets('opens Gesture Lab from developer tools', (tester) async {
-    await _openProfile(tester);
-
+    await tester.scrollUntilVisible(find.text(AppStrings.gestureLabTitle), 200);
     await tester.tap(find.text(AppStrings.gestureLabTitle));
     await tester.pumpAndSettle();
     expect(find.byType(GestureLabScreen), findsOneWidget);
-    await tester.binding.handlePopRoute();
+  });
+
+  testWidgets('sign-out asks first and returns to the welcome screen', (
+    tester,
+  ) async {
+    await _openProfile(tester);
+    final signOut = find.text(AppStrings.signOut);
+    // The list is built lazily: scroll until the last tile exists.
+    await tester.scrollUntilVisible(signOut, 200);
+    await tester.tap(signOut);
     await tester.pumpAndSettle();
-    expect(find.byType(GestureLabScreen), findsNothing);
-    expect(find.text(AppStrings.checkInTitle), findsNothing);
+    expect(find.text(AppStrings.signOutConfirmTitle), findsOneWidget);
+
+    await tester.tap(find.text(AppStrings.signOutCancel));
+    await tester.pumpAndSettle();
+    expect(find.text('Алия Н.'), findsOneWidget);
+
+    await tester.tap(signOut);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, AppStrings.signOut));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(WelcomeScreen), findsOneWidget);
+    // Back cannot return into the closed session.
+    expect(await tester.binding.handlePopRoute(), isFalse);
   });
 }

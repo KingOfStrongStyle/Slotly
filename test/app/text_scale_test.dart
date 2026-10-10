@@ -1,11 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:slotly/app/app.dart';
-import 'package:slotly/app/app_scope.dart';
-import 'package:slotly/app/theme.dart';
 import 'package:slotly/core/app_strings.dart';
 import 'package:slotly/features/booking/presentation/booking_form_screen.dart';
-import 'package:slotly/features/catalog/data/demo_services.dart';
+import 'package:slotly/features/booking/presentation/bookings_controller.dart';
 import 'package:slotly/features/catalog/presentation/service_details_screen.dart';
 
 import '../helpers/test_app.dart';
@@ -14,60 +10,68 @@ import '../helpers/test_app.dart';
 /// tests fail if a main screen breaks at a large accessibility font size.
 void main() {
   const largeText = 2.0;
-  final service = demoServices.firstWhere((s) => s.id == 'svc-english');
 
-  testWidgets('welcome and home tabs fit with large text', (tester) async {
-    usePhoneSurface(tester, textScale: largeText);
-    await tester.pumpWidget(
-      const SlotlyApp(createDependencies: createTestDependencies),
-    );
-    await tester.pumpAndSettle();
+  testWidgets('welcome and sign-in fit with large text', (tester) async {
+    await pumpApp(tester, textScale: largeText);
     expect(find.text(AppStrings.appTagline), findsOneWidget);
-
     await tester.ensureVisible(find.text(AppStrings.welcomeShowServices));
     await tester.tap(find.text(AppStrings.welcomeShowServices));
     await tester.pumpAndSettle();
+    expect(find.text(AppStrings.signInSubtitle), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
-    for (final tab in [AppStrings.tabBookings, AppStrings.tabProfile]) {
-      await tester.tap(
-        find.descendant(
-          of: find.byType(NavigationBar),
-          matching: find.text(tab),
-        ),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('customer tabs fit with large text', (tester) async {
+    await pumpApp(tester, login: 'aliya', textScale: largeText);
+    for (final tab in [
+      AppStrings.tabFavorites,
+      AppStrings.tabBookings,
+      AppStrings.tabProfile,
+    ]) {
+      await openTab(tester, tab);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('owner tabs fit with large text', (tester) async {
+    await pumpApp(tester, login: 'north', textScale: largeText);
+    for (final tab in [
+      AppStrings.ownerTabBookings,
+      AppStrings.ownerTabServices,
+      AppStrings.ownerTabReviews,
+      AppStrings.ownerTabOrganization,
+    ]) {
+      await openTab(tester, tab);
     }
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('details and booking form fit with large text', (tester) async {
     usePhoneSurface(tester, textScale: largeText);
-    final dependencies = createTestDependencies();
-    addTearDown(dependencies.dispose);
+    final deps = await createTestDependencies();
+    addTearDown(deps.dispose);
+    await signIn(deps, 'aliya');
+    final service = deps.database.tables.services['svc-english']!;
+    final bookings = BookingsController(deps.bookings);
+    addTearDown(bookings.dispose);
 
-    await tester.pumpWidget(
-      AppScope(
-        dependencies: dependencies,
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: ServiceDetailsScreen(service: service, onBook: () {}),
-        ),
-      ),
+    await pumpScreen(
+      tester,
+      ServiceDetailsScreen(service: service, onBook: () {}),
     );
-    await tester.pumpAndSettle();
+    usePhoneSurface(tester, textScale: largeText);
     expect(find.text(service.title), findsOneWidget);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
-        home: BookingFormScreen(
-          service: service,
-          bookings: dependencies.bookings,
-          clock: () => testNow,
-          onBooked: (_) {},
-        ),
+    await pumpScreen(
+      tester,
+      BookingFormScreen(
+        service: service,
+        bookings: bookings,
+        clock: () => testNow,
+        onBooked: (_) {},
       ),
     );
+    usePhoneSurface(tester, textScale: largeText);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.bookingContinue), findsOneWidget);
     expect(tester.takeException(), isNull);

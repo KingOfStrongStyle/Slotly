@@ -13,6 +13,97 @@ abstract final class AppSpacing {
   static const maxContentWidth = 640.0;
 }
 
+/// Semantic colors that Material 3 does not provide: rating stars,
+/// positive and warning states, and a fixed palette for chart categories.
+/// Registered as a [ThemeExtension], so light and dark themes have their own
+/// values and widgets read them with `Theme.of(context).extension`.
+@immutable
+class SlotlyColors extends ThemeExtension<SlotlyColors> {
+  const SlotlyColors({
+    required this.rating,
+    required this.success,
+    required this.onSuccessContainer,
+    required this.successContainer,
+    required this.warning,
+    required this.chart,
+  });
+
+  static const light = SlotlyColors(
+    rating: Color(0xFFB7791F),
+    success: Color(0xFF2E7D4F),
+    successContainer: Color(0xFFD6F0DF),
+    onSuccessContainer: Color(0xFF0D3B22),
+    warning: Color(0xFFB45309),
+    // Categorical slots validated for color vision deficiencies (all
+    // pairs, light and dark): blue, orange, aqua. Single-series charts use
+    // the brand primary instead.
+    chart: [Color(0xFF2A78D6), Color(0xFFEB6834), Color(0xFF1BAF7A)],
+  );
+
+  static const dark = SlotlyColors(
+    rating: Color(0xFFF2C14E),
+    success: Color(0xFF7FD3A0),
+    successContainer: Color(0xFF1D4B33),
+    onSuccessContainer: Color(0xFFD6F0DF),
+    warning: Color(0xFFF5A35C),
+    chart: [Color(0xFF3987E5), Color(0xFFD95926), Color(0xFF199E70)],
+  );
+
+  final Color rating;
+  final Color success;
+  final Color successContainer;
+  final Color onSuccessContainer;
+  final Color warning;
+
+  /// Series colors in a fixed order: the same category always gets the
+  /// same color on every chart.
+  final List<Color> chart;
+
+  static SlotlyColors of(BuildContext context) =>
+      Theme.of(context).extension<SlotlyColors>() ?? light;
+
+  @override
+  SlotlyColors copyWith({
+    Color? rating,
+    Color? success,
+    Color? successContainer,
+    Color? onSuccessContainer,
+    Color? warning,
+    List<Color>? chart,
+  }) => SlotlyColors(
+    rating: rating ?? this.rating,
+    success: success ?? this.success,
+    successContainer: successContainer ?? this.successContainer,
+    onSuccessContainer: onSuccessContainer ?? this.onSuccessContainer,
+    warning: warning ?? this.warning,
+    chart: chart ?? this.chart,
+  );
+
+  @override
+  SlotlyColors lerp(SlotlyColors? other, double t) {
+    if (other == null) return this;
+    return SlotlyColors(
+      rating: Color.lerp(rating, other.rating, t)!,
+      success: Color.lerp(success, other.success, t)!,
+      successContainer: Color.lerp(
+        successContainer,
+        other.successContainer,
+        t,
+      )!,
+      onSuccessContainer: Color.lerp(
+        onSuccessContainer,
+        other.onSuccessContainer,
+        t,
+      )!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      chart: [
+        for (var i = 0; i < chart.length; i++)
+          Color.lerp(chart[i], other.chart[i], t)!,
+      ],
+    );
+  }
+}
+
 abstract final class AppRadii {
   static const s = 8.0;
   static const m = 12.0;
@@ -39,6 +130,12 @@ abstract final class AppTheme {
 
     return ThemeData(
       colorScheme: colors,
+      extensions: [
+        if (brightness == Brightness.dark)
+          SlotlyColors.dark
+        else
+          SlotlyColors.light,
+      ],
       scaffoldBackgroundColor: colors.surface,
       visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(

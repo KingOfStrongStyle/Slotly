@@ -1,36 +1,58 @@
 import 'package:flutter/material.dart';
 
-enum HomeTab { services, bookings, profile }
+import '../data/local/app_database.dart';
+import '../features/catalog/domain/service.dart';
 
-/// App-wide UI settings and the selected bottom navigation tab.
+enum ClientTab { catalog, favorites, bookings, profile }
+
+enum OwnerTab { dashboard, bookings, services, reviews, organization }
+
+/// Device settings (theme) and the selected tab of each shell.
 ///
-/// Settings live only in memory: persistence is out of the MVP scope.
+/// The theme is saved in the local database, so it survives a restart;
+/// tabs are UI state and start from the first tab after sign-in.
 class AppController extends ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.light;
-  bool _demoNotificationsEnabled = true;
-  HomeTab _currentTab = HomeTab.services;
+  AppController(this._database);
 
-  ThemeMode get themeMode => _themeMode;
-  bool get isDarkMode => _themeMode == ThemeMode.dark;
-  bool get demoNotificationsEnabled => _demoNotificationsEnabled;
-  HomeTab get currentTab => _currentTab;
+  final AppDatabase _database;
+  ClientTab _clientTab = ClientTab.catalog;
+  OwnerTab _ownerTab = OwnerTab.dashboard;
+  ServiceCategory? _initialCategory;
 
-  void setDarkMode(bool enabled) {
-    final mode = enabled ? ThemeMode.dark : ThemeMode.light;
-    if (mode == _themeMode) return;
-    _themeMode = mode;
+  ThemeMode get themeMode => isDarkMode ? ThemeMode.dark : ThemeMode.light;
+  bool get isDarkMode => _database.tables.settings.darkTheme;
+  ClientTab get clientTab => _clientTab;
+  OwnerTab get ownerTab => _ownerTab;
+
+  /// Category chosen on the welcome screen, applied once to the catalog.
+  ServiceCategory? get initialCategory => _initialCategory;
+
+  Future<void> setDarkMode(bool enabled) async {
+    if (enabled == isDarkMode) return;
+    await _database.update((t) => t.settings.darkTheme = enabled);
     notifyListeners();
   }
 
-  void setDemoNotifications(bool enabled) {
-    if (enabled == _demoNotificationsEnabled) return;
-    _demoNotificationsEnabled = enabled;
+  void selectClientTab(ClientTab tab) {
+    if (tab == _clientTab) return;
+    _clientTab = tab;
     notifyListeners();
   }
 
-  void selectTab(HomeTab tab) {
-    if (tab == _currentTab) return;
-    _currentTab = tab;
+  void selectOwnerTab(OwnerTab tab) {
+    if (tab == _ownerTab) return;
+    _ownerTab = tab;
     notifyListeners();
+  }
+
+  void setInitialCategory(ServiceCategory? category) {
+    _initialCategory = category;
+  }
+
+  /// Called on sign-in and sign-out: every session starts from the first
+  /// tab.
+  void resetTabs() {
+    _clientTab = ClientTab.catalog;
+    _ownerTab = OwnerTab.dashboard;
   }
 }
