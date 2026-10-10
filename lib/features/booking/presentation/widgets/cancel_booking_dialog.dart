@@ -4,8 +4,6 @@ import '../../../../core/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/booking.dart';
 
-/// Asks before cancelling. Resolves to `true` only on explicit confirmation;
-/// tapping outside or pressing Back keeps the booking.
 Future<bool> showCancelBookingDialog(
   BuildContext context,
   Booking booking,

@@ -1,9 +1,5 @@
 import 'service.dart';
 
-/// A local business: barbershop, clinic, car service and so on.
-///
-/// Services, specialists, photos, bookings and reviews all refer to
-/// [id], so ownership checks are a simple comparison of ids.
 class Organization {
   const Organization({
     required this.id,
@@ -23,12 +19,10 @@ class Organization {
   final ServiceCategory category;
   final String description;
 
-  /// Demonstration contact fields, not real addresses.
   final String address;
   final String phone;
   final int artworkVariant;
 
-  /// Unpublished organizations are visible only to their owner.
   final bool isPublished;
 
   Organization copyWith({
@@ -63,11 +57,6 @@ class Organization {
   String toString() => 'Organization($id, $name)';
 }
 
-/// Photo of a business.
-///
-/// Demo organizations use built-in illustrations ([illustrationVariant]);
-/// photos added by an owner are files copied into the app directory
-/// ([filePath]). Binary data never goes into the database.
 class BusinessPhoto {
   const BusinessPhoto({
     required this.id,
@@ -84,7 +73,6 @@ class BusinessPhoto {
   final String id;
   final String organizationId;
 
-  /// Order in the gallery, starting from 0.
   final int position;
   final DateTime addedAt;
   final String? filePath;

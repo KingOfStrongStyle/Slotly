@@ -1,10 +1,6 @@
 import 'organization.dart';
 import 'service.dart';
 
-/// Filters the catalog by title and category.
-///
-/// The search is case-insensitive and treats `ё` as `е`, because Russian
-/// users often type one instead of the other.
 List<Service> filterServices(
   Iterable<Service> services, {
   String query = '',
@@ -22,7 +18,6 @@ List<Service> filterServices(
 String normalizeSearchText(String value) =>
     value.trim().toLowerCase().replaceAll('ё', 'е');
 
-/// Organizations whose name or any of whose [services] match [query].
 List<Organization> filterOrganizations(
   Iterable<Organization> organizations, {
   required Iterable<Service> services,

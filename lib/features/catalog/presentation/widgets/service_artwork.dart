@@ -4,9 +4,6 @@ import '../../../../app/theme.dart';
 import '../../domain/service.dart';
 import '../service_category_style.dart';
 
-/// Abstract illustration of a service: category icon on a tinted
-/// background with a few soft circles. [Service.artworkVariant] picks the
-/// tint and the circle layout, so neighbouring cards look different.
 class ServiceArtwork extends StatelessWidget {
   const ServiceArtwork({
     super.key,
@@ -61,7 +58,6 @@ class _CirclesPainter extends CustomPainter {
   final Color circles;
   final int variant;
 
-  // Circle centers and radii as fractions of the shortest side.
   static const _layouts = [
     [(0.15, 0.2, 0.35), (0.95, 0.9, 0.45)],
     [(0.9, 0.15, 0.4), (0.1, 0.95, 0.3)],

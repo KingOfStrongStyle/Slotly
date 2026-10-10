@@ -9,15 +9,12 @@ import '../domain/booking_repository.dart';
 import '../domain/time_slot.dart';
 import 'demo_schedule.dart';
 
-/// [BookingRepository] on top of the local database.
 class LocalBookingRepository implements BookingRepository {
   const LocalBookingRepository(
     this._context, {
     this.schedule = const DemoSchedule(),
   });
 
-  /// Tickets are numbered from 101: three digits are quick to draw and do
-  /// not look like a queue position.
   static const firstTicketNumber = 101;
 
   final LocalContext _context;
@@ -135,6 +132,8 @@ class LocalBookingRepository implements BookingRepository {
   }
 
   @override
+  // Влад: ищем талон только среди своих записей (клиент) или своей организации
+  // (владелец). Чужой талон просто "не найден", без намёка что он есть
   Future<Booking> checkIn(String ticketNumber) async {
     final user = _context.user;
     final Booking? booking;
@@ -175,7 +174,6 @@ class LocalBookingRepository implements BookingRepository {
     return _save(booking.copyWith(status: BookingStatus.completed));
   }
 
-  /// A booking of the signed-in customer; others are reported as missing.
   Booking _ownBooking(String bookingId) {
     final booking = _tables.bookings[bookingId];
     _context.require(

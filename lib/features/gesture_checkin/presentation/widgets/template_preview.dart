@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../domain/gesture_point.dart';
 import '../../domain/gesture_template.dart';
 
-/// Small drawing of a template. The dot marks where each stroke starts.
 class TemplatePreview extends StatelessWidget {
   const TemplatePreview({super.key, required this.template});
 
@@ -14,8 +13,6 @@ class TemplatePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    // CustomPaint without a child takes its size from the constraints only;
-    // SizedBox.expand makes it fill the space given by the parent.
     return SizedBox.expand(
       child: CustomPaint(
         painter: _TemplatePainter(

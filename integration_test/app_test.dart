@@ -21,9 +21,6 @@ import 'package:slotly/features/welcome/welcome_screen.dart';
 
 import '../test/helpers/test_app.dart' show FakePhotoPicker;
 
-/// End-to-end scenarios on a real device or emulator with the real clock.
-/// Every test starts from a fresh in-memory database with the demo data;
-/// reminders go to an in-memory service so they can be inspected.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -101,7 +98,6 @@ void main() {
       (w) => w is TimeSlotChip && w.isAvailable,
     );
     if (free.evaluate().isEmpty) {
-      // Tomorrow may be Sunday (day off): pick the next day in the strip.
       await tapVisible(tester, find.byKey(const ValueKey('day-2')));
       free = find.byWidgetPredicate((w) => w is TimeSlotChip && w.isAvailable);
     }
@@ -284,7 +280,6 @@ void main() {
       () => deps.business.updateOrganization(other.copyWith(name: 'Захват')),
       throwsA(isA<AccessDeniedException>()),
     );
-    // The owner shell has no customer catalog and no "Записаться".
     expect(find.text(AppStrings.tabCatalog), findsNothing);
     expect(find.text(AppStrings.detailsBook), findsNothing);
   });
@@ -350,7 +345,6 @@ void main() {
     expect(find.byType(WelcomeScreen), findsOneWidget);
     expect(reminders.scheduled, isEmpty);
 
-    // "Restart": a new app on the same stored data.
     await tester.pumpWidget(const SizedBox());
     await launch(tester);
     expect(find.byType(WelcomeScreen), findsOneWidget);

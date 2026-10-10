@@ -12,16 +12,6 @@ import '../domain/ticket_entry.dart';
 import 'widgets/gesture_pad.dart';
 import 'widgets/template_preview.dart';
 
-/// Arrival check-in at the reception desk: the visitor draws the ticket
-/// number of their booking digit by digit and finishes with "S"; the
-/// booking is then marked as arrived through [checkIn].
-///
-/// Opened from the owner's bookings: handwriting works without a keyboard,
-/// so a tablet at the reception can stay on this screen. Customers have a
-/// one-tap "Я на месте" button in their own booking instead.
-///
-/// The screen does not scroll as a whole: a vertical scroll view would
-/// compete with the pad for vertical finger movements.
 class TicketCheckInScreen extends StatefulWidget {
   const TicketCheckInScreen({
     super.key,
@@ -34,8 +24,6 @@ class TicketCheckInScreen extends StatefulWidget {
   final GestureClassifier classifier;
   final List<GestureTemplate> templates;
 
-  /// Checks in the booking with the given ticket number; throws the
-  /// errors of `BookingRepository.checkIn`.
   final Future<Booking> Function(String ticketNumber) checkIn;
   final String finishSymbol;
 
@@ -55,6 +43,8 @@ class _TicketCheckInScreenState extends State<TicketCheckInScreen> {
     super.dispose();
   }
 
+  // Ян: номер талона рисуется по одной цифре, неуверенную цифру не
+  // принимаем, а просим нарисовать ещё раз
   Future<void> _recognize() async {
     final result = widget.classifier.recognize(_pad.toGestureStrokes());
     final (entry, outcome) = _entry.apply(result);
@@ -232,7 +222,6 @@ class _Feedback {
   final String message;
   final bool isError;
 
-  /// Set after a successful check-in.
   final Booking? booking;
 }
 

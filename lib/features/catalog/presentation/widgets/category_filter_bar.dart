@@ -5,7 +5,6 @@ import '../../../../core/app_strings.dart';
 import '../../domain/service.dart';
 import '../service_category_style.dart';
 
-/// Horizontally scrolling category chips. `null` means "all categories".
 class CategoryFilterBar extends StatelessWidget {
   const CategoryFilterBar({
     super.key,

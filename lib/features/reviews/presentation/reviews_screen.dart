@@ -33,8 +33,6 @@ List<Review> sortReviews(List<Review> reviews, ReviewSort sort) {
   return sorted;
 }
 
-/// All reviews of an organization with the rating distribution and
-/// sorting. The signed-in customer can edit or delete their own reviews.
 class ReviewsScreen extends StatefulWidget {
   const ReviewsScreen({
     super.key,
@@ -48,7 +46,6 @@ class ReviewsScreen extends StatefulWidget {
   final String organizationName;
   final ReviewRepository reviews;
 
-  /// Null for guests and owners: no review is "own".
   final String? currentUserId;
 
   @override

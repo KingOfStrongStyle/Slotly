@@ -22,8 +22,6 @@ enum ServiceIssue {
 
 enum PhotoIssue { limitReached, unsupportedFormat, fileTooLarge }
 
-/// Validation rules for everything an owner edits. Repositories enforce
-/// them; forms use the same rules to show messages next to fields.
 abstract final class BusinessRules {
   static const minNameLength = 3;
   static const maxNameLength = 60;

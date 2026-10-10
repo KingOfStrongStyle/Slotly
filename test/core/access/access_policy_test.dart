@@ -6,11 +6,8 @@ import 'package:slotly/features/auth/domain/app_user.dart';
 
 import '../../helpers/test_app.dart';
 
-/// The permission matrix as a table: every action × every kind of actor.
-///
-/// Client actions are checked on a record of Aliya; owner actions on the
-/// organization "Северный". "own" and "other" columns show that ownership
-/// of the record matters, not only the role.
+// Влад: вся матрица прав таблицей: 16 действий на 5 видов пользователей.
+// Добавили действие в AppAction - добавь строку сюда, иначе тест упадёт
 void main() {
   const policy = AccessPolicy();
   final aliya = userOf('aliya');
@@ -26,7 +23,6 @@ void main() {
     'owner (other organization)': ownerWhiteLine,
   };
 
-  // Expected results in the order of [actors].
   const matrix = <AppAction, List<bool>>{
     AppAction.browseCatalog: [true, true, true, true, true],
     AppAction.toggleFavorite: [false, true, true, false, false],
@@ -57,8 +53,6 @@ void main() {
       test(
         '${action.name} — ${names[i]}: ${expected[i] ? 'allowed' : 'denied'}',
         () {
-          // Client-scoped actions without a record (e.g. createBooking) ignore
-          // the owner id, so "other record" is the same as "own" there.
           final isRecordAction = action.scope == AccessScope.client;
           final allowed = policy.can(
             actor,

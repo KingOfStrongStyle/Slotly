@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 
-/// Small accent heading that separates groups of content on a screen.
 class SectionTitle extends StatelessWidget {
   const SectionTitle(
     this.text, {

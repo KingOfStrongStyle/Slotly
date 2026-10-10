@@ -20,8 +20,6 @@ class _BusinessData {
   final List<BusinessPhoto> photos;
 }
 
-/// "Организация" tab of the owner: profile fields, the photo gallery
-/// (up to five photos, reorder, remove) and account settings.
 class BusinessProfileScreen extends StatefulWidget {
   const BusinessProfileScreen({
     super.key,
@@ -37,7 +35,6 @@ class BusinessProfileScreen extends StatefulWidget {
   final BusinessRepository business;
   final PhotoPicker photoPicker;
 
-  /// Settings, preview and sign-out tiles provided by the shell.
   final List<Widget> settings;
 
   @override
@@ -77,8 +74,6 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     super.dispose();
   }
 
-  /// Fills the fields once, so a reload after saving does not overwrite
-  /// what the owner is typing.
   void _fillForm() {
     final organization = _query.data?.organization;
     if (organization == null || _loaded != null) return;
@@ -110,6 +105,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     });
   }
 
+  // Ян: при пяти фото пикер даже не открываем, сразу сообщение
   Future<void> _addPhoto() async {
     final path = await widget.photoPicker.pickImage();
     if (path == null) return;
@@ -203,7 +199,6 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                       children: [
                         ..._profileForm(context),
                         ..._photos(context, data),
-                        // Default padding: aligned with the list tiles below.
                         const SectionTitle(AppStrings.businessSettingsSection),
                         ...widget.settings,
                       ],

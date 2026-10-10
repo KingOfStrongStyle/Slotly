@@ -3,13 +3,11 @@ import 'review.dart';
 
 enum ReviewIssue { ratingOutOfRange, textTooLong, replyEmpty, replyTooLong }
 
-/// Why a customer can or cannot review a booking.
 enum ReviewEligibility { allowed, notCompleted, alreadyReviewed, notOwnBooking }
 
 abstract final class ReviewRules {
   static const maxReplyLength = 500;
 
-  /// A customer reviews only their own completed visit, once.
   static ReviewEligibility eligibility({
     required Booking booking,
     required String userId,

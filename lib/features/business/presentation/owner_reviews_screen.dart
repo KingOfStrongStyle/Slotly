@@ -12,8 +12,6 @@ import '../../reviews/domain/review_rules.dart';
 import '../../reviews/presentation/review_widgets.dart';
 import '../../reviews/presentation/reviews_screen.dart';
 
-/// Reviews of the owner's organization. The owner may answer a review but
-/// has no way to change or delete it — neither here nor in the repository.
 class OwnerReviewsScreen extends StatefulWidget {
   const OwnerReviewsScreen({
     super.key,
@@ -162,7 +160,6 @@ class _ReplyDialogState extends State<_ReplyDialog> {
   @override
   void initState() {
     super.initState();
-    // Rebuild on every edit, whatever the source of the change.
     _text.addListener(() => setState(() => _touched = true));
   }
 

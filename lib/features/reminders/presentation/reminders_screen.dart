@@ -9,9 +9,6 @@ import '../data/reminder_service.dart';
 import '../domain/reminder_planner.dart';
 import 'reminder_coordinator.dart';
 
-/// Settings and status of local reminders: the switch, the Android
-/// permission, and the list of reminders planned for upcoming bookings.
-/// The list doubles as a manual test aid.
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key, required this.coordinator});
 

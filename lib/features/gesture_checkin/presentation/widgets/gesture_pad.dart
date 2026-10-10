@@ -5,8 +5,6 @@ import '../../../../app/theme.dart';
 import '../../../../core/app_strings.dart';
 import '../../domain/gesture_point.dart';
 
-/// Strokes drawn on a [GesturePad]. Kept outside the widget so the screen
-/// can read, undo and clear them.
 class GesturePadController extends ChangeNotifier {
   final List<List<Offset>> _strokes = [];
 
@@ -36,18 +34,12 @@ class GesturePadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Converts Flutter offsets to the pure Dart points of the recognizer.
   List<GestureStroke> toGestureStrokes() => [
     for (final stroke in _strokes)
       [for (final p in stroke) GesturePoint(p.dx, p.dy)],
   ];
 }
 
-/// Square drawing area for handwritten symbols.
-///
-/// Uses `onPanStart`, `onPanUpdate` and `onPanEnd`. `DragStartBehavior.down`
-/// makes the stroke start exactly where the finger touched the screen,
-/// otherwise the first few pixels (the touch slop) would be lost.
 class GesturePad extends StatelessWidget {
   const GesturePad({
     super.key,
@@ -126,7 +118,6 @@ class _StrokesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Light center guides help to draw symbols of a similar size.
     final guide = Paint()
       ..color = guideColor
       ..strokeWidth = 1;

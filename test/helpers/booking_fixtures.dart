@@ -2,7 +2,6 @@ import 'package:slotly/data/seed/demo_accounts.dart';
 import 'package:slotly/data/seed/demo_catalog.dart';
 import 'package:slotly/features/booking/domain/booking.dart';
 
-/// Demo booking for widget tests. All values are fictional.
 Booking fixtureBooking({
   required String id,
   required DateTime startAt,

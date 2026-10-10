@@ -9,7 +9,6 @@ import 'package:slotly/features/reminders/domain/reminder_planner.dart';
 import '../../helpers/test_app.dart';
 
 void main() {
-  // AppDependencies creates the lifecycle logger, which needs a binding.
   TestWidgetsFlutterBinding.ensureInitialized();
   late InMemoryReminderService service;
   late AppDependencies deps;

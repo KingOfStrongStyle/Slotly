@@ -7,8 +7,6 @@ import '../../../core/widgets/rating_badge.dart';
 import '../domain/rating_summary.dart';
 import '../domain/review.dart';
 
-/// Five stars, filled up to [rating]. Decorative: the caller provides the
-/// text alternative.
 class StarRow extends StatelessWidget {
   const StarRow({super.key, required this.rating, this.size = 16});
 
@@ -35,9 +33,6 @@ class StarRow extends StatelessWidget {
   }
 }
 
-/// Average, count and a horizontal bar per star. Bars are plain widgets,
-/// and every row has a text label, so the numbers are readable without
-/// colors and by TalkBack.
 class RatingDistribution extends StatelessWidget {
   const RatingDistribution({super.key, required this.summary});
 
@@ -151,9 +146,6 @@ class _StarBar extends StatelessWidget {
   }
 }
 
-/// One review. When [onEdit] and [onDelete] are given (own review), a long
-/// press and the "⋮" button open the same action menu. [onReply] is the
-/// owner's action.
 class ReviewTile extends StatelessWidget {
   const ReviewTile({
     super.key,

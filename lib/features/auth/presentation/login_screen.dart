@@ -9,8 +9,6 @@ import '../data/auth_repository.dart';
 import '../domain/app_user.dart';
 import 'session_controller.dart';
 
-/// Demo sign-in. On success the root of the app replaces the whole stack
-/// with the shell of the user's role, so this screen does not navigate.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
@@ -20,7 +18,6 @@ class LoginScreen extends StatefulWidget {
 
   final SessionController session;
 
-  /// Public demo accounts offered for one-tap filling.
   final List<DemoAccount> accounts;
 
   @override

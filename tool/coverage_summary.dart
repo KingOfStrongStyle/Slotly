@@ -1,8 +1,3 @@
-// Prints line coverage from coverage/lcov.info grouped by layer.
-//
-// Usage:
-//   flutter test --coverage
-//   dart run tool/coverage_summary.dart
 import 'dart:io';
 
 void main(List<String> args) {

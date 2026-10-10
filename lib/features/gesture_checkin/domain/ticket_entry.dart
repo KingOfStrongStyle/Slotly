@@ -8,8 +8,6 @@ enum TicketEntryOutcome {
   numberEmpty,
 }
 
-/// Ticket number typed with gestures: digits are appended, the finishing
-/// symbol completes the input.
 class TicketEntry {
   const TicketEntry({
     this.number = '',
@@ -23,7 +21,6 @@ class TicketEntry {
   final bool isCompleted;
   final String finishSymbol;
 
-  /// Applies a recognition result and tells what happened.
   (TicketEntry, TicketEntryOutcome) apply(GestureRecognitionResult result) {
     final label = result.label;
     if (!result.isAccepted || label == null) {

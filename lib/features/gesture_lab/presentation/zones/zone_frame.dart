@@ -5,7 +5,6 @@ import '../gesture_log.dart';
 
 typedef GestureEventCallback = void Function(GestureKind kind, String message);
 
-/// Rounded surface with a hint line that hosts one gesture demonstration.
 class ZoneFrame extends StatelessWidget {
   const ZoneFrame({
     super.key,

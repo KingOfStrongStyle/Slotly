@@ -8,8 +8,6 @@ import 'zone_frame.dart';
 
 const _knobSize = 56.0;
 
-/// Horizontal drag: the knob follows the finger, the zone shows the
-/// direction and, after release, the fling velocity.
 class HorizontalDragZone extends StatefulWidget {
   const HorizontalDragZone({super.key, required this.onEvent});
 
@@ -99,7 +97,6 @@ class _HorizontalDragZoneState extends State<HorizontalDragZone> {
   }
 }
 
-/// Vertical drag: shows how far the finger moved since the drag started.
 class VerticalDragZone extends StatefulWidget {
   const VerticalDragZone({super.key, required this.onEvent});
 
@@ -145,7 +142,6 @@ class _VerticalDragZoneState extends State<VerticalDragZone> {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Guarded: with very large text the area can be smaller than the knob.
                   final maxOffset = math.max(
                     0.0,
                     (constraints.maxHeight - _knobSize) / 2,

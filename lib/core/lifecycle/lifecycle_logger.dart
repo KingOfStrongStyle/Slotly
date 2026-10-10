@@ -4,12 +4,6 @@ import 'package:flutter/widgets.dart';
 import '../utils/clock.dart';
 import 'lifecycle_event.dart';
 
-/// Records application lifecycle transitions into an in-memory journal.
-///
-/// Created once at app startup (see `AppDependencies`) so that events are
-/// captured even before the diagnostics screen is opened. The journal is not
-/// persisted: after the process is killed it starts again from #1. Transitions
-/// right before termination can be watched with `adb logcat -s flutter`.
 class LifecycleLogger extends ChangeNotifier {
   LifecycleLogger({this.clock = systemClock}) {
     final initialState = WidgetsBinding.instance.lifecycleState;
@@ -22,7 +16,6 @@ class LifecycleLogger extends ChangeNotifier {
   final List<LifecycleEvent> _events = [];
   AppLifecycleState? _currentState;
 
-  /// Journal in chronological order.
   List<LifecycleEvent> get events => List.unmodifiable(_events);
 
   AppLifecycleState? get currentState => _currentState;

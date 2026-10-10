@@ -8,12 +8,6 @@ import '../../domain/booking.dart';
 
 enum BookingAction { details, reschedule, cancel, review }
 
-/// Opened by a tap: everything about the booking and the buttons for each
-/// available action. These buttons are the accessible alternative to the
-/// swipe and long-press gestures.
-///
-/// [onCheckIn] is passed only while check-in is open; otherwise
-/// [checkInAvailability] explains when it will be possible.
 Future<void> showBookingDetailsSheet(
   BuildContext context,
   Booking booking, {
@@ -221,8 +215,6 @@ String bookingStatusText(Booking booking) {
   }
 }
 
-/// Opened by a long press: the same actions as the details sheet, as a
-/// short menu.
 Future<BookingAction?> showBookingActionsSheet(
   BuildContext context,
   Booking booking, {

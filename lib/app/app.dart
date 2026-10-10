@@ -11,12 +11,6 @@ import 'owner_shell.dart';
 import 'routes.dart';
 import 'theme.dart';
 
-/// Root widget. Shows the welcome and sign-in screens to a guest, the
-/// customer shell to a client and the owner shell to a business owner.
-///
-/// Every sign-in and sign-out creates a new [Navigator] (new key), so no
-/// screen of the previous session stays in the back stack: after sign-out
-/// the Back button cannot return to the owner dashboard.
 class SlotlyApp extends StatefulWidget {
   const SlotlyApp({super.key, required this.dependencies});
 
@@ -44,6 +38,8 @@ class _SlotlyAppState extends State<SlotlyApp> {
     super.dispose();
   }
 
+  // Кирилл: при смене пользователя пересоздаём навигатор, иначе в стеке остаются
+  // экраны прошлого аккаунта
   void _onSessionChanged() {
     final userId = _dependencies.session.currentUser?.id;
     if (userId == _sessionUserId) return;

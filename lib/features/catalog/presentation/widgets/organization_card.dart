@@ -10,12 +10,6 @@ import '../../domain/organization.dart';
 import '../service_category_style.dart';
 import 'business_photo_view.dart';
 
-/// Catalog card of a business.
-///
-/// Tap opens the organization; double tap adds it to favorites (with a
-/// heart animation and a light haptic click). The heart button does the
-/// same for users who cannot or do not want to double-tap. When
-/// [onToggleFavorite] is null (owner view) there is no favorite action.
 class OrganizationCard extends StatefulWidget {
   const OrganizationCard({
     super.key,
@@ -42,8 +36,6 @@ class _OrganizationCardState extends State<OrganizationCard> {
   int _burst = 0;
 
   void _onDoubleTap() {
-    // Double tap only adds: removing by an accidental double tap would be
-    // surprising. Removal is done with the heart button.
     if (!widget.isFavorite) widget.onToggleFavorite?.call();
     HapticFeedback.lightImpact();
     setState(() => _burst++);
@@ -54,8 +46,6 @@ class _OrganizationCardState extends State<OrganizationCard> {
     final theme = Theme.of(context);
     final organization = widget.organization;
     final canFavorite = widget.onToggleFavorite != null;
-    // The heart button is a sibling of the tappable area, not its child:
-    // otherwise every tap on it would wait for the double-tap timeout.
     return Card(
       child: Stack(
         children: [
@@ -113,6 +103,8 @@ class _OrganizationCardState extends State<OrganizationCard> {
             ),
           ),
           if (canFavorite)
+            // Ян: сердце отдельным слоем поверх карточки: если оно внутри области
+            // с onDoubleTap, обычное нажатие ждёт таймаут двойного
             Positioned(
               top: AppSpacing.s,
               right: AppSpacing.s,

@@ -1,9 +1,4 @@
-/// All user-facing Russian texts in one place.
-///
-/// Keeping strings here (instead of inline in widgets) makes it possible to
-/// move to ARB files and `flutter gen-l10n` later without touching layouts.
 abstract final class AppStrings {
-  // General
   static const appName = 'Slotly';
   static const appTagline = 'Запись на услуги без звонков';
   static const appVersion = '0.2.0';
@@ -28,7 +23,6 @@ abstract final class AppStrings {
     'декабря',
   ];
 
-  // Service categories
   static const categoryAll = 'Все';
   static const categoryBarbershop = 'Барбершоп';
   static const categoryBeauty = 'Салон красоты';
@@ -37,11 +31,9 @@ abstract final class AppStrings {
   static const categoryAutoService = 'Автосервис';
   static const categoryTutoring = 'Репетиторы';
 
-  // Navigation
   static const tabBookings = 'Записи';
   static const tabProfile = 'Профиль';
 
-  // Welcome
   static const welcomeDescription =
       'Выберите услугу, специалиста и удобное время. Запись подтверждается '
       'сразу, без ожидания звонка администратора.';
@@ -51,7 +43,6 @@ abstract final class AppStrings {
       'Выбрано: $label. Каталог откроется с этим фильтром';
   static const welcomeShowServices = 'Продолжить';
 
-  // Catalog
   static const catalogClearSearch = 'Очистить поиск';
   static String catalogFoundCount(int count) => 'Найдено: $count';
   static const catalogEmptyTitle = 'Ничего не найдено';
@@ -59,7 +50,6 @@ abstract final class AppStrings {
       'Попробуйте изменить запрос или выбрать другую категорию.';
   static const catalogResetFilters = 'Сбросить фильтры';
 
-  // Lifecycle diagnostics
   static const diagnosticsTitle = 'Диагностика';
   static const diagnosticsCurrentState = 'Текущее состояние';
   static const diagnosticsUnknownState = 'Платформа ещё не сообщила состояние';
@@ -94,7 +84,6 @@ abstract final class AppStrings {
       'Движок Flutter работает без видимого окна: Activity уничтожена или '
       'приложение закрывается.';
 
-  // Profile
   static const profileTitle = 'Профиль';
   static const profileSettingsSection = 'Настройки';
   static const profileDarkTheme = 'Тёмная тема';
@@ -106,7 +95,6 @@ abstract final class AppStrings {
       'Учебный MVP сервиса онлайн-записи и электронной очереди для '
       'локального бизнеса. $demoDataNotice';
 
-  // Service details
   static const detailsPrice = 'Стоимость';
   static const detailsDuration = 'Длительность';
   static const detailsCategory = 'Категория';
@@ -114,7 +102,6 @@ abstract final class AppStrings {
   static const detailsSpecialists = 'Специалисты';
   static const detailsBook = 'Записаться';
 
-  // Booking form
   static const bookingTitle = 'Новая запись';
   static const bookingSpecialistSection = 'Специалист';
   static const bookingDateSection = 'Дата';
@@ -142,7 +129,6 @@ abstract final class AppStrings {
   static const bookingSlotNoLongerAvailable =
       'Это время уже заняли. Выберите другое.';
 
-  // Booking confirmation
   static const confirmTitle = 'Подтвердите запись';
   static const confirmService = 'Услуга';
   static const confirmSpecialist = 'Специалист';
@@ -157,7 +143,6 @@ abstract final class AppStrings {
   static String bookingCreatedTicket(String ticket) =>
       '. Талон $ticket — назовите или нарисуйте его по приходу';
 
-  // My bookings
   static const bookingsTitle = 'Мои записи';
   static String bookingsActiveTab(int count) => 'Активные ($count)';
   static String bookingsCancelledTab(int count) => 'Отменённые ($count)';
@@ -205,7 +190,6 @@ abstract final class AppStrings {
   static const bookingCancelled = 'Запись отменена';
   static const bookingCancelFailed = 'Не удалось отменить запись';
 
-  // Gesture Lab
   static const gestureLabTitle = 'Gesture Lab';
   static const gestureLabClearLog = 'Очистить журнал';
   static const gestureLabLogTitle = 'Журнал жестов';
@@ -254,7 +238,6 @@ abstract final class AppStrings {
   static String gestureLogScale(String scale) => 'Pinch: масштаб $scale×';
   static const gestureLogScaleReset = 'Масштаб сброшен';
 
-  // Ticket check-in
   static const checkInTitle = 'Отметка о приходе';
   static const checkInTemplates = 'Как рисовать символы';
   static const checkInTemplatesHint =
@@ -300,7 +283,6 @@ abstract final class AppStrings {
   static const checkInFailed =
       'Не удалось отметить приход. Попробуйте ещё раз.';
 
-  // Sign-in
   static const signInTitle = 'Вход';
   static const signInSubtitle =
       'Войдите как клиент, чтобы записываться, или как владелец, чтобы '
@@ -326,11 +308,9 @@ abstract final class AppStrings {
       'следующего входа.';
   static const signOutCancel = 'Остаться';
 
-  // Client shell
   static const tabCatalog = 'Каталог';
   static const tabFavorites = 'Избранное';
 
-  // Organizations
   static const catalogOrganizations = 'Места';
   static const catalogServices = 'Услуги';
   static const catalogSearchOrganizationsHint = 'Найти место или услугу';
@@ -379,7 +359,6 @@ abstract final class AppStrings {
   static String photoLabel(String organization, int index) =>
       'Фото $index, $organization';
 
-  // Reviews
   static const reviewsEmptyTitle = 'Отзывов пока нет';
   static const reviewsEmptyMessage =
       'Отзыв может оставить клиент после завершённого визита.';
@@ -419,7 +398,6 @@ abstract final class AppStrings {
       'визита.';
   static const reviewFailed = 'Не удалось сохранить отзыв';
 
-  // Booking: price options and rescheduling
   static const bookingPriceSection = 'Вариант';
   static const bookingMissingPriceOption = 'вариант услуги';
   static const rescheduleTitle = 'Перенос записи';
@@ -436,14 +414,12 @@ abstract final class AppStrings {
       'Запись уже нельзя изменить: визит начался или вы отметились.';
   static const bookingChangeFailed = 'Не удалось изменить запись';
 
-  // Owner shell
   static const ownerTabDashboard = 'Обзор';
   static const ownerTabBookings = 'Записи';
   static const ownerTabServices = 'Услуги';
   static const ownerTabReviews = 'Отзывы';
   static const ownerTabOrganization = 'Организация';
 
-  // Owner dashboard
   static const dashboardTitle = 'Обзор';
   static const periodLabel = 'Период';
   static String periodDays(int days) => '$days дней';
@@ -487,7 +463,6 @@ abstract final class AppStrings {
       'Показатели рассчитываются из записей, отзывов и избранного вашей '
       'организации. Отмены не учитываются в рейтинге специалистов и услуг.';
 
-  // Owner bookings
   static const ownerBookingsTitle = 'Записи организации';
   static const ownerBookingsToday = 'Сегодня';
   static const ownerBookingsUpcoming = 'Предстоящие';
@@ -502,7 +477,6 @@ abstract final class AppStrings {
       'Нажмите на запись для подробностей. Отметьте визит, когда клиент '
       'ушёл, — после этого он сможет оставить отзыв.';
 
-  // Owner services
   static const ownerServicesTitle = 'Услуги и цены';
   static const ownerServiceAdd = 'Добавить услугу';
   static const ownerServiceEdit = 'Изменить';
@@ -543,7 +517,6 @@ abstract final class AppStrings {
   static String serviceTooManyOptions(int max) => 'Не больше $max вариантов';
   static const serviceNoSpecialists = 'Выберите хотя бы одного специалиста';
 
-  // Owner reviews
   static const ownerReviewsTitle = 'Отзывы клиентов';
   static const ownerReviewReply = 'Ответить';
   static const ownerReplyTitle = 'Ответ на отзыв';
@@ -556,7 +529,6 @@ abstract final class AppStrings {
       'Владелец может ответить на отзыв, но не может изменить или удалить '
       'его.';
 
-  // Business profile
   static const businessTitle = 'Организация';
   static const businessProfileSection = 'Профиль';
   static const businessFieldName = 'Название';
@@ -589,7 +561,6 @@ abstract final class AppStrings {
   static const businessPreview = 'Как видят клиенты';
   static const businessSettingsSection = 'Настройки';
 
-  // Profile
   static const profileReminders = 'Напоминания о записях';
   static const profileRemindersHint = 'Накануне, утром в день визита и за час';
   static const profileDevSection = 'Для разработчиков';
@@ -598,7 +569,6 @@ abstract final class AppStrings {
   static const profileDemoAccountNote =
       'Демо-аккаунт: данные хранятся только на этом устройстве';
 
-  // Reminders
   static const remindersTitle = 'Напоминания';
   static const remindersEnabled = 'Напоминать о записях';
   static const remindersEnabledHint =

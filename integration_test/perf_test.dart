@@ -12,11 +12,6 @@ import 'package:slotly/features/reminders/data/reminder_service.dart';
 
 import '../test/helpers/test_app.dart' show FakePhotoPicker;
 
-/// Frame timings of the heaviest scrolling scenarios, collected from the
-/// engine's [FrameTiming] reports. Build time measures the app's Dart code;
-/// raster time on an emulator mostly measures its software GPU, so the two
-/// are reported separately. Run with `flutter drive --profile` (see
-/// test_driver/perf_driver.dart).
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   final report = <String, Object?>{};
@@ -26,7 +21,6 @@ void main() {
     void collect(List<FrameTiming> batch) => timings.addAll(batch);
     SchedulerBinding.instance.addTimingsCallback(collect);
     await action();
-    // Timings arrive in batches; wait for the last one.
     await Future<void>.delayed(const Duration(seconds: 1));
     SchedulerBinding.instance.removeTimingsCallback(collect);
     report[key] = _summarize(timings);
@@ -43,8 +37,6 @@ void main() {
     await tester.pumpWidget(SlotlyApp(dependencies: deps));
     await tester.pumpAndSettle();
 
-    // Warm-up pass, not measured: first-time costs (glyph loading, first
-    // layout of each card) are reported separately from steady scrolling.
     await measure('catalog_first_pass', () async {
       final list = find.byType(Scrollable).first;
       await tester.fling(list, const Offset(0, -800), 2000);

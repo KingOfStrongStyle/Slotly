@@ -1,14 +1,8 @@
 import 'dart:io';
 
-/// Copies picked images into a directory owned by the app.
-///
-/// The picker returns a temporary file or a content URI that may disappear
-/// later; the copy keeps the photo available until the owner removes it.
 abstract interface class PhotoStorage {
-  /// Size of the picked file in bytes.
   Future<int> sizeOf(String sourcePath);
 
-  /// Returns the path of the managed copy.
   Future<String> importPhoto(String sourcePath, String photoId);
 
   Future<void> delete(String path);
@@ -23,6 +17,8 @@ class FilePhotoStorage implements PhotoStorage {
   Future<int> sizeOf(String sourcePath) => File(sourcePath).length();
 
   @override
+  // Влад: копируем файл к себе, в базе только путь. Если фото удалят из галереи,
+  // у организации оно останется
   Future<String> importPhoto(String sourcePath, String photoId) async {
     await directory.create(recursive: true);
     final dot = sourcePath.lastIndexOf('.');
@@ -39,11 +35,9 @@ class FilePhotoStorage implements PhotoStorage {
   }
 }
 
-/// Keeps "files" in memory; used by tests.
 class MemoryPhotoStorage implements PhotoStorage {
   MemoryPhotoStorage({this.sizes = const {}});
 
-  /// Size of each source path; unknown paths are 100 KB.
   final Map<String, int> sizes;
   final Set<String> stored = {};
 

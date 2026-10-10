@@ -11,11 +11,6 @@ enum BookingDraftIssue {
   commentTooLong,
 }
 
-/// State of the booking form, independent of widgets.
-///
-/// Business rules live here so they can be unit-tested: changing the
-/// specialist or the day resets the chosen time, because the old time slot
-/// may not exist in the new schedule.
 class BookingDraft {
   const BookingDraft({
     required this.service,
@@ -33,7 +28,6 @@ class BookingDraft {
   final DateTime? day;
   final TimeSlot? slot;
 
-  /// Chosen line of the detailed price list, if the service has one.
   final PriceOption? priceOption;
   final String comment;
 
@@ -96,7 +90,6 @@ class BookingDraft {
 
   bool get isComplete => issues.isEmpty;
 
-  /// Throws [StateError] when called on an incomplete draft.
   BookingRequest toRequest() {
     final specialist = this.specialist;
     final slot = this.slot;

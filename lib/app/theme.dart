@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Spacing scale shared by all screens (multiples of 4 dp).
 abstract final class AppSpacing {
   static const xs = 4.0;
   static const s = 8.0;
@@ -9,15 +8,12 @@ abstract final class AppSpacing {
   static const xl = 24.0;
   static const xxl = 32.0;
 
-  /// Content wider than this is centered on tablets and landscape phones.
   static const maxContentWidth = 640.0;
 }
 
-/// Semantic colors that Material 3 does not provide: rating stars,
-/// positive and warning states, and a fixed palette for chart categories.
-/// Registered as a [ThemeExtension], so light and dark themes have their own
-/// values and widgets read them with `Theme.of(context).extension`.
 @immutable
+// Ян: свои цвета поверх Material 3: рейтинг, успех, графики. Палитру графиков
+// проверял на дальтонизм, тёмная тема - отдельные оттенки, не инверсия
 class SlotlyColors extends ThemeExtension<SlotlyColors> {
   const SlotlyColors({
     required this.rating,
@@ -34,9 +30,6 @@ class SlotlyColors extends ThemeExtension<SlotlyColors> {
     successContainer: Color(0xFFD6F0DF),
     onSuccessContainer: Color(0xFF0D3B22),
     warning: Color(0xFFB45309),
-    // Categorical slots validated for color vision deficiencies (all
-    // pairs, light and dark): blue, orange, aqua. Single-series charts use
-    // the brand primary instead.
     chart: [Color(0xFF2A78D6), Color(0xFFEB6834), Color(0xFF1BAF7A)],
   );
 
@@ -55,8 +48,6 @@ class SlotlyColors extends ThemeExtension<SlotlyColors> {
   final Color onSuccessContainer;
   final Color warning;
 
-  /// Series colors in a fixed order: the same category always gets the
-  /// same color on every chart.
   final List<Color> chart;
 
   static SlotlyColors of(BuildContext context) =>
@@ -111,7 +102,6 @@ abstract final class AppRadii {
   static const xl = 28.0;
 }
 
-/// Material 3 theme built from a single brand seed color.
 abstract final class AppTheme {
   static const seedColor = Color(0xFF0B6E69);
 

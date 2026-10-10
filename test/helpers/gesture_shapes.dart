@@ -2,14 +2,11 @@ import 'dart:math' as math;
 
 import 'package:slotly/features/gesture_checkin/domain/gesture_point.dart';
 
-/// Straight stroke from (x1, y1) to (x2, y2).
 GestureStroke lineStroke(double x1, double y1, double x2, double y2) => [
   for (var i = 0; i <= 12; i++)
     GesturePoint(x1 + (x2 - x1) * i / 12, y1 + (y2 - y1) * i / 12),
 ];
 
-/// Rotates, stretches, shifts and scales strokes, adds deterministic noise
-/// and can reverse the drawing order, imitating a real hand-drawn copy.
 List<GestureStroke> distort(
   List<GestureStroke> strokes, {
   double rotationDegrees = 0,

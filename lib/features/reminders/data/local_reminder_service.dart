@@ -9,15 +9,6 @@ import 'package:timezone/timezone.dart' as tz;
 import '../domain/reminder_planner.dart';
 import 'reminder_service.dart';
 
-/// Android implementation on top of `flutter_local_notifications`.
-///
-/// * Times are converted with the device time zone (`flutter_timezone`),
-///   so a reminder at 18:00 fires at 18:00 local time even across a
-///   daylight-saving change.
-/// * `inexactAllowWhileIdle`: Android may deliver a few minutes late, but
-///   no "exact alarm" permission is needed — fine for an appointment
-///   reminder.
-/// * The booking id travels in the payload; a tap opens that booking.
 class LocalReminderService implements ReminderService {
   LocalReminderService._(this._plugin);
 
@@ -30,9 +21,6 @@ class LocalReminderService implements ReminderService {
   final _opened = StreamController<String>.broadcast();
   String? _launchBookingId;
 
-  /// Initialises the plugin and time zones. Falls back to
-  /// [InMemoryReminderService] if the platform part is unavailable, so the
-  /// app still starts (for example in a desktop build).
   static Future<ReminderService> create() async {
     try {
       tz_data.initializeTimeZones();
@@ -105,6 +93,8 @@ class LocalReminderService implements ReminderService {
         id: reminder.id,
         scheduledDate: tz.TZDateTime.from(reminder.fireAt, tz.local),
         notificationDetails: details,
+        // Кирилл: inexact специально: для точных нужно отдельное разрешение на будильники.
+        // Android может сдвинуть показ до часа, это описано в docs/notifications.html
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         title: reminder.title,
         body: reminder.body,

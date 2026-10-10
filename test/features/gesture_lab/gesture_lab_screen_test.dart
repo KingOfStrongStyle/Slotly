@@ -11,7 +11,6 @@ void main() {
       pumpScreen(tester, GestureLabScreen(clock: () => testNow));
 
   Future<void> openZone(WidgetTester tester, String title) async {
-    // The tab bar is scrollable: the last tabs may start off-screen.
     await tester.ensureVisible(find.text(title));
     await tester.pumpAndSettle();
     await tester.tap(find.text(title));
@@ -25,7 +24,6 @@ void main() {
     expect(find.text(AppStrings.gestureLabLogEmpty), findsOneWidget);
 
     await tester.tap(card);
-    // Single tap is reported after the double-tap timeout.
     await tester.pumpAndSettle(kDoubleTapTimeout);
     expect(find.text(AppStrings.gestureCardSelected), findsOneWidget);
     expect(find.text(AppStrings.gestureLogTap), findsOneWidget);

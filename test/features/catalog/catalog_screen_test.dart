@@ -120,7 +120,6 @@ void main() {
   testWidgets('tap opens the place', (tester) async {
     await pumpCatalog(tester);
     await tester.tap(find.text('Автосервис «Гараж 24»'));
-    // A single tap is confirmed after the double-tap timeout.
     await tester.pump(kDoubleTapTimeout);
     await tester.pumpAndSettle();
     expect(openedOrganizations.single.id, orgGarage);
@@ -145,7 +144,6 @@ void main() {
     );
     expect(button, findsOneWidget);
 
-    // Double tap again never removes by accident.
     await tester.tap(card);
     await tester.pump(kDoubleTapMinTime);
     await tester.tap(card);

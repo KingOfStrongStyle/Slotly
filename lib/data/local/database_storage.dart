@@ -1,22 +1,13 @@
 import 'dart:io';
 
-/// Where the serialized database lives. The database itself does not know
-/// whether it is a file on the device or a string in a test.
 abstract interface class DatabaseStorage {
-  /// `null` when nothing has been saved yet.
   Future<String?> read();
 
   Future<void> write(String contents);
 
-  /// Keeps an unreadable snapshot for diagnostics before it is replaced.
   Future<void> backupCorrupted(String contents);
 }
 
-/// Stores the database as one JSON file.
-///
-/// Every write goes to a temporary file first and then replaces the real
-/// file with a rename, which is atomic on Android and iOS file systems: a
-/// crash in the middle of a write leaves the previous version intact.
 class FileDatabaseStorage implements DatabaseStorage {
   FileDatabaseStorage(this.file);
 
@@ -27,6 +18,8 @@ class FileDatabaseStorage implements DatabaseStorage {
       await file.exists() ? file.readAsString() : null;
 
   @override
+  // Влад: сначала во временный файл, потом rename - если приложение убьют
+  // посреди записи, старый файл останется целым
   Future<void> write(String contents) async {
     await file.parent.create(recursive: true);
     final temporary = File('${file.path}.tmp');
@@ -39,7 +32,6 @@ class FileDatabaseStorage implements DatabaseStorage {
       File('${file.path}.corrupted').writeAsString(contents, flush: true);
 }
 
-/// In-memory storage for tests and previews.
 class MemoryDatabaseStorage implements DatabaseStorage {
   MemoryDatabaseStorage([this.contents]);
 

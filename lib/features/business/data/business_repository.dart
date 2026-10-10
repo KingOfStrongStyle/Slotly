@@ -8,25 +8,17 @@ import '../../catalog/domain/service.dart';
 import '../domain/business_rules.dart';
 import 'photo_storage.dart';
 
-/// What an owner changes in their organization: the profile, services with
-/// price lists, and the photo gallery. Every method checks that the
-/// signed-in owner manages the organization being changed.
 abstract interface class BusinessRepository {
   Listenable get changes;
 
-  /// All services of the organization, including hidden ones.
   Future<List<Service>> fetchManagedServices(String organizationId);
 
-  /// Throws [ValidationException] with [OrganizationIssue] values.
   Future<Organization> updateOrganization(Organization organization);
 
-  /// Creates the service when [Service.id] is empty, otherwise updates it.
-  /// Throws [ValidationException] with [ServiceIssue] values.
   Future<Service> saveService(Service service);
 
   Future<Service> setServiceHidden(String serviceId, {required bool hidden});
 
-  /// Throws [ValidationException] with [PhotoIssue] values.
   Future<BusinessPhoto> addPhoto(
     String organizationId, {
     required String sourcePath,
@@ -34,10 +26,11 @@ abstract interface class BusinessRepository {
 
   Future<void> removePhoto(String photoId);
 
-  /// Moves the photo to [newPosition] (0-based) and renumbers the rest.
   Future<void> movePhoto(String photoId, int newPosition);
 }
 
+// Влад: каждый метод проверяет organizationId ресурса, а не тот, что пришёл
+// с экрана - так нельзя "перетащить" чужую услугу к себе
 class LocalBusinessRepository implements BusinessRepository {
   const LocalBusinessRepository(this._context, this._photos);
 
@@ -68,7 +61,6 @@ class LocalBusinessRepository implements BusinessRepository {
     if (stored == null) {
       throw RecordNotFoundException('organization', organization.id);
     }
-    // Only editable fields are taken from the input.
     final updated = stored.copyWith(
       name: organization.name.trim(),
       description: organization.description.trim(),
@@ -79,7 +71,6 @@ class LocalBusinessRepository implements BusinessRepository {
     if (issues.isNotEmpty) throw ValidationException(issues);
     return _context.database.update((t) {
       t.organizations[updated.id] = updated;
-      // Keep the name in existing bookings readable for customers.
       return updated;
     });
   }

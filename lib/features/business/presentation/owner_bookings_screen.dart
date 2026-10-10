@@ -14,9 +14,6 @@ import '../../booking/presentation/widgets/booking_tile.dart';
 
 enum OwnerBookingsFilter { today, upcoming, past }
 
-/// Bookings of the owner's organization. The owner checks visitors in
-/// (handwritten ticket number at the reception or the button in the
-/// details) and marks finished visits as completed.
 class OwnerBookingsScreen extends StatefulWidget {
   const OwnerBookingsScreen({
     super.key,

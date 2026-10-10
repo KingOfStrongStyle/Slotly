@@ -15,11 +15,6 @@ import 'app_controller.dart';
 import 'app_scope.dart';
 import 'routes.dart';
 
-/// Main screen of a business owner: dashboard, bookings, services, reviews
-/// and the organization profile — all scoped to [AppUser.organizationId].
-///
-/// Hiding customer screens here is only the first line of defence: every
-/// repository call checks the owner's organization again.
 class OwnerShell extends StatefulWidget {
   const OwnerShell({super.key, required this.user});
 

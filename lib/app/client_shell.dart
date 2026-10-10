@@ -20,12 +20,6 @@ import 'app_controller.dart';
 import 'app_scope.dart';
 import 'routes.dart';
 
-/// Main screen of a customer with the bottom [NavigationBar].
-///
-/// Controllers of this session (catalog, bookings, own reviews) are created
-/// here and disposed on sign-out together with the shell. Tabs are kept in
-/// an [IndexedStack], so the search text and scroll position of each tab
-/// survive switching.
 class ClientShell extends StatefulWidget {
   const ClientShell({super.key, required this.user, this.initialCategory});
 
@@ -73,7 +67,6 @@ class _ClientShellState extends State<ClientShell> {
     super.dispose();
   }
 
-  /// A tap on a reminder opens the "Записи" tab with that booking.
   Future<void> _openBookingFromReminder(String bookingId) async {
     if (!mounted) return;
     Navigator.of(context).popUntil((route) => route.isFirst);
@@ -91,7 +84,6 @@ class _ClientShellState extends State<ClientShell> {
     final context = _bookingsKey.currentContext;
     final screen = _bookingsKey.currentWidget;
     if (context == null || screen is! BookingsScreen) return;
-    // Reuse the same details flow as a tap in the list.
     screen.showDetails(context, booking);
   }
 
@@ -184,8 +176,6 @@ class _ClientShellState extends State<ClientShell> {
       builder: (context, _) {
         final current = controller.clientTab;
         return PopScope(
-          // Android convention: Back on a secondary tab returns to the first
-          // tab instead of closing the app.
           canPop: current == ClientTab.catalog,
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) controller.selectClientTab(ClientTab.catalog);

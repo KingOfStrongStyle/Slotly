@@ -7,12 +7,6 @@ import '../../domain/organization.dart';
 import '../../domain/service.dart';
 import '../service_category_style.dart';
 
-/// Shows a business photo: a file added by the owner or a built-in
-/// illustration of the demo data.
-///
-/// Files are decoded at the size they are displayed ([cacheWidth]), so a
-/// 12-megapixel photo does not take 48 MB of memory in a list. A missing
-/// or broken file shows a placeholder instead of an error.
 class BusinessPhotoView extends StatelessWidget {
   const BusinessPhotoView({
     super.key,
@@ -26,8 +20,6 @@ class BusinessPhotoView extends StatelessWidget {
   final ServiceCategory category;
   final BoxFit fit;
 
-  /// Width in logical pixels the image is shown at; null keeps the full
-  /// resolution (used by the zoomable gallery).
   final double? decodeWidth;
 
   @override
@@ -73,8 +65,6 @@ class _Unavailable extends StatelessWidget {
   }
 }
 
-/// Calm geometric illustration: a tinted surface, a few large shapes and
-/// the category icon. Four variants make neighbouring photos differ.
 class _Illustration extends StatelessWidget {
   const _Illustration({required this.category, required this.variant});
 
@@ -90,7 +80,6 @@ class _Illustration extends StatelessWidget {
       2 => (colors.tertiaryContainer, colors.onTertiaryContainer),
       _ => (colors.surfaceContainerHighest, colors.onSurfaceVariant),
     };
-    // ClipRect: the large circles must not paint outside the photo box.
     return ExcludeSemantics(
       child: ClipRect(
         child: CustomPaint(
@@ -125,7 +114,6 @@ class _ShapesPainter extends CustomPainter {
   final Color shapes;
   final int variant;
 
-  // Circle centers and radii as fractions of width/height/shortest side.
   static const _layouts = [
     [(0.12, 0.25, 0.55), (0.92, 0.95, 0.6)],
     [(0.85, 0.1, 0.5), (0.1, 0.9, 0.45)],

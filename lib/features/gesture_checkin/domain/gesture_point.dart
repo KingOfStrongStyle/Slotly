@@ -1,7 +1,5 @@
 import 'dart:math' as math;
 
-/// A point of a hand-drawn stroke. Pure Dart, so the recognizer does not
-/// depend on Flutter and can be unit-tested directly.
 class GesturePoint {
   const GesturePoint(this.x, this.y);
 
@@ -22,5 +20,4 @@ class GesturePoint {
   String toString() => '(${x.toStringAsFixed(2)}, ${y.toStringAsFixed(2)})';
 }
 
-/// One continuous movement of the finger, from touch down to touch up.
 typedef GestureStroke = List<GesturePoint>;

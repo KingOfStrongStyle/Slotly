@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Slotly brand mark: a 2x2 grid of time slots, one of them booked.
-///
-/// Drawn in code so the same geometry can be reproduced in the SVG files of
-/// the design prototype (`design/assets/slotly-logo.svg`).
 class SlotlyLogo extends StatelessWidget {
   const SlotlyLogo({super.key, this.size = 72});
 

@@ -7,12 +7,6 @@ import '../../features/reviews/domain/review.dart';
 import 'database_tables.dart';
 import 'schema.dart';
 
-/// Converts [DatabaseTables] to JSON and back.
-///
-/// Kept in the data layer so domain models stay free of storage details.
-/// Dates are stored as ISO-8601 strings in UTC and converted back to local
-/// time on reading, so a change of the device time zone shows the same
-/// instant in the new zone.
 abstract final class DatabaseCodec {
   static JsonMap encode(DatabaseTables t) => {
     'schemaVersion': latestSchemaVersion,
@@ -31,7 +25,6 @@ abstract final class DatabaseCodec {
     'favorites': [for (final f in t.favorites.values) _favorite(f)],
   };
 
-  /// [data] must already be migrated to the latest schema.
   static DatabaseTables decode(JsonMap data) {
     final t = DatabaseTables();
     _readSettings(t.settings, data['settings'] as JsonMap? ?? const {});

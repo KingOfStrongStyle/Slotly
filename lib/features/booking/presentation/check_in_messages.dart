@@ -3,8 +3,6 @@ import '../../../core/utils/formatters.dart';
 import '../domain/booking.dart';
 import '../domain/booking_repository.dart';
 
-/// Explains why [BookingsController.checkIn] failed. Shared by the
-/// handwritten check-in screen and the "Я на месте" button.
 String checkInErrorMessage(Object error) => switch (error) {
   TicketNotFoundException(:final ticketNumber) => AppStrings.checkInNotFound(
     ticketNumber,

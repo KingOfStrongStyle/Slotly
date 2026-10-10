@@ -18,15 +18,6 @@ import 'widgets/booking_confirmation_dialog.dart';
 import 'widgets/date_selector.dart';
 import 'widgets/specialist_selector.dart';
 
-/// Booking form: price option, specialist, date, time and a comment.
-///
-/// The screen keeps a [BookingDraft] and only renders it; validation rules
-/// are in the draft. The booking is created through [BookingsController]
-/// after the user confirms the summary dialog.
-///
-/// With [rescheduling] the same form moves an existing booking: only the
-/// specialist, the date and the time can change, and the current time of
-/// the booking is shown as free.
 class BookingFormScreen extends StatefulWidget {
   const BookingFormScreen({
     super.key,
@@ -41,7 +32,6 @@ class BookingFormScreen extends StatefulWidget {
   final BookingsController bookings;
   final Clock clock;
 
-  /// Called with the created or moved booking.
   final ValueChanged<Booking> onBooked;
   final Booking? rescheduling;
 
@@ -57,8 +47,6 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   bool _slotsFailed = false;
   bool _isSubmitting = false;
 
-  /// Increases with every schedule request, so a slow old response cannot
-  /// overwrite the slots of a newer selection.
   int _slotsRequestId = 0;
 
   @override
@@ -319,8 +307,6 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
       minLines: 2,
       maxLines: 4,
       maxLength: BookingDraft.maxCommentLength,
-      // The counter turns red instead of silently cutting the text, so the
-      // user sees why the button is disabled.
       maxLengthEnforcement: MaxLengthEnforcement.none,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textCapitalization: TextCapitalization.sentences,
@@ -353,7 +339,6 @@ class _ServiceSummary extends StatelessWidget {
 
   final Service service;
 
-  /// The booking being moved, shown with its current time.
   final Booking? current;
 
   @override

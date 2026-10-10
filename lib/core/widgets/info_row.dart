@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 
-/// Icon, label and value in one line. Used in service details and in the
-/// booking confirmation dialog.
 class InfoRow extends StatelessWidget {
   const InfoRow({
     super.key,

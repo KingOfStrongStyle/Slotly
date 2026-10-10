@@ -13,15 +13,6 @@ import '../local/database_tables.dart';
 import 'demo_accounts.dart';
 import 'demo_catalog.dart';
 
-/// Fills an empty database with fictional, reproducible demo data.
-///
-/// * Runs once: [version] is stored in the database, a second call does
-///   nothing, so restarting the app never duplicates records.
-/// * Deterministic: a fixed [Random] seed and the injected [Clock] give the
-///   same data for the same "now"; dates are relative to the first launch,
-///   so charts for the last 7 days are never empty.
-/// * Raw data only: bookings, reviews and favorites. Ratings and analytics
-///   are always computed from them, never stored.
 class DemoSeed {
   const DemoSeed({
     required this.clock,
@@ -39,11 +30,10 @@ class DemoSeed {
   final DemoSchedule schedule;
   final PasswordHasher hasher;
 
-  /// False inserts only accounts and the catalog, without bookings,
-  /// reviews and favorites — tests then build exactly the data they need.
   final bool withActivity;
 
-  /// Returns true when data was inserted.
+  // Влад: seed только в пустую базу, повторный запуск ничего не дублирует.
+  // Random с фиксированным зерном, даты от clock - в тестах данные всегда одни и те же
   Future<bool> apply(AppDatabase database) async {
     final settings = database.tables.settings;
     if (settings.seedVersion >= version || !database.tables.isEmpty) {
@@ -53,6 +43,7 @@ class DemoSeed {
     return true;
   }
 
+  // Влад: рейтинги и цифры аналитики тут не задаём, они считаются из записей и отзывов
   void _populate(DatabaseTables t) {
     final random = Random(_randomSeed);
     final now = clock();
@@ -108,8 +99,6 @@ class DemoSeed {
   void _addReviews(DatabaseTables t, Random random, DateTime now) {
     final completed = t.bookings.values.where((b) => b.isCompleted).toList()
       ..sort(Booking.compareByStartAt);
-    // The latest visits of Aliya stay without a review, so the "write a
-    // review" scenario is always available for this account.
     final aliyaLatest = completed
         .where((b) => b.clientId == clientAliyaId)
         .toList()
@@ -194,7 +183,6 @@ class DemoSeed {
   static DateTime _min(DateTime a, DateTime b) => a.isBefore(b) ? a : b;
 }
 
-/// Creates bookings day by day without overlaps for a specialist.
 class _BookingGenerator {
   _BookingGenerator(this.t, this.random, this.now, this.schedule);
 
@@ -203,7 +191,6 @@ class _BookingGenerator {
   final DateTime now;
   final DemoSchedule schedule;
 
-  /// Expected bookings per day for each organization.
   static const _dailyLoad = {
     orgNorth: 0.55,
     orgWhiteLine: 0.4,
@@ -213,7 +200,6 @@ class _BookingGenerator {
     orgFormula: 0.06,
   };
 
-  /// Relative load of specialists: some are booked noticeably more often.
   static const _specialistWeight = {
     'sp-daniyar': 3,
     'sp-arman': 2,
@@ -249,8 +235,6 @@ class _BookingGenerator {
     }
   }
 
-  /// Fixed upcoming visits used in the documented demo scenarios. Each one
-  /// lands on the nearest working day of the specialist.
   void _addScripted(DateTime today) {
     const scripted = [
       ('svc-men-haircut', 'sp-arman', 1, 11, clientDamirId, 'Дамир К.', 0),
@@ -396,14 +380,11 @@ class _BookingGenerator {
 class _ReviewProfile {
   const _ReviewProfile(this.share, this.ratingWeights);
 
-  /// Share of completed visits that get a review.
   final double share;
 
-  /// Weights for 1…5 stars.
   final List<int> ratingWeights;
 }
 
-/// "Формула" is missing on purpose: one organization without reviews.
 const _reviewProfiles = {
   orgNorth: _ReviewProfile(0.55, [1, 1, 2, 8, 18]),
   orgWhiteLine: _ReviewProfile(0.6, [1, 2, 3, 9, 12]),

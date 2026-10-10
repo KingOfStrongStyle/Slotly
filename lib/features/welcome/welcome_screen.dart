@@ -7,8 +7,6 @@ import '../../core/widgets/slotly_logo.dart';
 import '../catalog/domain/service.dart';
 import '../catalog/presentation/service_category_style.dart';
 
-/// First screen of the app. The selected category is local state
-/// (StatefulWidget + setState) and is handed over to the catalog.
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key, required this.onShowServices});
 

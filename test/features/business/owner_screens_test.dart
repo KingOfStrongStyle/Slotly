@@ -53,7 +53,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.chartBookingsWeekly), findsOneWidget);
 
-    // Table view is the text alternative of a chart.
     await tester.tap(find.byTooltip(AppStrings.chartShowTable).first);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.chartColumnPeriod), findsOneWidget);
@@ -205,7 +204,6 @@ void main() {
     await scrollToIn(tester, reply.first, screen: OwnerReviewsScreen);
     await tester.tap(reply.first);
     await tester.pumpAndSettle();
-    // Other tabs stay in the IndexedStack: type into the dialog's field.
     await tester.enterText(
       find.descendant(
         of: find.byType(AlertDialog),

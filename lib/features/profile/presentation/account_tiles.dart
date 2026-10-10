@@ -8,7 +8,6 @@ import '../../../core/widgets/section_title.dart';
 import '../../../core/widgets/slotly_logo.dart';
 import '../../auth/domain/app_user.dart';
 
-/// Pieces of the profile shared by the customer and the owner shells.
 abstract final class AccountTiles {
   static Widget userHeader(BuildContext context, AppUser user) {
     final theme = Theme.of(context);

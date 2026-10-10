@@ -4,7 +4,6 @@ import '../../../../app/theme.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../catalog/domain/service.dart';
 
-/// Single-choice list of specialists for the selected service.
 class SpecialistSelector extends StatelessWidget {
   const SpecialistSelector({
     super.key,

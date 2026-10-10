@@ -1,9 +1,7 @@
 typedef JsonMap = Map<String, Object?>;
 
-/// Upgrades a stored database from one schema version to the next.
 typedef Migration = JsonMap Function(JsonMap data);
 
-/// Thrown when the stored data cannot be read by this app version.
 class UnsupportedSchemaException implements Exception {
   const UnsupportedSchemaException(this.message);
 
@@ -13,12 +11,8 @@ class UnsupportedSchemaException implements Exception {
   String toString() => 'UnsupportedSchemaException: $message';
 }
 
-/// Brings stored JSON to [currentVersion] by applying migrations one by
-/// one: version 1 -> 2 -> 3 and so on.
-///
-/// Every structural change of the stored data adds a migration under the
-/// version it upgrades from and increases [currentVersion]. Old data is
-/// never read by code that expects the new structure.
+// Влад: миграции идут цепочкой по одной версии. Новая версия схемы = новая
+// функция в schemaMigrations + тест на старый json
 class SchemaMigrator {
   const SchemaMigrator({
     this.currentVersion = latestSchemaVersion,
@@ -53,9 +47,6 @@ class SchemaMigrator {
   }
 }
 
-/// Version 1: first persisted schema (users, organizations, catalog,
-/// photos, bookings, reviews, favorites, settings).
-/// Version 2: services can be hidden from customers (`isHidden`).
 const latestSchemaVersion = 2;
 
 const schemaMigrations = <int, Migration>{1: _addServiceVisibility};

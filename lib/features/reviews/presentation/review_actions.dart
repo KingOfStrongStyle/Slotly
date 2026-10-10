@@ -6,10 +6,6 @@ import '../data/review_repository.dart';
 import '../domain/review.dart';
 import 'review_form_sheet.dart';
 
-/// Shared flows for writing, editing and deleting a review, used from the
-/// booking list and from the reviews screen. Each shows the result in a
-/// SnackBar.
-
 Future<void> writeReview(
   BuildContext context,
   ReviewRepository reviews,

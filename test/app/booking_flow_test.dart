@@ -101,7 +101,6 @@ void main() {
     final written = (await deps.reviews.fetchMyReviews()).first;
     expect(written.text, 'Пришлось ждать');
     expect(written.rating, 1);
-    // The booking now says the review is written.
     expect(
       find.descendant(
         of: find.byWidgetPredicate(

@@ -8,11 +8,6 @@ import 'zones/drag_zones.dart';
 import 'zones/scale_zone.dart';
 import 'zones/tap_zone.dart';
 
-/// Lab 3: standard gestures, each in its own zone, plus a shared journal.
-///
-/// Zones are switched with a [TabBar] but deliberately without a
-/// [TabBarView]: a TabBarView would itself listen to horizontal drags and
-/// compete with the horizontal drag demo in the gesture arena.
 class GestureLabScreen extends StatefulWidget {
   const GestureLabScreen({super.key, required this.clock});
 

@@ -3,8 +3,6 @@ import '../../core/utils/clock.dart';
 import '../../features/auth/domain/app_user.dart';
 import 'app_database.dart';
 
-/// What every local repository needs: the data, the permission rules, the
-/// signed-in user and the current time.
 class LocalContext {
   const LocalContext({
     required this.database,
@@ -32,8 +30,6 @@ class LocalContext {
   );
 }
 
-/// The requested record does not exist or is not visible to the user.
-/// Records of other tenants are reported the same way as missing ones.
 class RecordNotFoundException implements Exception {
   const RecordNotFoundException(this.what, this.id);
 
@@ -44,8 +40,6 @@ class RecordNotFoundException implements Exception {
   String toString() => 'RecordNotFoundException($what $id)';
 }
 
-/// Input broke a validation rule; [issues] are enum values of the
-/// corresponding draft class.
 class ValidationException<T extends Enum> implements Exception {
   const ValidationException(this.issues);
 

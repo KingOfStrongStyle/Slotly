@@ -49,7 +49,6 @@ void main() {
     expect(find.text(AppStrings.galleryPosition(1, 4)), findsOneWidget);
     expect(find.text('Удлинённая'), findsOneWidget);
 
-    // The gallery is a scrollable too: scroll the page itself.
     await scrollToIn(
       tester,
       find.textContaining(AppStrings.organizationAllReviews),
@@ -72,7 +71,6 @@ void main() {
     expect(find.byTooltip(AppStrings.favoriteRemove), findsOneWidget);
     expect(find.byType(PhotoGalleryScreen), findsNothing);
 
-    // The heart button removes it again.
     await tester.tap(find.byTooltip(AppStrings.favoriteRemove));
     await tester.pumpAndSettle();
     expect(await favorites.fetchFavoriteIds(), isNot(contains(orgNorth)));
@@ -88,12 +86,10 @@ void main() {
     expect(find.byType(PhotoGalleryScreen), findsOneWidget);
     expect(find.text(AppStrings.galleryPosition(1, 4)), findsOneWidget);
 
-    // Horizontal swipe: next photo.
     await tester.fling(find.byType(PageView).last, const Offset(-300, 0), 1000);
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.galleryPosition(2, 4)), findsOneWidget);
 
-    // Pinch with two fingers.
     final center = tester.getCenter(find.byType(InteractiveViewer).last);
     final first = await tester.startGesture(center - const Offset(20, 0));
     final second = await tester.startGesture(center + const Offset(20, 0));
@@ -109,7 +105,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byTooltip(AppStrings.galleryResetZoom), findsNothing);
 
-    // Swipe down closes the viewer.
     await tester.fling(find.byType(PageView).last, const Offset(0, 400), 1500);
     await tester.pumpAndSettle();
     expect(find.byType(PhotoGalleryScreen), findsNothing);

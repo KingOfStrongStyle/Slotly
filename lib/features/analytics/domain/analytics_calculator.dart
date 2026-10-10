@@ -4,20 +4,9 @@ import '../../favorites/domain/favorite.dart';
 import '../../reviews/domain/review.dart';
 import 'owner_analytics.dart';
 
-/// Turns raw records of ONE organization into dashboard numbers.
-///
-/// Pure Dart: no Flutter, no storage, so every formula is unit-tested on
-/// small hand-made data sets. The caller (the repository) is responsible
-/// for passing only records of the organization the owner manages.
-///
-/// Formulas:
-/// * period = from 00:00 of the day `N-1` days ago until now;
-/// * bookings = visits with `startAt` in the period, any status;
-/// * cancellation rate = cancelled / bookings (null when bookings = 0);
-/// * average rating = mean of reviews created in the period;
-/// * top specialist / service = most non-cancelled bookings, ties by name;
-/// * series = the same counts split by day (7, 30) or by week (90).
 abstract final class AnalyticsCalculator {
+  // Влад: чистая функция без базы и часов, поэтому тесты на ручных данных.
+  // Период включает сегодняшний день, будущие записи сегодня не считаем
   static OwnerAnalytics calculate({
     required AnalyticsPeriod period,
     required DateTime now,
@@ -86,8 +75,6 @@ abstract final class AnalyticsCalculator {
       ? null
       : reviews.fold(0, (sum, r) => sum + r.rating) / reviews.length;
 
-  /// Counts by name, most frequent first; equal counts sorted by name so
-  /// the order (and the "top" item) is stable.
   static List<NamedCount> _countBy(Iterable<String> names) {
     final counts = <String, int>{};
     for (final name in names) {
@@ -101,9 +88,6 @@ abstract final class AnalyticsCalculator {
     });
   }
 
-  /// Day or week intervals covering the period, oldest first. Weeks are
-  /// counted back from today, so the last bar is always "the last 7 days"
-  /// and only the oldest one may be shorter.
   static List<(DateTime, DateTime)> _buckets(
     AnalyticsPeriod period,
     DateTime from,

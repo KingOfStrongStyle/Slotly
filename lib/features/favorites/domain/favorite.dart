@@ -1,7 +1,3 @@
-/// A customer saved an organization to come back to it later.
-///
-/// One record per (customer, organization); removing the favorite deletes
-/// it. [createdAt] feeds the "added to favorites" metric of the owner.
 class Favorite {
   const Favorite({
     required this.userId,

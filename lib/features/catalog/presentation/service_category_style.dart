@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/app_strings.dart';
 import '../domain/service.dart';
 
-/// Presentation details of [ServiceCategory]: kept outside the domain enum
-/// because labels and icons belong to the UI layer.
 extension ServiceCategoryStyle on ServiceCategory {
   String get label => switch (this) {
     ServiceCategory.barbershop => AppStrings.categoryBarbershop,

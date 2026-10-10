@@ -17,8 +17,6 @@ void main() {
   final pad = find.byKey(const ValueKey('gesture-pad'));
   late TestData data;
 
-  /// Reception tablet of "Северный": ticket 17 starts in 30 minutes, so
-  /// check-in is already open; ticket 42 is tomorrow.
   Future<void> pumpCheckIn(WidgetTester tester) async {
     data = await TestData.create();
     data.signInAs('north');
@@ -50,7 +48,6 @@ void main() {
     );
   }
 
-  /// Draws strokes given in a 0..100 box inside the pad, like a finger.
   Future<void> draw(WidgetTester tester, List<GestureStroke> strokes) async {
     final rect = tester.getRect(pad);
     Offset toScreen(GesturePoint p) => Offset(
@@ -198,7 +195,6 @@ void main() {
     }
     final previews = find.byType(TemplatePreview);
     expect(previews, findsNWidgets(symbolTemplates.length));
-    // A zero-sized canvas would draw every template as a single dot.
     expect(tester.getSize(previews.first), const Size(56, 56));
   });
 }

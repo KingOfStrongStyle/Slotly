@@ -7,7 +7,6 @@ import '../../domain/service.dart';
 import '../service_category_style.dart';
 import 'service_artwork.dart';
 
-/// Catalog list item. Reused by the catalog and by the design golden tests.
 class ServiceCard extends StatelessWidget {
   const ServiceCard({
     super.key,
@@ -19,8 +18,6 @@ class ServiceCard extends StatelessWidget {
   final Service service;
   final VoidCallback? onTap;
 
-  /// Shown in the global service search, where services of different
-  /// businesses are mixed.
   final String? organizationName;
 
   @override

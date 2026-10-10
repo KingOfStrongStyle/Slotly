@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
-# Boots the Android emulator used for local development (if it is not
-# running yet) and waits until it is ready, so VS Code can launch the app
-# on it right away. Used as a preLaunchTask in .vscode/launch.json.
+# Кирилл: поднимает эмулятор перед F5 в VS Code (см. .vscode/tasks.json).
+# Если устройство уже подключено - ничего не делает
 set -euo pipefail
 
 AVD_NAME="${SLOTLY_AVD:-slotly_api36}"
 PORT=5554
 SERIAL="emulator-$PORT"
 
-# Use the same SDK as Flutter, so the emulator and `flutter run` talk to one
-# adb server. ANDROID_HOME wins when it is set explicitly.
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 if [ -z "$SDK" ]; then
   SDK="$(flutter config --list 2>/dev/null | sed -n 's/^ *android-sdk: //p')"

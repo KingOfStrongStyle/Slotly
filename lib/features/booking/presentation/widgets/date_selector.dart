@@ -4,7 +4,6 @@ import '../../../../app/theme.dart';
 import '../../../../core/app_strings.dart';
 import '../../../../core/utils/clock.dart';
 
-/// Horizontal strip with the next [days] dates starting from [today].
 class DateSelector extends StatelessWidget {
   const DateSelector({
     super.key,

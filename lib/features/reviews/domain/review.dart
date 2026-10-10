@@ -1,4 +1,3 @@
-/// Owner's public answer to a review.
 class ReviewReply {
   const ReviewReply({required this.text, required this.createdAt});
 
@@ -6,10 +5,6 @@ class ReviewReply {
   final DateTime createdAt;
 }
 
-/// Customer feedback about one completed booking.
-///
-/// A review always belongs to a booking, so a customer can rate a business
-/// only after a real visit and only once per visit.
 class Review {
   const Review({
     required this.id,
@@ -40,10 +35,8 @@ class Review {
   final String authorId;
   final String authorName;
 
-  /// 1…5 stars.
   final int rating;
 
-  /// Empty when the customer left only stars.
   final String text;
   final DateTime createdAt;
   final DateTime? updatedAt;

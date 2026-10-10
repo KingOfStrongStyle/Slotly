@@ -7,11 +7,6 @@ import 'zone_frame.dart';
 
 enum _CardAction { toggleSelection, toggleFavorite, reset }
 
-/// Tap, double tap and long press on one card.
-///
-/// With `onDoubleTap` registered, Flutter waits for the double-tap timeout
-/// (about 300 ms) before reporting a single tap. This delay is expected and
-/// is part of the demonstration.
 class TapZone extends StatefulWidget {
   const TapZone({super.key, required this.onEvent});
 

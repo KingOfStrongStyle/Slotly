@@ -1,10 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Loads data through a repository and reloads it whenever [refreshOn]
-/// fires, so every screen that shows the data stays up to date after a
-/// change made anywhere in the app.
-///
-/// Screens read [data], [isLoading] and [error] in a `ListenableBuilder`.
 class LiveQuery<T> extends ChangeNotifier {
   LiveQuery(this._load, {this._refreshOn}) {
     _refreshOn?.addListener(_onSourceChanged);
@@ -17,8 +12,6 @@ class LiveQuery<T> extends ChangeNotifier {
   bool _isLoading = false;
   bool _isDisposed = false;
 
-  /// Increases with every request, so a slow old response cannot overwrite
-  /// a newer one.
   int _requestId = 0;
 
   T? get data => _data;

@@ -11,10 +11,6 @@ import '../../catalog/domain/service.dart';
 import '../data/business_repository.dart';
 import '../domain/business_rules.dart';
 
-/// Creates or edits a service with its detailed price list.
-///
-/// Validation uses [BusinessRules] — the same rules the repository
-/// enforces — so the form shows a message next to each invalid field.
 class ServiceEditorScreen extends StatefulWidget {
   const ServiceEditorScreen({
     super.key,
@@ -28,11 +24,9 @@ class ServiceEditorScreen extends StatefulWidget {
   final String organizationId;
   final ServiceCategory category;
 
-  /// Specialists of the organization to choose from.
   final List<Specialist> specialists;
   final BusinessRepository business;
 
-  /// Null when creating a new service.
   final Service? service;
 
   @override

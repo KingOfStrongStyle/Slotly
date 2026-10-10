@@ -8,8 +8,6 @@ import '../../../core/widgets/section_title.dart';
 import '../../auth/domain/app_user.dart';
 import 'account_tiles.dart';
 
-/// "Профиль" tab of the customer: account, settings, developer tools and
-/// sign-out.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,

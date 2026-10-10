@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/app_strings.dart';
 import 'session_controller.dart';
 
-/// Asks for confirmation and signs out. The root of the app then replaces
-/// the whole navigation stack with the welcome screen.
 Future<void> confirmSignOut(
   BuildContext context,
   SessionController session,

@@ -1,14 +1,8 @@
 import '../../features/auth/domain/app_user.dart';
 
-/// Every operation that needs a permission check.
-///
-/// Client actions work with the client's own records; owner actions work
-/// with the records of the owner's organization.
 enum AppAction {
-  // Everyone, including a guest.
   browseCatalog,
 
-  // Client.
   toggleFavorite,
   createBooking,
   viewOwnBookings,
@@ -17,7 +11,6 @@ enum AppAction {
   writeReview,
   editOwnReview,
 
-  // Owner, only for their own organization.
   viewDashboard,
   viewOrganizationBookings,
   manageOrganizationBookings,
@@ -61,17 +54,11 @@ class AccessDeniedException implements Exception {
   String toString() => 'AccessDeniedException(${action.name}: $reason)';
 }
 
-/// The permission matrix of Slotly in one place.
-///
-/// Repositories call [require] before every read of private data and every
-/// change, so a hidden button is never the only protection. The UI calls
-/// [can] to decide what to show. On a server the same rules become
-/// permission classes and queryset filters.
+// Кирилл: одна таблица прав на всё приложение. UI только прячет кнопки,
+// а реальная проверка - require() в каждом методе репозитория
 class AccessPolicy {
   const AccessPolicy();
 
-  /// [organizationId] — organization that owns the resource;
-  /// [resourceOwnerId] — client who owns the resource (booking, review).
   bool can(
     AppUser? user,
     AppAction action, {
@@ -79,7 +66,6 @@ class AccessPolicy {
     String? resourceOwnerId,
   }) => _denialReason(user, action, organizationId, resourceOwnerId) == null;
 
-  /// Throws [AccessDeniedException] when [can] would return false.
   void require(
     AppUser? user,
     AppAction action, {
@@ -118,6 +104,4 @@ class AccessPolicy {
   }
 }
 
-/// Returns the signed-in user. Repositories receive this function instead
-/// of the session object, just like a server reads the user from a token.
 typedef CurrentUser = AppUser? Function();

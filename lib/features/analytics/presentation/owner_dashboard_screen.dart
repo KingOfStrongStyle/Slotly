@@ -10,10 +10,6 @@ import '../data/analytics_repository.dart';
 import '../domain/owner_analytics.dart';
 import 'charts.dart';
 
-/// Owner dashboard: KPI tiles and charts for one organization.
-///
-/// The period filter changes every number on the screen at once, because
-/// they all come from one `OwnerAnalytics` result.
 class OwnerDashboardScreen extends StatefulWidget {
   const OwnerDashboardScreen({
     super.key,

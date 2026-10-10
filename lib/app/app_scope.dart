@@ -24,11 +24,6 @@ import '../features/reminders/presentation/reminder_coordinator.dart';
 import '../features/reviews/data/review_repository.dart';
 import 'app_controller.dart';
 
-/// Everything the screens need, created once at startup.
-///
-/// This is the only place that decides which implementations are used
-/// (local database today, HTTP repositories later), so screens never
-/// construct their own data sources.
 class AppDependencies {
   AppDependencies._({
     required this.clock,
@@ -48,8 +43,8 @@ class AppDependencies {
     required this.gestureClassifier,
   });
 
-  /// Opens the database from [storage], fills it with demo data on the
-  /// first launch, restores the previous session and syncs reminders.
+  // Кирилл: вся сборка зависимостей тут, без DI-пакетов. В тестах сюда же
+  // подставляем память вместо файлов и фейковые напоминания/пикер
   static Future<AppDependencies> create({
     required DatabaseStorage storage,
     required PhotoStorage photoStorage,
@@ -122,7 +117,6 @@ class AppDependencies {
   }
 }
 
-/// Makes [AppDependencies] reachable from any route via [AppScope.of].
 class AppScope extends InheritedWidget {
   const AppScope({super.key, required this.dependencies, required super.child});
 

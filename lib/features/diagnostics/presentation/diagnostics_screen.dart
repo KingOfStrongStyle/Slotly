@@ -8,7 +8,6 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/responsive.dart';
 
-/// Lab 1: shows the current lifecycle state and the numbered journal.
 class DiagnosticsScreen extends StatelessWidget {
   const DiagnosticsScreen({super.key, required this.logger});
 
@@ -28,7 +27,6 @@ class DiagnosticsScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: logger,
       builder: (context, _) {
-        // Newest first: the latest transition is what the user just caused.
         final events = logger.events.reversed.toList();
         return Scaffold(
           appBar: AppBar(

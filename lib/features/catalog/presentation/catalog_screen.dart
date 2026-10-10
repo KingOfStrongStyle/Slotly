@@ -14,11 +14,6 @@ import 'widgets/service_card.dart';
 
 enum CatalogMode { organizations, services }
 
-/// "Каталог" tab: places (organizations) or individual services, one
-/// search field and one category filter for both.
-///
-/// Query, category and mode are local UI state; the data comes from
-/// [CatalogController], so the screen does not know where it is stored.
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
     super.key,
@@ -34,7 +29,6 @@ class CatalogScreen extends StatefulWidget {
   final ValueChanged<Service> onServiceSelected;
   final ServiceCategory? initialCategory;
 
-  /// Called after a favorite was toggled, with the new state.
   final void Function(Organization organization, bool isFavorite)?
   onFavoriteChanged;
 

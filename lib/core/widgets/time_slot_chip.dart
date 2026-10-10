@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../app_strings.dart';
 
-/// Time slot in the booking form.
-///
-/// States: available, selected and unavailable. An unavailable slot is
-/// disabled, crossed out and announced as busy by screen readers, so it can
-/// never be chosen.
 class TimeSlotChip extends StatelessWidget {
   const TimeSlotChip({
     super.key,

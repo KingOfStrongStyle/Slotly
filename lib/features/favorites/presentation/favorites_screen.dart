@@ -8,7 +8,6 @@ import '../../catalog/domain/organization.dart';
 import '../../catalog/presentation/catalog_controller.dart';
 import '../../catalog/presentation/widgets/organization_card.dart';
 
-/// "Избранное" tab: organizations the customer saved.
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({
     super.key,

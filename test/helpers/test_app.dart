@@ -15,10 +15,8 @@ import 'package:slotly/features/business/data/photo_picker.dart';
 import 'package:slotly/features/business/data/photo_storage.dart';
 import 'package:slotly/features/reminders/data/reminder_service.dart';
 
-/// Fixed "now" for all widget tests: Monday, 5 October 2026, 09:00.
 final testNow = DateTime(2026, 10, 5, 9);
 
-/// Emulates a typical Android phone (Pixel 7: 1080 x 2400 px, 411 x 914 dp).
 void usePhoneSurface(WidgetTester tester, {double textScale = 1}) {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.625;
@@ -27,7 +25,6 @@ void usePhoneSurface(WidgetTester tester, {double textScale = 1}) {
   addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 }
 
-/// Picker that returns a preset path, or null to simulate "cancelled".
 class FakePhotoPicker implements PhotoPicker {
   String? nextPath = '/picked/photo.jpg';
   int calls = 0;
@@ -39,8 +36,6 @@ class FakePhotoPicker implements PhotoPicker {
   }
 }
 
-/// Full app dependencies on an in-memory database with the demo data,
-/// fake reminders and a fake photo picker.
 Future<AppDependencies> createTestDependencies({
   Clock? clock,
   InMemoryReminderService? reminders,
@@ -63,8 +58,6 @@ AppUser userOf(String login) => accountOf(login).user;
 Future<void> signIn(AppDependencies dependencies, String login) =>
     dependencies.session.signIn(login, accountOf(login).password);
 
-/// Database with accounts and the catalog only (no bookings, reviews,
-/// favorites), plus a context whose signed-in user can be switched.
 class TestData {
   TestData._(this.database, this.clock);
 
@@ -94,7 +87,6 @@ class TestData {
   void signInAs(String? login) => user = login == null ? null : userOf(login);
 }
 
-/// Pumps the whole app; signs in first when [login] is given.
 Future<AppDependencies> pumpApp(
   WidgetTester tester, {
   String? login,
@@ -110,7 +102,6 @@ Future<AppDependencies> pumpApp(
   return deps;
 }
 
-/// Wraps a single screen with the same theme and localization as the app.
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
@@ -133,7 +124,6 @@ Future<void> pumpScreen(
   await tester.pumpAndSettle();
 }
 
-/// Taps a destination of the bottom navigation bar.
 Future<void> openTab(WidgetTester tester, String label) async {
   await tester.tap(
     find.descendant(of: find.byType(NavigationBar), matching: find.text(label)),
@@ -141,9 +131,6 @@ Future<void> openTab(WidgetTester tester, String label) async {
   await tester.pumpAndSettle();
 }
 
-/// Scrolls the main list of [screen] until [finder] is built, then brings
-/// it fully into view. Needed where text fields add their own Scrollables
-/// to the tree.
 Future<void> scrollToIn(
   WidgetTester tester,
   Finder finder, {

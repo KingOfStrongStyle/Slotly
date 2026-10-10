@@ -14,19 +14,13 @@ class ReviewNotAllowedException implements Exception {
   String toString() => 'ReviewNotAllowedException(${reason.name})';
 }
 
-/// Reviews of organizations. Ratings are never stored: callers build a
-/// `RatingSummary` from the returned reviews.
 abstract interface class ReviewRepository {
   Listenable get changes;
 
-  /// Public reviews of an organization, newest first.
   Future<List<Review>> fetchOrganizationReviews(String organizationId);
 
-  /// Reviews written by the signed-in customer.
   Future<List<Review>> fetchMyReviews();
 
-  /// Throws [ReviewNotAllowedException] unless the signed-in customer owns
-  /// the completed booking and has not reviewed it yet.
   Future<Review> createReview({
     required String bookingId,
     required int rating,
@@ -41,11 +35,11 @@ abstract interface class ReviewRepository {
 
   Future<void> deleteReview(String reviewId);
 
-  /// Owner answers a review of their organization. The review itself
-  /// cannot be changed by the owner.
   Future<Review> replyToReview(String reviewId, String text);
 }
 
+// Влад: отзыв только на свою завершённую запись и один раз. Правила общие
+// с UI лежат в ReviewRules, здесь проверяем ещё раз
 class LocalReviewRepository implements ReviewRepository {
   const LocalReviewRepository(this._context);
 

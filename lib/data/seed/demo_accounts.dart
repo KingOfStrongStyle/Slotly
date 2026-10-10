@@ -1,11 +1,6 @@
 import '../../features/auth/domain/app_user.dart';
 import 'demo_catalog.dart';
 
-/// A demo sign-in shown on the login screen and in the documentation.
-///
-/// PUBLIC TEST DATA: these logins and passwords are published on purpose
-/// so anyone can try the demo. They protect nothing and must never be
-/// reused for real accounts.
 class DemoAccount {
   const DemoAccount({
     required this.user,
@@ -16,7 +11,6 @@ class DemoAccount {
   final AppUser user;
   final String password;
 
-  /// What to try with this account.
   final String scenario;
 }
 

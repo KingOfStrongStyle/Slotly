@@ -53,7 +53,6 @@ void main() {
     await tester.tap(find.text(AppStrings.diagnosticsTitle));
     await tester.pumpAndSettle();
     expect(find.byType(DiagnosticsScreen), findsOneWidget);
-    // System Back button, as on an Android device.
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.byType(DiagnosticsScreen), findsNothing);
@@ -69,7 +68,6 @@ void main() {
   ) async {
     await _openProfile(tester);
     final signOut = find.text(AppStrings.signOut);
-    // The list is built lazily: scroll until the last tile exists.
     await tester.scrollUntilVisible(signOut, 200);
     await tester.tap(signOut);
     await tester.pumpAndSettle();
@@ -85,7 +83,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(WelcomeScreen), findsOneWidget);
-    // Back cannot return into the closed session.
     expect(await tester.binding.handlePopRoute(), isFalse);
   });
 }

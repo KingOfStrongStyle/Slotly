@@ -10,8 +10,6 @@ import '../domain/service.dart';
 import 'service_category_style.dart';
 import 'widgets/service_artwork.dart';
 
-/// Full description of one service. The [Service] object arrives through
-/// the constructor from the catalog, so no repeated lookup by id is needed.
 class ServiceDetailsScreen extends StatelessWidget {
   const ServiceDetailsScreen({
     super.key,
@@ -21,7 +19,6 @@ class ServiceDetailsScreen extends StatelessWidget {
 
   final Service service;
 
-  /// Null when the viewer cannot book (an owner previewing the catalog).
   final VoidCallback? onBook;
 
   @override

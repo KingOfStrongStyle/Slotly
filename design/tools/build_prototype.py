@@ -20,7 +20,6 @@ import os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DESIGN = os.path.join(ROOT, 'design')
 
-# Tokens (light scheme), see design/README.md.
 C = {
     'primary': '#006A65', 'onPrimary': '#FFFFFF',
     'primaryContainer': '#9DF2EA', 'onPrimaryContainer': '#00504C',
@@ -36,7 +35,6 @@ C = {
 FONT = "Roboto, 'Segoe UI', Arial, sans-serif"
 W, H = 360, 800
 
-# ---------------------------------------------------------------- icons
 
 ICONS = {
     'search': '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>',
@@ -85,7 +83,6 @@ def icon(name, x, y, size=24, color=None, width=2):
             f'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round">{ICONS[name]}</g>')
 
 
-# ---------------------------------------------------------------- primitives
 
 def esc(t):
     return html.escape(t, quote=True)
@@ -114,7 +111,6 @@ def hotspot(x, y, w, h, target, label):
             f'rx="12" fill="#000" fill-opacity="0"><title>{esc(label)}</title></rect>')
 
 
-# ---------------------------------------------------------------- components
 
 def status_bar():
     return (text(20, 26, '12:00', 13, 500) +
@@ -285,7 +281,6 @@ def frame(name, body):
             f'{status_bar()}{body}</svg>')
 
 
-# ---------------------------------------------------------------- frames
 
 CATEGORIES = [('Барбершоп', 'scissors'), ('Салон красоты', 'spa'), ('Стоматология', 'smile'),
               ('Клиника', 'hospital'), ('Автосервис', 'car'), ('Репетиторы', 'school')]
@@ -516,7 +511,6 @@ def bookings():
            text(16, 166, 'Нажмите для подробностей, удерживайте для действий.', 12, color=C['onSurfaceVariant']),
            text(16, 182, 'Влево — отменить, вправо — перенести.', 12, color=C['onSurfaceVariant']),
            booking_tile(196, '6', 'Мужская стрижка', '12:00–12:45 · Талон 143', 'b1')]
-    # Second booking half-swiped to the right: rescheduling background.
     out.append(rect(16, 284, 328, 76, C['secondaryContainer'], 16))
     out.append(icon('calendar', 34, 310, 24, C['onSecondaryContainer']))
     out.append(text(66, 327, 'Перенести', 14, 600, C['onSecondaryContainer']))
@@ -596,7 +590,6 @@ FRAMES = [('welcome', welcome), ('login', login), ('catalog', catalog), ('search
           ('booking', lambda: booking_form(False)), ('confirm', lambda: booking_form(True)),
           ('bookings', bookings), ('profile', profile), ('dashboard', dashboard)]
 
-# ---------------------------------------------------------------- components (UI kit)
 
 
 def component(name, w, h, body):
@@ -635,7 +628,6 @@ def components():
             'text-field': field, 'navigation-bar': nav}
 
 
-# ---------------------------------------------------------------- HTML prototype
 
 PROTOTYPE_TEMPLATE = '''<!doctype html>
 <html lang="ru">
@@ -729,7 +721,6 @@ show(order.includes(start) ? start : 'welcome');
 '''
 
 
-# ---------------------------------------------------------------- UI kit page
 
 DARK = {
     'primary': '#81D5CE', 'onPrimary': '#003734', 'primaryContainer': '#00504C',
@@ -921,7 +912,6 @@ def main():
     frames_dir = os.path.join(DESIGN, 'figma-import', 'frames')
     comp_dir = os.path.join(DESIGN, 'figma-import', 'components')
     os.makedirs(frames_dir, exist_ok=True)
-    # Frames are renumbered when the set changes: remove stale files first.
     for name in os.listdir(frames_dir):
         if name.endswith('.svg'):
             os.remove(os.path.join(frames_dir, name))
@@ -937,13 +927,11 @@ def main():
     for name, svg in component_svgs.items():
         with open(os.path.join(comp_dir, f'{name}.svg'), 'w', encoding='utf-8') as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + svg + '\n')
-    # Inline copies need unique clip-path ids on one page.
     inline = {k: v.replace('clip-', f'ui-{k}-clip-') for k, v in component_svgs.items()}
     with open(os.path.join(DESIGN, 'prototype', 'ui-kit.html'), 'w', encoding='utf-8') as f:
         f.write(ui_kit_page(inline))
 
     steps = ''.join(f'<li data-frame="{k}">{TITLES[k]}</li>' for k, _ in FRAMES)
-    # Gallery copies get their own clip-path ids: ids must be unique on a page.
     gallery = ''.join(f'<figure><div class="device">{built[k].replace("clip-", "g-clip-")}</div>'
                       f'<figcaption>{i:02d} · {TITLES[k]}</figcaption></figure>'
                       for i, (k, _) in enumerate(FRAMES, start=1))

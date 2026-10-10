@@ -5,10 +5,6 @@ import '../../../../core/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/booking.dart';
 
-/// One booking: date badge, service, time, specialist and ticket number.
-///
-/// [subtitle] replaces the place name (the owner sees the client instead);
-/// [trailing] holds an inline action such as "Оставить отзыв".
 class BookingTile extends StatelessWidget {
   const BookingTile({
     super.key,

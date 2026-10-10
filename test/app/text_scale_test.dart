@@ -6,8 +6,6 @@ import 'package:slotly/features/catalog/presentation/service_details_screen.dart
 
 import '../helpers/test_app.dart';
 
-/// Layout overflow is reported as a test failure by the framework, so these
-/// tests fail if a main screen breaks at a large accessibility font size.
 void main() {
   const largeText = 2.0;
 

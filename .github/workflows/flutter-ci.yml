@@ -1,3 +1,5 @@
+# Кирилл: версию Flutter держим такой же, как локально, иначе golden-ы расходятся.
+# Эталоны в CI только сравниваются, --update-goldens тут не запускаем
 name: Flutter CI
 
 on:
@@ -32,8 +34,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # Same version as on the development machine, so golden images and
-          # lints behave identically. Update together with docs/environment.html.
           flutter-version: 3.47.6
           cache: true
 
@@ -46,7 +46,6 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      # Golden files are compared, never regenerated: no --update-goldens here.
       - name: Run unit, widget and golden tests with coverage
         run: flutter test --coverage
 

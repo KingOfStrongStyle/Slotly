@@ -4,15 +4,11 @@ import '../../../core/access/access_policy.dart';
 import '../../../data/local/local_context.dart';
 import '../domain/favorite.dart';
 
-/// Organizations saved by the signed-in customer.
 abstract interface class FavoritesRepository {
   Listenable get changes;
 
-  /// Ids of favorite organizations; empty for owners and guests.
   Future<Set<String>> fetchFavoriteIds();
 
-  /// Adds or removes the organization; returns true when it is now a
-  /// favorite.
   Future<bool> toggle(String organizationId);
 }
 

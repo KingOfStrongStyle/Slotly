@@ -4,7 +4,6 @@ import 'package:slotly/features/booking/domain/booking_draft.dart';
 import 'package:slotly/features/booking/domain/time_slot.dart';
 
 void main() {
-  // A service without a detailed price list.
   final service = demoServices.firstWhere((s) => s.id == 'svc-beard');
   final withOptions = demoServices.firstWhere((s) => s.id == 'svc-men-haircut');
   final specialist = service.availableSpecialists.first;

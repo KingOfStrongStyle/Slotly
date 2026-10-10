@@ -5,8 +5,6 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/info_row.dart';
 import '../../domain/booking_repository.dart';
 
-/// Shows the booking summary and resolves to `true` only when the user
-/// presses "Подтвердить". Dismissing the dialog means "not confirmed".
 Future<bool> showBookingConfirmationDialog(
   BuildContext context,
   BookingRequest request,

@@ -63,7 +63,6 @@ void main() {
 
         expect(path, endsWith('photos/photo-1.jpg'));
         expect(File(path).lengthSync(), 2048);
-        // The original may disappear later; the copy stays.
         source.deleteSync();
         expect(File(path).existsSync(), isTrue);
 

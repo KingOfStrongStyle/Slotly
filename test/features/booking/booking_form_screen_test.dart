@@ -13,7 +13,6 @@ import '../../helpers/booking_fixtures.dart';
 import '../../helpers/test_app.dart';
 
 void main() {
-  // "Оформление бороды" has no price list; "Мужская стрижка" has one.
   final freeTime = DateTime(2026, 10, 5, 12);
   final busyTime = DateTime(2026, 10, 5, 14);
 
@@ -43,7 +42,6 @@ void main() {
     data = await TestData.create();
     data.signInAs('aliya');
     final service = data.database.tables.services[serviceId]!;
-    // Another customer already took 14:00 with the first barber.
     await data.database.update((t) {
       final other = fixtureBooking(
         id: 'other',

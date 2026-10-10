@@ -1,7 +1,5 @@
 enum UserRole { client, owner }
 
-/// Signed-in person. Passwords are not part of the user: the demo
-/// credentials live separately in the local database.
 class AppUser {
   const AppUser({
     required this.id,
@@ -19,7 +17,6 @@ class AppUser {
   final String displayName;
   final UserRole role;
 
-  /// The organization an owner manages; `null` for clients.
   final String? organizationId;
 
   bool get isClient => role == UserRole.client;

@@ -19,7 +19,6 @@ void main() {
 
     expect(find.text('Сезонный шиномонтаж'), findsOneWidget);
     expect(find.text(AppStrings.categoryAutoService), findsOneWidget);
-    // Detailed price list instead of one price.
     expect(find.textContaining('R13–R16 — 12\u00A0000\u00A0₸'), findsOneWidget);
     expect(
       find.textContaining('R20 и больше — 20\u00A0000\u00A0₸'),

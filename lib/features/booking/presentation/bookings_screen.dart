@@ -13,12 +13,6 @@ import 'widgets/booking_sheets.dart';
 import 'widgets/booking_tile.dart';
 import 'widgets/cancel_booking_dialog.dart';
 
-/// "Записи" tab of the customer: active, past and cancelled bookings.
-///
-/// Gestures on an active booking: tap opens details, long press opens the
-/// action menu, swipe left asks to cancel, swipe right opens rescheduling.
-/// Every gesture has a button alternative in the details sheet, and
-/// nothing is changed without an explicit confirmation.
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({
     super.key,
@@ -33,7 +27,6 @@ class BookingsScreen extends StatelessWidget {
   final BookingsController bookings;
   final Clock clock;
 
-  /// Completed bookings that already have a review.
   final Set<String> reviewedBookingIds;
   final VoidCallback onBrowseServices;
   final ValueChanged<Booking> onReschedule;
@@ -84,7 +77,6 @@ class BookingsScreen extends StatelessWidget {
   bool _canReview(Booking booking) =>
       booking.isCompleted && !reviewedBookingIds.contains(booking.id);
 
-  /// Opens the details sheet; also used when a reminder is tapped.
   void showDetails(BuildContext context, Booking booking) {
     final now = clock();
     final availability = booking.checkInAvailabilityAt(now);
@@ -140,8 +132,6 @@ class BookingsScreen extends StatelessWidget {
               SliverAppBar(
                 pinned: true,
                 title: const Text(AppStrings.bookingsTitle),
-                // Three fixed tabs fit a 360 dp phone; a scrollable bar
-                // would hide "Отменённые" behind the edge.
                 bottom: TabBar(
                   labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                   tabs: [
@@ -291,7 +281,6 @@ class _BookingList extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final gutter = responsiveGutter(constraints.maxWidth);
-        // Lazy builder: the list of past visits can be long.
         return ListView.builder(
           padding: EdgeInsets.fromLTRB(
             gutter,
@@ -324,9 +313,6 @@ class _BookingList extends StatelessWidget {
   }
 }
 
-/// Active booking with two swipe directions: left asks to cancel, right
-/// opens rescheduling. Both only start the action — nothing changes
-/// without confirmation.
 class _SwipeableBookingTile extends StatelessWidget {
   const _SwipeableBookingTile({
     super.key,
@@ -346,11 +332,10 @@ class _SwipeableBookingTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    // Ян: влево - отмена, вправо - перенос. То же есть в меню записи,
+    // жест не единственный способ
     return Dismissible(
       key: ValueKey('dismiss-${booking.id}'),
-      // Always returns false: Dismissible must not remove the tile by
-      // itself. If the user confirms, the controller updates the list and
-      // the tile moves to another tab; otherwise it slides back.
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.endToStart) {
           await onSwipeCancel();

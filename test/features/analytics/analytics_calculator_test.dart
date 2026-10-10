@@ -8,7 +8,6 @@ import 'package:slotly/features/reviews/domain/review.dart';
 
 import '../../helpers/booking_fixtures.dart';
 
-/// Hand-made data with numbers that are easy to check by eye.
 void main() {
   final now = DateTime(2026, 10, 5, 15);
 
@@ -59,9 +58,7 @@ void main() {
     booking('b', DateTime(2026, 10, 4, 12)),
     booking('c', DateTime(2026, 10, 4, 14), status: BookingStatus.cancelled),
     booking('d', DateTime(2026, 9, 30, 11), serviceId: 'svc-beard'),
-    // Outside 7 days, inside 30.
     booking('e', DateTime(2026, 9, 20, 11), serviceId: 'svc-beard'),
-    // Later today: not counted yet.
     booking('f', DateTime(2026, 10, 5, 18), status: BookingStatus.confirmed),
   ];
 
@@ -85,7 +82,6 @@ void main() {
       const NamedCount('Мужская стрижка', 2),
       const NamedCount('Оформление бороды', 2),
     ]);
-    // Equal counts: alphabetical order decides.
     expect(month.topService, const NamedCount('Мужская стрижка', 2));
     expect(month.topSpecialist, const NamedCount('Арман С.', 4));
   });

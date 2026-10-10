@@ -6,14 +6,6 @@ import '../domain/organization.dart';
 import '../domain/service.dart';
 import 'widgets/business_photo_view.dart';
 
-/// Full-screen photo viewer.
-///
-/// * Horizontal swipe — next or previous photo (PageView).
-/// * Pinch — zoom a photo (InteractiveViewer); the reset button returns
-///   to 100 %. While a photo is zoomed, swiping pans it instead of
-///   changing the page.
-/// * Vertical swipe down — closes the viewer when the photo is not zoomed;
-///   the close button does the same.
 class PhotoGalleryScreen extends StatefulWidget {
   const PhotoGalleryScreen({
     super.key,
@@ -71,6 +63,8 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
     );
   }
 
+  // Ян: свайп вниз закрывает галерею, но только без зума, иначе он
+  // конфликтует с перемещением увеличенного фото
   void _onVerticalDragEnd(DragEndDetails details) {
     if (_isZoomed) return;
     final fastSwipe = (details.primaryVelocity ?? 0) > 700;
@@ -117,8 +111,6 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
           offset: Offset(0, _dragOffset),
           child: PageView.builder(
             controller: _pages,
-            // Swiping between photos is disabled while one is zoomed, so a
-            // pan inside the photo does not turn the page.
             physics: _isZoomed
                 ? const NeverScrollableScrollPhysics()
                 : const PageScrollPhysics(),

@@ -6,9 +6,8 @@ import '../../../app/theme.dart';
 import '../../../core/app_strings.dart';
 import '../domain/owner_analytics.dart';
 
-/// Card with a title, a chart and a "table" toggle. The table is the text
-/// alternative of the chart: the same numbers without relying on bar
-/// lengths or colors.
+// Ян: у каждого графика есть табличный вид, TalkBack читает таблицу,
+// а не столбики
 class ChartCard extends StatefulWidget {
   const ChartCard({
     super.key,
@@ -21,7 +20,6 @@ class ChartCard extends StatefulWidget {
   final String title;
   final Widget chart;
 
-  /// Label and value of each table row.
   final List<(String, String)> rows;
   final Widget? footer;
 
@@ -133,11 +131,6 @@ class _Table extends StatelessWidget {
   }
 }
 
-/// Vertical bars over time, one series in the brand color.
-///
-/// Tap a bar to see its exact value above the chart (the touch version of
-/// a hover tooltip). The whole chart has one semantics label with the total
-/// and the maximum; the table view lists every value.
 class TimeBarChart extends StatefulWidget {
   const TimeBarChart({
     super.key,
@@ -150,7 +143,6 @@ class TimeBarChart extends StatefulWidget {
   final String title;
   final List<TimeBucket> buckets;
 
-  /// Human label of a bucket: "пн, 6 окт." or "30 сен – 6 окт".
   final String Function(TimeBucket bucket) labelOf;
   final double height;
 
@@ -251,7 +243,6 @@ class _TimeBarChartState extends State<TimeBarChart> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s),
-                // Recessive single axis: only the maximum and zero.
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -291,7 +282,6 @@ class _Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // A zero value keeps a 2 px stub so the day is visibly "nothing".
     final barHeight = fraction == 0 ? 2.0 : math.max(4.0, fraction * height);
     return AnimatedContainer(
       duration: MediaQuery.disableAnimationsOf(context)
@@ -308,9 +298,6 @@ class _Bar extends StatelessWidget {
   }
 }
 
-/// Horizontal bars with the label on the left and the value on the right
-/// (direct labels), longest first. Shows at most [maxItems]; the rest is
-/// folded into "Остальные".
 class RankedBars extends StatelessWidget {
   const RankedBars({super.key, required this.items, this.maxItems = 5});
 
@@ -373,12 +360,9 @@ class RankedBars extends StatelessWidget {
   }
 }
 
-/// One stacked bar split by category with a legend that repeats every
-/// value as text, so identity never depends on color alone.
 class StackedShareBar extends StatelessWidget {
   const StackedShareBar({super.key, required this.parts});
 
-  /// Label, value and color of each part, in a fixed order.
   final List<(String, int, Color)> parts;
 
   @override
@@ -397,12 +381,10 @@ class StackedShareBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: SizedBox(
             height: 16,
-            // Stretch: a ColoredBox without a child would get zero height.
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (var i = 0; i < visible.length; i++) ...[
-                  // 2 px surface gap between segments.
                   if (i > 0) const SizedBox(width: 2),
                   Expanded(
                     flex: visible[i].$2,

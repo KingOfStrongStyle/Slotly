@@ -36,7 +36,6 @@ extension GestureKindIcon on GestureKind {
   };
 }
 
-/// Newest-first list of recognized gestures.
 class GestureLogView extends StatelessWidget {
   const GestureLogView({super.key, required this.entries});
 

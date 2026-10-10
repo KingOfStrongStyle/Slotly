@@ -9,20 +9,14 @@ class InvalidCredentialsException implements Exception {
   String toString() => 'InvalidCredentialsException';
 }
 
-/// Sign-in contract. A server implementation will exchange credentials for
-/// access and refresh tokens; screens do not change.
 abstract interface class AuthRepository {
-  /// Throws [InvalidCredentialsException] for a wrong login or password.
-  /// The error does not say which one was wrong.
   Future<AppUser> signIn(String login, String password);
 
-  /// The user of the previous session, or `null`.
   Future<AppUser?> restoreSession();
 
   Future<void> signOut();
 }
 
-/// Demo sign-in against accounts stored in the local database.
 class LocalAuthRepository implements AuthRepository {
   const LocalAuthRepository(this._database, {PasswordHasher? hasher})
     : _hasher = hasher ?? const PasswordHasher();

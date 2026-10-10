@@ -8,7 +8,6 @@ import '../data/catalog_repository.dart';
 import '../domain/organization.dart';
 import '../domain/service.dart';
 
-/// Everything the customer catalog shows, loaded in one pass.
 class CatalogData {
   const CatalogData({
     required this.organizations,
@@ -21,10 +20,8 @@ class CatalogData {
   final List<Organization> organizations;
   final List<Service> services;
 
-  /// Computed from reviews on every load; never stored.
   final Map<String, RatingSummary> ratings;
 
-  /// First photo of each organization, used on cards.
   final Map<String, BusinessPhoto> covers;
   final Set<String> favoriteIds;
 
@@ -38,8 +35,6 @@ class CatalogData {
       favoriteIds.contains(organizationId);
 }
 
-/// Customer catalog state. Reloads after any change of the data, so a new
-/// review or favorite is visible on every screen at once.
 class CatalogController extends LiveQuery<CatalogData> {
   CatalogController({
     required CatalogRepository catalog,
@@ -57,7 +52,6 @@ class CatalogController extends LiveQuery<CatalogData> {
 
   final FavoritesRepository _favorites;
 
-  /// Returns true when the organization is now a favorite.
   Future<bool> toggleFavorite(String organizationId) =>
       _favorites.toggle(organizationId);
 

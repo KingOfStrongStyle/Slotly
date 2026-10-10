@@ -10,6 +10,8 @@ import 'features/business/data/photo_picker.dart';
 import 'features/business/data/photo_storage.dart';
 import 'features/reminders/data/local_reminder_service.dart';
 
+// Кирилл: база и фото лежат в support-каталоге приложения, при удалении приложения
+// всё стирается. Сбросить демо-данные: adb shell pm clear kz.slotly.mobile
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final directory = await getApplicationSupportDirectory();

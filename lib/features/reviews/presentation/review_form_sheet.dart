@@ -8,8 +8,6 @@ import '../domain/review_rules.dart';
 
 typedef ReviewInput = ({int rating, String text});
 
-/// Opens the review form. Returns the entered rating and text, or null if
-/// the customer closed the sheet.
 Future<ReviewInput?> showReviewForm(
   BuildContext context, {
   required String subtitle,

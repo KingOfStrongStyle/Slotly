@@ -11,10 +11,6 @@ import '../data/business_repository.dart';
 
 enum _ServiceAction { edit, toggleHidden }
 
-/// Services of the owner's organization, including hidden ones.
-///
-/// Long press (or the "⋮" button) opens the action menu; the floating
-/// button of the owner shell adds a new service.
 class OwnerServicesScreen extends StatefulWidget {
   const OwnerServicesScreen({
     super.key,
@@ -26,7 +22,6 @@ class OwnerServicesScreen extends StatefulWidget {
   final String organizationId;
   final BusinessRepository business;
 
-  /// Opens the editor; null service means "create".
   final ValueChanged<Service?> onEdit;
 
   @override
@@ -112,8 +107,6 @@ class _OwnerServicesScreenState extends State<OwnerServicesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // The "Добавить услугу" button lives in the owner shell's Scaffold, so
-    // SnackBars of the shell move it up instead of covering it.
     return LayoutBuilder(
       builder: (context, constraints) {
         final gutter = responsiveGutter(constraints.maxWidth);
@@ -155,7 +148,6 @@ class _OwnerServicesScreenState extends State<OwnerServicesScreen> {
                   );
                 }
                 return SliverPadding(
-                  // Bottom space keeps the last item above the FAB.
                   padding: EdgeInsets.fromLTRB(gutter, 0, gutter, 96),
                   sliver: SliverList.separated(
                     itemCount: services.length,

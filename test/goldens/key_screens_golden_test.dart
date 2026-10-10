@@ -28,9 +28,8 @@ import 'package:slotly/features/welcome/welcome_screen.dart';
 
 import '../helpers/test_app.dart';
 
-/// Golden tests use a fixed 360 × 780 surface, a pixel ratio of 1, the
-/// built-in deterministic test font and the demo data seeded at a fixed
-/// "now", so the images do not depend on the current date or the machine.
+// Ян: эталоны обновлять только после просмотра картинок глазами:
+// flutter test --update-goldens test/goldens
 void main() {
   Future<void> pumpGolden(
     WidgetTester tester,

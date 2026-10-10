@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_strings.dart';
 
-/// Visible alternative to the double-tap gesture: a heart toggle with a
-/// clear label for TalkBack.
 class FavoriteButton extends StatelessWidget {
   const FavoriteButton({
     super.key,
@@ -15,7 +13,6 @@ class FavoriteButton extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback? onPressed;
 
-  /// Over a photo the button gets a solid backdrop for contrast.
   final bool onImage;
 
   @override
@@ -44,14 +41,9 @@ class FavoriteButton extends StatelessWidget {
   }
 }
 
-/// Large heart that pops over a photo or card after a double tap.
-///
-/// Respects the system "remove animations" setting: the heart then simply
-/// appears and fades without scaling.
 class FavoriteBurst extends StatefulWidget {
   const FavoriteBurst({super.key, required this.trigger});
 
-  /// Increase to play the animation once more.
   final int trigger;
 
   @override

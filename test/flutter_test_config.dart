@@ -3,12 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Applied by `flutter test` to every test file in this directory.
-///
-/// Golden images are generated on macOS, while CI runs on Linux. Text uses
-/// the deterministic test font, but anti-aliasing of curves can differ by a
-/// few pixels between platforms, so up to 0.5 % of pixels may differ.
-/// Larger changes still fail. CI never runs `--update-goldens`.
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   final comparator = goldenFileComparator;
   if (comparator is LocalFileComparator) {

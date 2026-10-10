@@ -5,7 +5,6 @@ import '../../../../core/widgets/slotly_logo.dart';
 import '../gesture_log.dart';
 import 'zone_frame.dart';
 
-/// Pinch to zoom the logo between [minScale] and [maxScale].
 class ScaleZone extends StatefulWidget {
   const ScaleZone({super.key, required this.onEvent});
 
@@ -27,8 +26,6 @@ class _ScaleZoneState extends State<ScaleZone> {
 
   void _onEnd(ScaleEndDetails details) {
     setState(() => _scaling = false);
-    // A one-finger pan also reaches the scale recognizer with scale 1.0;
-    // only real pinches are logged.
     if ((_scale - _scaleAtStart).abs() < 0.05) return;
     widget.onEvent(
       GestureKind.scale,

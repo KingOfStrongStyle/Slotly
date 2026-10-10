@@ -3,15 +3,8 @@ import 'dart:math' as math;
 import '../domain/gesture_point.dart';
 import '../domain/gesture_template.dart';
 
-/// Symbol that finishes ticket input.
 const finishSymbol = 'S';
 
-/// Reference drawings of digits 0–9 and the letter S.
-///
-/// Coordinates are in a 100 × 100 box with the y axis pointing down, like on
-/// the screen. Curves are built from ellipse arcs: angle 0° points right,
-/// 90° points down, 270° points up. The recognizer normalizes position and
-/// size, so only the shape matters.
 final symbolTemplates = <GestureTemplate>[
   GestureTemplate(label: '0', strokes: [_arc(50, 50, 28, 45, 270, 630)]),
   GestureTemplate(label: '1', strokes: [_line(50, 5, 50, 95)]),
@@ -37,7 +30,6 @@ final symbolTemplates = <GestureTemplate>[
       [..._arc(50, 28, 23, 22, 200, 450), ..._arc(50, 72, 26, 23, 270, 520)],
     ],
   ),
-  // "4" is drawn either closed (diagonal) or open (with a corner).
   GestureTemplate(
     label: '4',
     strokes: [
@@ -102,8 +94,6 @@ GestureStroke _line(double x1, double y1, double x2, double y2) {
   ];
 }
 
-/// Ellipse arc from [fromDegrees] to [toDegrees]; going from a larger to a
-/// smaller angle draws the arc in the opposite direction.
 GestureStroke _arc(
   double cx,
   double cy,

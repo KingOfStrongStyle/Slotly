@@ -12,14 +12,6 @@ import '../../booking/domain/booking_repository.dart';
 import '../data/reminder_service.dart';
 import '../domain/reminder_planner.dart';
 
-/// Keeps the reminders scheduled on the device in sync with the bookings
-/// of the signed-in customer.
-///
-/// After every change of bookings (created, moved, cancelled, checked in),
-/// every sign-in and sign-out, and every change of the setting, it cancels
-/// all reminders and schedules the current plan again. A customer has a
-/// handful of upcoming bookings, so the full resync is cheap and leaves no
-/// orphaned or duplicated reminders.
 class ReminderCoordinator extends ChangeNotifier {
   ReminderCoordinator({
     required this._service,
@@ -62,7 +54,6 @@ class ReminderCoordinator extends ChangeNotifier {
   ReminderPermission get permission => _permission;
   bool get isEnabled => _database.tables.settings.remindersEnabled;
 
-  /// Subscribes to changes and performs the first sync.
   Future<void> start() async {
     if (_started) return;
     _started = true;
@@ -91,10 +82,10 @@ class ReminderCoordinator extends ChangeNotifier {
 
   void _scheduleSync() => unawaited(sync());
 
-  /// Recomputes and reschedules all reminders. Calls are queued, so two
-  /// quick changes never interleave.
   Future<void> sync() => _queue = _queue.then((_) => _sync());
 
+  // Кирилл: не считаем дифф, а каждый раз всё отменяем и ставим заново.
+  // Записей мало, зато не бывает "висящих" напоминаний после отмены
   Future<void> _sync() async {
     final user = _session.currentUser;
     List<Booking> bookings = const [];

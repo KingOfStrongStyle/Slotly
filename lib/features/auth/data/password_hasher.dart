@@ -3,12 +3,8 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 
-/// Salted SHA-256 for the local demo accounts.
-///
-/// This only avoids storing demo passwords as plain text in the local file.
-/// It is not a security boundary: everything runs on the user's device, and
-/// a fast hash such as SHA-256 is not suitable for real passwords. A server
-/// version must hash with Argon2id (or bcrypt/scrypt) on the server.
+// Кирилл: соль + sha256 только чтобы не держать пароли открытым текстом в json.
+// Это демо-вход, на сервере будет нормальная авторизация
 class PasswordHasher {
   const PasswordHasher();
 
@@ -21,8 +17,6 @@ class PasswordHasher {
   String hash(String password, String salt) =>
       sha256.convert(utf8.encode('$salt:$password')).toString();
 
-  /// Compares in constant time, so the check does not leak how many
-  /// characters matched.
   bool verify(String password, String salt, String expectedHash) {
     final actual = hash(password, salt);
     if (actual.length != expectedHash.length) return false;

@@ -19,16 +19,6 @@ import '../features/reviews/presentation/reviews_screen.dart';
 import 'app_controller.dart';
 import 'app_scope.dart';
 
-/// Route configuration of the app.
-///
-/// Screens without parameters are registered as named routes. Screens that
-/// need data get a typed factory method, so objects such as [Service] are
-/// passed straight into the screen constructor instead of an untyped
-/// argument. Routes connect screens to each other and to
-/// [AppDependencies]; the screens themselves only expose callbacks.
-///
-/// Owner-only routes are created only by the owner shell, and the data
-/// layer checks permissions again, so a customer cannot reach them.
 abstract final class AppRoutes {
   static const signIn = '/sign-in';
   static const diagnostics = '/diagnostics';
@@ -44,8 +34,6 @@ abstract final class AppRoutes {
         RemindersScreen(coordinator: AppScope.of(context).reminders),
   };
 
-  /// Organization page for a customer ([bookings] given) or an owner
-  /// previewing the catalog (no booking, no favorites).
   static Route<void> organization(
     String organizationId, {
     BookingsController? bookings,
@@ -127,7 +115,6 @@ abstract final class AppRoutes {
     );
   }
 
-  /// Reception check-in by a handwritten ticket number (owner only).
   static Route<void> ticketCheckIn() {
     return MaterialPageRoute(
       settings: const RouteSettings(name: '/owner/check-in'),
@@ -161,8 +148,6 @@ abstract final class AppRoutes {
     );
   }
 
-  /// After a successful booking the customer lands on "Записи" and sees a
-  /// confirmation with the ticket number in a SnackBar.
   static void _showBookingResult(BuildContext context, Booking booking) {
     final dependencies = AppScope.of(context);
     final messenger = ScaffoldMessenger.of(context);

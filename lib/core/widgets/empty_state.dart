@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 
-/// Explains why a list is empty and, if possible, offers the next step.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,

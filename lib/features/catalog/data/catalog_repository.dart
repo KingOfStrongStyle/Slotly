@@ -5,24 +5,17 @@ import '../../../data/local/local_context.dart';
 import '../domain/organization.dart';
 import '../domain/service.dart';
 
-/// Public catalog: organizations, their services, specialists and photos.
 abstract interface class CatalogRepository {
-  /// Fires after any change of catalog data.
   Listenable get changes;
 
-  /// Published organizations, sorted by name.
   Future<List<Organization>> fetchOrganizations();
 
-  /// Throws [RecordNotFoundException] for an unknown or unpublished id.
   Future<Organization> fetchOrganization(String id);
 
-  /// Services offered to customers: hidden ones are excluded. When
-  /// [organizationId] is null, services of all published organizations.
   Future<List<Service>> fetchServices({String? organizationId});
 
   Future<List<Specialist>> fetchSpecialists(String organizationId);
 
-  /// Photos in gallery order.
   Future<List<BusinessPhoto>> fetchPhotos(String organizationId);
 }
 

@@ -16,8 +16,7 @@ import 'package:slotly/features/reviews/data/review_repository.dart';
 
 import '../helpers/test_app.dart';
 
-/// The same rules as the matrix, but through the repositories: a direct
-/// call of a forbidden method fails even if the UI never shows the button.
+// Влад: то же самое, но вызовами репозиториев напрямую, мимо UI
 void main() {
   late TestData data;
   late LocalBookingRepository bookings;

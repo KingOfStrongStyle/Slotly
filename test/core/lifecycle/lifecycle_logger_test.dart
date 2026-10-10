@@ -75,8 +75,6 @@ void main() {
     logger.dispose();
     await sendPlatformLifecycle(tester, AppLifecycleState.paused);
 
-    // A listener that was not removed would call notifyListeners on a
-    // disposed ChangeNotifier and fail the test with an exception.
     expect(tester.takeException(), isNull);
     expect(logger.events.length, eventsBefore);
   });

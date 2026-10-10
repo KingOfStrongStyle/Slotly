@@ -1,10 +1,6 @@
 import '../../features/catalog/domain/organization.dart';
 import '../../features/catalog/domain/service.dart';
 
-// Demonstration catalog. All businesses, people, addresses, phone numbers
-// and prices are fictional and exist only to show Slotly without a backend.
-// Ids of services are stable: tests and the lab scenarios refer to them.
-
 const orgNorth = 'org-north';
 const orgLavanda = 'org-lavanda';
 const orgWhiteLine = 'org-white-line';
@@ -113,8 +109,6 @@ const _saule = Specialist(
   role: 'Стоматолог-терапевт',
 );
 
-/// On vacation: the extraction service has no free slots, which shows the
-/// "no time available" state.
 const _bauyrzhan = Specialist(
   id: 'sp-bauyrzhan',
   organizationId: orgWhiteLine,

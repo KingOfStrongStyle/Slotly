@@ -5,12 +5,6 @@ import '../domain/booking.dart';
 import '../domain/booking_repository.dart';
 import '../domain/time_slot.dart';
 
-/// Bookings of the signed-in customer, shared by all customer screens.
-///
-/// Screens read [active], [past] and [cancelled] and call the actions;
-/// they never change the list themselves. The controller reloads after any
-/// change in the repository, so a booking changed on another screen (or by
-/// the owner) is shown everywhere.
 class BookingsController extends ChangeNotifier {
   BookingsController(this._repository) {
     _repository.changes.addListener(load);
@@ -26,17 +20,14 @@ class BookingsController extends ChangeNotifier {
   bool get hasLoadError => _hasLoadError;
   List<Booking> get all => _bookings;
 
-  /// Upcoming confirmed bookings, nearest first.
   List<Booking> get active =>
       _bookings.where((b) => b.isActive).toList()
         ..sort(Booking.compareByStartAt);
 
-  /// Completed visits, latest first.
   List<Booking> get past =>
       _bookings.where((b) => b.isCompleted).toList()
         ..sort((a, b) => Booking.compareByStartAt(b, a));
 
-  /// Cancelled bookings, latest first.
   List<Booking> get cancelled =>
       _bookings.where((b) => b.isCancelled).toList()
         ..sort((a, b) => Booking.compareByStartAt(b, a));
@@ -69,7 +60,6 @@ class BookingsController extends ChangeNotifier {
     ignoreBookingId: ignoreBookingId,
   );
 
-  /// Throws [SlotUnavailableException] if the slot was taken meanwhile.
   Future<Booking> book(BookingRequest request) =>
       _repository.createBooking(request);
 
@@ -83,8 +73,6 @@ class BookingsController extends ChangeNotifier {
     specialist: specialist,
   );
 
-  /// Throws [TicketNotFoundException] or [CheckInUnavailableException]
-  /// when the customer cannot be checked in.
   Future<Booking> checkIn(String ticketNumber) =>
       _repository.checkIn(ticketNumber);
 

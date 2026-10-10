@@ -1,5 +1,3 @@
-/// Business category of a service. Labels and icons are mapped in the
-/// presentation layer so the domain stays independent of Flutter.
 enum ServiceCategory {
   barbershop,
   beauty,
@@ -18,17 +16,14 @@ class Specialist {
     this.workingWeekdays = defaultWorkingWeekdays,
   });
 
-  /// Monday to Saturday ([DateTime.monday] = 1).
   static const defaultWorkingWeekdays = {1, 2, 3, 4, 5, 6};
 
   final String id;
   final String name;
   final String role;
 
-  /// Empty only in bookings created before organizations existed.
   final String organizationId;
 
-  /// Days of the week with appointments. Empty while on vacation.
   final Set<int> workingWeekdays;
 
   bool worksOn(DateTime day) => workingWeekdays.contains(day.weekday);
@@ -43,7 +38,6 @@ class Specialist {
   String toString() => 'Specialist($id, $name)';
 }
 
-/// One line of a detailed price list, for example "Длинные волосы".
 class PriceOption {
   const PriceOption({
     required this.id,
@@ -86,30 +80,21 @@ class Service {
 
   final String id;
 
-  /// Business that provides the service.
   final String organizationId;
   final String title;
   final ServiceCategory category;
   final String description;
   final Duration duration;
 
-  /// Base price in tenge. Integer amounts avoid floating point rounding.
   final int priceKzt;
 
-  /// Optional detailed price list. When it is not empty, the customer picks
-  /// one option and its price replaces [priceKzt].
   final List<PriceOption> priceOptions;
   final List<Specialist> availableSpecialists;
 
-  /// Visual identifier: selects one of the built-in abstract illustrations,
-  /// so the catalog needs no network or third-party images.
   final int artworkVariant;
 
-  /// Hidden services stay in existing bookings but are not offered to new
-  /// customers.
   final bool isHidden;
 
-  /// Lowest price a customer can pay, shown as "от …" in the catalog.
   int get minPriceKzt => priceOptions.isEmpty
       ? priceKzt
       : priceOptions.map((o) => o.priceKzt).reduce((a, b) => a < b ? a : b);

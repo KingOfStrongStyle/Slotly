@@ -41,8 +41,6 @@ class OrganizationDetails {
   final bool isFavorite;
 }
 
-/// Organization page: gallery, description, price list, specialists with
-/// their rating and the latest reviews.
 class OrganizationScreen extends StatefulWidget {
   const OrganizationScreen({
     super.key,
@@ -55,8 +53,6 @@ class OrganizationScreen extends StatefulWidget {
     this.canFavorite = true,
   });
 
-  /// Specialist rating is shown only with at least this many reviews:
-  /// one or two reviews say little about a person.
   static const minReviewsForSpecialistRating = 3;
 
   final String organizationId;
@@ -66,7 +62,6 @@ class OrganizationScreen extends StatefulWidget {
   final ValueChanged<Service> onServiceSelected;
   final ValueChanged<Organization> onOpenReviews;
 
-  /// False for owners: businesses do not collect favorites.
   final bool canFavorite;
 
   @override
