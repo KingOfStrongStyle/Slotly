@@ -2,7 +2,7 @@
 """Builds the Slotly design prototype from one set of tokens.
 
 Outputs:
-  design/figma-import/frames/*.svg      8 mobile frames (360 x 800), importable into Figma
+  design/figma-import/frames/*.svg      11 mobile frames (360 x 800), importable into Figma
   design/figma-import/components/*.svg  UI kit components in their states
   design/prototype/index.html           clickable prototype with the same frames
   design/prototype/ui-kit.html          tokens, icons, components and usage rules
@@ -68,6 +68,13 @@ ICONS = {
     'event-busy': '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 13l6 5M15 13l-6 5"/>',
     'event-ok': '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8.5 15l2.5 2.5 4.5-5"/>',
     'search-off': '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M7.5 7.5l6 6"/>',
+    'heart': '<path d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z"/>',
+    'star': '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
+    'insights': '<path d="M4 18l5-6 4 3 7-9"/><circle cx="20" cy="6" r="1.2"/>',
+    'review': '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M7 21l4-4M8 11h8"/>',
+    'lock': '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',
+    'logout': '<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
+    'table': '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M4 15h16"/>',
 }
 
 
@@ -136,7 +143,7 @@ def search_field(y, value=None, focused=False):
         out.append(text(64, y + 30, value, 16))
         out.append(icon('close', 312, y + 12, 22))
     else:
-        out.append(text(64, y + 30, 'Найти услугу', 16, color=C['onSurfaceVariant']))
+        out.append(text(64, y + 30, 'Найти место или услугу', 16, color=C['onSurfaceVariant']))
     return ''.join(out)
 
 
@@ -195,18 +202,58 @@ def service_card(y, title, meta, price, variant, icon_name, target=None, uid='c'
     return ''.join(out)
 
 
-def nav_bar(active, targets, top=H - 80):
-    items = [('Услуги', 'store'), ('Записи', 'list'), ('Профиль', 'person')]
+CLIENT_TABS = [('Каталог', 'store'), ('Избранное', 'heart'), ('Записи', 'list'), ('Профиль', 'person')]
+OWNER_TABS = [('Обзор', 'insights'), ('Записи', 'list'), ('Услуги', 'store'), ('Отзывы', 'review'),
+              ('Организация', 'person')]
+
+
+def nav_bar(active, targets, top=H - 80, items=None):
+    items = items or CLIENT_TABS
+    n = len(items)
     out = [rect(0, top, W, 80, C['surfaceContainer'])]
     for i, (label, icon_name) in enumerate(items):
-        cx = W / 6 * (2 * i + 1)
+        cx = W / (2 * n) * (2 * i + 1)
         if i == active:
-            out.append(rect(cx - 32, top + 12, 64, 32, C['secondaryContainer'], 16))
+            out.append(rect(cx - 28, top + 12, 56, 32, C['secondaryContainer'], 16))
         color = C['onSecondaryContainer'] if i == active else C['onSurfaceVariant']
         out.append(icon(icon_name, cx - 12, top + 16, 24, color))
-        out.append(text(cx, top + 58, label, 12, 600 if i == active else 500, C['onSurface'], 'middle'))
-        if targets and targets[i]:
-            out.append(hotspot(cx - 56, top + 4, 112, 72, targets[i], label))
+        out.append(text(cx, top + 58, label, 11 if n > 4 else 12, 600 if i == active else 500, C['onSurface'], 'middle'))
+        if targets and i < len(targets) and targets[i]:
+            out.append(hotspot(cx - W / (2 * n), top + 4, W / n, 72, targets[i], label))
+    return ''.join(out)
+
+
+def segmented(y, labels, selected, targets=None, x=16, w=328):
+    out = [rect(x, y, w, 44, C['surface'], 22, C['outline'])]
+    seg = w / len(labels)
+    for i, label in enumerate(labels):
+        sx = x + i * seg
+        if i == selected:
+            r = 22 if i in (0, len(labels) - 1) else 0
+            out.append(rect(sx + 1, y + 1, seg - 2, 42, C['secondaryContainer'], r))
+        if i > 0:
+            out.append(rect(sx, y, 1, 44, C['outline']))
+        out.append(text(sx + seg / 2, y + 27, label, 14, 500, C['onSurface'], 'middle'))
+        if targets and targets[i] and i != selected:
+            out.append(hotspot(sx, y, seg, 44, targets[i], label))
+    return ''.join(out)
+
+
+def rating(x, y, value, count):
+    return (icon('star', x, y - 14, 18, '#B7791F') + text(x + 22, y, value, 14, 700) +
+            text(x + 22 + text_width(value, 14) + 6, y, f'· {count}', 13, color=C['onSurfaceVariant']))
+
+
+def org_card(y, name, category, value, count, variant, icon_name, favorite=False, target=None, uid='o'):
+    out = [rect(16, y, 328, 224, C['surfaceContainerLow'], 16, C['outlineVariant']),
+           artwork(16, y, 328, 137, variant, icon_name, r=16, icon_size=40, uid=uid),
+           rect(16, y + 120, 328, 17, C[ART[variant % 3][0]]),
+           f'<circle cx="316" cy="{y + 28}" r="20" fill="{C["surface"]}" fill-opacity=".9"/>',
+           icon('heart', 304, y + 16, 24, C['error'] if favorite else C['onSurface']),
+           text(32, y + 166, name, 16, 500), text(32, y + 186, category, 12, color=C['onSurfaceVariant']),
+           rating(32, y + 210, value, count)]
+    if target:
+        out.append(hotspot(16, y, 280, 224, target, name))
     return ''.join(out)
 
 
@@ -271,7 +318,7 @@ def welcome():
         x += w + 8
     out.append(text(24, y + 64, 'Выбрано: Барбершоп — каталог откроется с фильтром', 12,
                     color=C['onSurfaceVariant']))
-    out.append(filled_button(24, y + 96, 312, 'Посмотреть услуги', 'catalog', icon_name='forward'))
+    out.append(filled_button(24, y + 96, 312, 'Продолжить', 'login', icon_name='forward'))
     return frame('01 Welcome', ''.join(out))
 
 
@@ -282,32 +329,86 @@ SERVICES = [('Мужская стрижка', 'Барбершоп · 45 мин',
             ('Чистка зубов', 'Стоматология · 1 ч', '18 000 ₸', 1, 'smile')]
 
 
+def login():
+    out = [app_bar('Вход', back='welcome'), logo(16, 104, 48),
+           text(16, 186, 'Войдите как клиент, чтобы записываться, или', 14, color=C['onSurfaceVariant']),
+           text(16, 206, 'как владелец, чтобы управлять организацией.', 14, color=C['onSurfaceVariant']),
+           rect(16, 228, 328, 52, C['surfaceContainerHighest'], 12), icon('person', 30, 242),
+           text(64, 260, 'aliya', 16), rect(16, 292, 328, 52, C['surfaceContainerHighest'], 12),
+           icon('lock', 30, 306), text(64, 324, '••••••••••', 16),
+           filled_button(16, 360, 328, 'Войти', 'catalog'),
+           rect(16, 432, 328, 280, C['surfaceContainerLow'], 16, C['outlineVariant']),
+           text(32, 462, 'Демо-аккаунты', 14, 500),
+           text(32, 484, 'Публичные пароли, данные только на этом', 12, color=C['onSurfaceVariant']),
+           text(32, 500, 'устройстве. Это не защищённая авторизация.', 12, color=C['onSurfaceVariant'])]
+    for i, (who, cred, target) in enumerate([('Алия Н. · Клиент', 'aliya / aliya-demo', 'catalog'),
+                                              ('Дамир К. · Клиент', 'damir / damir-demo', 'catalog'),
+                                              ('Ержан Б. · Владелец', 'north / north-demo', 'dashboard')]):
+        y = 524 + i * 60
+        out.append(icon('store' if 'Владелец' in who else 'person', 32, y + 2))
+        out.append(text(68, y + 14, who, 15))
+        out.append(text(68, y + 34, cred, 13, color=C['onSurfaceVariant']))
+        out.append(hotspot(16, y - 6, 328, 56, target, who))
+    return frame('02 Вход', ''.join(out))
+
+
 def catalog():
-    out = [app_bar('Услуги'), search_field(96), hotspot(16, 96, 328, 48, 'search', 'Поиск'),
-           chips_row(156, [('Все', True, None), ('Барбершоп', False, 'scissors'), ('Салон красоты', False, 'spa')]),
-           text(16, 214, 'Найдено: 11', 12, 500)]
-    y = 228
-    for i, (title, meta, price, variant, icon_name) in enumerate(SERVICES[:4]):
-        out.append(service_card(y, title, meta, price, variant, icon_name, 'details' if i == 0 else None, f'cat{i}'))
-        y += 108
-    out.append(nav_bar(0, [None, 'bookings', 'profile']))
-    return frame('02 Каталог', ''.join(out))
+    out = [app_bar('Каталог'), search_field(96), hotspot(16, 96, 328, 48, 'search', 'Поиск'),
+           segmented(156, ['Места', 'Услуги'], 0, [None, 'search']),
+           chips_row(212, [('Все', True, None), ('Барбершоп', False, 'scissors'), ('Салон красоты', False, 'spa')]),
+           text(16, 268, 'Найдено: 6', 12, 500),
+           org_card(280, 'Барбершоп «Северный»', 'Барбершоп', '4,6', '17 отзывов', 0, 'scissors', True,
+                    'organization', 'org0'),
+           org_card(516, 'Автосервис «Гараж 24»', 'Автосервис', '3,3', '6 отзывов', 1, 'car', False, None, 'org1'),
+           nav_bar(0, [None, None, 'bookings', 'profile'])]
+    return frame('03 Каталог мест', ''.join(out))
 
 
 def search_results():
-    out = [app_bar('Услуги'), search_field(96, 'стриж', focused=True),
-           chips_row(156, [('Все', True, None), ('Барбершоп', False, 'scissors'), ('Салон красоты', False, 'spa')]),
-           text(16, 214, 'Найдено: 1', 12, 500),
-           service_card(228, *SERVICES[0], target='details', uid='s0'),
-           text(16, 366, 'Пустой результат:', 12, 500, C['onSurfaceVariant']),
+    out = [app_bar('Каталог'), search_field(96, 'стриж', focused=True),
+           segmented(156, ['Места', 'Услуги'], 1, ['catalog', None]),
+           chips_row(212, [('Все', True, None), ('Барбершоп', False, 'scissors'), ('Салон красоты', False, 'spa')]),
+           text(16, 268, 'Найдено: 3', 12, 500),
+           service_card(280, *SERVICES[0], target='details', uid='s0'),
+           text(16, 400, 'Пустой результат:', 12, 500, C['onSurfaceVariant']),
            f'<circle cx="180" cy="430" r="34" fill="{C["secondaryContainer"]}"/>',
            icon('search-off', 162, 412, 36, C['onSecondaryContainer']),
            text(180, 494, 'Ничего не найдено', 16, 500, anchor='middle'),
            text(180, 518, 'Попробуйте изменить запрос', 14, color=C['onSurfaceVariant'], anchor='middle'),
            text(180, 538, 'или выбрать другую категорию.', 14, color=C['onSurfaceVariant'], anchor='middle'),
            outlined_button(110, 556, 140, 'Сбросить фильтры'),
-           nav_bar(0, [None, 'bookings', 'profile'])]
-    return frame('03 Результаты поиска', ''.join(out))
+           nav_bar(0, ['catalog', None, 'bookings', 'profile'])]
+    return frame('04 Поиск услуг', ''.join(out))
+
+
+def organization():
+    out = [artwork(0, 0, W, 240, 0, 'scissors', r=0, icon_size=72, uid='org'),
+           icon('back', 16, 52, 24, C['onSurface']), hotspot(4, 40, 48, 48, 'catalog', 'Назад'),
+           icon('heart', 320, 52, 24, C['error']),
+           rect(272, 200, 72, 28, '#000000', 8, opacity=0.55), text(308, 219, '1 из 4', 13, 500, '#FFFFFF', 'middle'),
+           text(16, 276, 'Барбершоп «Северный»', 22), text(16, 298, 'Барбершоп', 13, color=C['onSurfaceVariant']),
+           rating(16, 328, '4,6', '17 отзывов'),
+           text(16, 364, 'Мужские стрижки и уход за бородой.', 15),
+           text(16, 410, 'Услуги и цены', 14, 500, C['primary']),
+           rect(16, 422, 328, 112, C['surfaceContainerLow'], 16, C['outlineVariant']),
+           text(32, 450, 'Мужская стрижка', 15, 500), text(300, 450, 'от 6 000 ₸', 14, 500, C['primary'], 'end'),
+           icon('chevron', 308, 434), text(32, 470, '45 мин', 12, color=C['onSurfaceVariant']),
+           text(32, 494, 'Короткая', 12, color=C['onSurfaceVariant']), text(300, 494, '6 000 ₸', 12, color=C['onSurfaceVariant'], anchor='end'),
+           text(32, 514, 'Удлинённая', 12, color=C['onSurfaceVariant']), text(300, 514, '7 500 ₸', 12, color=C['onSurfaceVariant'], anchor='end'),
+           hotspot(16, 422, 328, 112, 'details', 'Мужская стрижка'),
+           rect(16, 546, 328, 64, C['surfaceContainerLow'], 16, C['outlineVariant']),
+           text(32, 574, 'Оформление бороды', 15, 500), text(300, 574, '4 000 ₸', 14, 500, C['primary'], 'end'),
+           text(32, 594, '30 мин', 12, color=C['onSurfaceVariant']),
+           text(16, 642, 'Отзывы', 14, 500, C['primary']),
+           text(16, 690, '4,6', 40, 700)]
+    for i, (stars, share, n) in enumerate([(5, .7, 12), (4, .24, 4), (3, .06, 1), (2, 0, 0), (1, 0, 0)]):
+        y = 660 + i * 16
+        out.append(text(116, y + 9, str(stars), 11, 500))
+        out.append(rect(132, y, 180, 8, C['surfaceContainerHighest'], 4))
+        if share:
+            out.append(rect(132, y, 180 * share, 8, '#B7791F', 4))
+        out.append(text(336, y + 9, str(n), 11, 500, anchor='end'))
+    return frame('05 Организация', ''.join(out))
 
 
 def info_row(y, icon_name, label, value, x=16):
@@ -327,9 +428,9 @@ def specialist_tile(y, initials, name, role, selected, x=16, w=328):
 
 def details():
     out = [artwork(0, 0, W, 220, 0, 'scissors', r=0, icon_size=72, uid='d'), icon('back', 16, 52, 24, C['onSurface']),
-           hotspot(4, 40, 48, 48, 'catalog', 'Назад'),
+           hotspot(4, 40, 48, 48, 'organization', 'Назад'),
            text(16, 260, 'Мужская стрижка', 24),
-           info_row(276, 'scissors', 'Категория', 'Барбершоп'), info_row(322, 'payments', 'Стоимость', '6 000 ₸'),
+           info_row(276, 'scissors', 'Категория', 'Барбершоп'), info_row(322, 'payments', 'Стоимость', 'Короткая — 6 000 ₸ · Удлинённая — 7 500 ₸'),
            info_row(368, 'clock', 'Длительность', '45 мин'),
            text(16, 436, 'Об услуге', 14, 500, C['primary']),
            text(16, 462, 'Консультация, мытьё головы, стрижка', 16),
@@ -340,7 +441,7 @@ def details():
            f'<circle cx="36" cy="624" r="20" fill="{C["secondaryContainer"]}"/>', text(36, 629, 'ДА', 14, 500, C['onSecondaryContainer'], 'middle'),
            text(68, 620, 'Данияр А.', 16), text(68, 640, 'Старший барбер', 14, color=C['onSurfaceVariant']),
            filled_button(16, 724, 328, 'Записаться', 'booking')]
-    return frame('04 Детали услуги', ''.join(out))
+    return frame('06 Детали услуги', ''.join(out))
 
 
 def date_chip(x, y, caption, day, selected):
@@ -366,7 +467,7 @@ def slot(x, y, label, state):
 def booking_form(dialog=False):
     out = [app_bar('Новая запись', back='details'),
            rect(16, 96, 328, 64, C['surfaceContainerLow'], 16, C['outlineVariant']),
-           text(32, 124, 'Мужская стрижка', 16, 500), text(32, 146, '45 мин · 6 000 ₸', 14, color=C['onSurfaceVariant']),
+           text(32, 124, 'Мужская стрижка · Удлинённая', 16, 500), text(32, 146, '45 мин · 7 500 ₸', 14, color=C['onSurfaceVariant']),
            text(16, 188, 'Специалист', 14, 500, C['primary']),
            specialist_tile(200, 'АС', 'Арман С.', 'Барбер', True),
            specialist_tile(272, 'ДА', 'Данияр А.', 'Старший барбер', False),
@@ -390,13 +491,13 @@ def booking_form(dialog=False):
         out.append(text(180, 270, 'Подтвердите запись', 22, anchor='middle'))
         for i, (icon_name, label, value) in enumerate([('store', 'Услуга', 'Мужская стрижка'), ('person', 'Специалист', 'Арман С.'),
                                                      ('calendar', 'Дата', 'вт, 6 октября'), ('clock', 'Время', '12:00–12:45'),
-                                                     ('payments', 'Стоимость', '6 000 ₸')]):
+                                                     ('payments', 'Стоимость', 'Удлинённая, 7 500 ₸')]):
             out.append(info_row(290 + i * 46, icon_name, label, value, x=56))
         out.append(text(108, 560, 'Изменить', 14, 500, C['primary'], 'middle'))
         out.append(hotspot(64, 536, 92, 40, 'booking', 'Изменить'))
         out.append(filled_button(172, 532, 140, 'Подтвердить', 'bookings', h=44))
-        return frame('06 Подтверждение', ''.join(out))
-    return frame('05 Специалист и время', ''.join(out))
+        return frame('08 Подтверждение', ''.join(out))
+    return frame('07 Вариант, специалист, время', ''.join(out))
 
 
 def booking_tile(y, day, title, details_text, uid):
@@ -408,20 +509,22 @@ def booking_tile(y, day, title, details_text, uid):
 
 def bookings():
     out = [app_bar('Мои записи'),
-           text(96, 120, 'Активные (2)', 14, 500, C['primary'], 'middle'), text(264, 120, 'Отменённые (0)', 14, 500, C['onSurfaceVariant'], 'middle'),
-           rect(40, 134, 112, 3, C['primary'], 2), rect(0, 137, W, 1, C['outlineVariant']),
-           text(16, 166, 'Нажмите для подробностей, удерживайте для действий,', 12, color=C['onSurfaceVariant']),
-           text(16, 182, 'смахните влево, чтобы отменить.', 12, color=C['onSurfaceVariant']),
-           booking_tile(196, '6', 'Мужская стрижка', '12:00–12:45 · Арман С.', 'b1')]
-    # Second booking half-swiped to show the cancel background.
-    out.append(rect(16, 284, 328, 76, C['errorContainer'], 16))
-    out.append(text(286, 327, 'Отменить', 14, 600, C['onErrorContainer'], 'end'))
-    out.append(icon('event-busy', 298, 310, 24, C['onErrorContainer']))
-    out.append('<g transform="translate(-150,0)">' + booking_tile(284, '7', 'Оформление бороды', '11:00–11:30 · Арман С.', 'b2') + '</g>')
+           text(60, 120, 'Активные (2)', 13, 500, C['primary'], 'middle'),
+           text(180, 120, 'Прошедшие (29)', 13, 500, C['onSurfaceVariant'], 'middle'),
+           text(300, 120, 'Отменённые (5)', 13, 500, C['onSurfaceVariant'], 'middle'),
+           rect(12, 134, 96, 3, C['primary'], 2), rect(0, 137, W, 1, C['outlineVariant']),
+           text(16, 166, 'Нажмите для подробностей, удерживайте для действий.', 12, color=C['onSurfaceVariant']),
+           text(16, 182, 'Влево — отменить, вправо — перенести.', 12, color=C['onSurfaceVariant']),
+           booking_tile(196, '6', 'Мужская стрижка', '12:00–12:45 · Талон 143', 'b1')]
+    # Second booking half-swiped to the right: rescheduling background.
+    out.append(rect(16, 284, 328, 76, C['secondaryContainer'], 16))
+    out.append(icon('calendar', 34, 310, 24, C['onSecondaryContainer']))
+    out.append(text(66, 327, 'Перенести', 14, 600, C['onSecondaryContainer']))
+    out.append('<g transform="translate(150,0)">' + booking_tile(284, '7', 'Оформление бороды', '11:00–11:30 · Талон 144', 'b2') + '</g>')
     out.append(rect(16, 632, 328, 48, C['inverseSurface'], 12))
-    out.append(text(32, 661, 'Вы записаны: Мужская стрижка, вт, 6 окт, 12:00', 13, color=C['onInverseSurface']))
-    out.append(nav_bar(1, ['catalog', None, 'profile']))
-    return frame('07 Мои записи', ''.join(out))
+    out.append(text(32, 661, 'Вы записаны: Мужская стрижка. Талон 143', 13, color=C['onInverseSurface']))
+    out.append(nav_bar(2, ['catalog', None, None, 'profile']))
+    return frame('09 Мои записи', ''.join(out))
 
 
 def switch(x, y, on):
@@ -442,23 +545,56 @@ def list_tile(y, icon_name, title, subtitle, trailing='chevron', on=None):
 def profile():
     out = [app_bar('Профиль'), rect(16, 96, 328, 88, C['surfaceContainerLow'], 16, C['outlineVariant']),
            f'<circle cx="60" cy="140" r="28" fill="{C["primaryContainer"]}"/>', text(60, 146, 'АН', 16, 500, C['onPrimaryContainer'], 'middle'),
-           text(104, 134, 'Алия Н.', 16, 500), text(104, 156, 'Демонстрационный профиль', 12, color=C['onSurfaceVariant']),
+           text(104, 134, 'Алия Н.', 16, 500), text(104, 156, 'Клиент · Логин aliya', 12, color=C['onSurfaceVariant']),
            text(16, 220, 'Настройки', 14, 500, C['primary']),
            list_tile(232, 'moon', 'Тёмная тема', 'Светлая и тёмная схема', 'switch', False),
-           list_tile(288, 'bell', 'Демо-уведомления', 'Напоминание после записи', 'switch', True),
-           text(16, 372, 'Учебные инструменты', 14, 500, C['primary']),
+           list_tile(288, 'bell', 'Напоминания о записях', 'Накануне, утром и за час'),
+           text(16, 372, 'Для разработчиков', 14, 500, C['primary']),
            list_tile(384, 'pulse', 'Диагностика', 'Жизненный цикл приложения'),
-           list_tile(440, 'gesture', 'Gesture Lab', 'Стандартные жесты Flutter'),
-           list_tile(496, 'draw', 'Ввод талона', 'Рукописный ввод номера'),
-           text(16, 580, 'О приложении', 14, 500, C['primary']),
-           list_tile(592, 'info', 'О Slotly', 'Версия 0.1.0 · учебный MVP', None),
-           nav_bar(2, ['catalog', 'bookings', None])]
-    return frame('08 Профиль', ''.join(out))
+           list_tile(440, 'gesture', 'Gesture Lab', 'Песочница жестов для ЛР №3'),
+           text(16, 524, 'О приложении', 14, 500, C['primary']),
+           list_tile(536, 'info', 'О Slotly', 'Версия 0.2.0 · учебный MVP', None),
+           icon('logout', 16, 604, 24, C['error']), text(56, 622, 'Выйти', 16, color=C['error']),
+           hotspot(0, 592, W, 48, 'welcome', 'Выйти'),
+           nav_bar(3, ['catalog', None, 'bookings', None])]
+    return frame('10 Профиль', ''.join(out))
 
 
-FRAMES = [('welcome', welcome), ('catalog', catalog), ('search', search_results), ('details', details),
+def kpi(x, y, label, value, note=''):
+    return (rect(x, y, 160, 84, C['surfaceContainerLow'], 16, C['outlineVariant']) +
+            text(x + 14, y + 24, label, 12, color=C['onSurfaceVariant']) + text(x + 14, y + 56, value, 24, 700) +
+            text(x + 14, y + 74, note, 11, color=C['onSurfaceVariant']))
+
+
+def dashboard():
+    out = [text(16, 64, 'Обзор', 22), text(16, 84, 'Барбершоп «Северный»', 12),
+           segmented(100, ['7 дней', '30 дней', '90 дней'], 1),
+           kpi(16, 156, 'Записи', '10'), kpi(184, 156, 'Состоялись', '6'),
+           kpi(16, 252, 'Отмены', '4', '40 % от всех'), kpi(184, 252, 'Рейтинг за период', '4,8', 'за всё время 4,6'),
+           rect(16, 352, 328, 236, C['surfaceContainerLow'], 16, C['outlineVariant']),
+           text(32, 382, 'Записи по дням', 14, 500), icon('table', 308, 364, 22),
+           text(32, 404, 'Коснитесь столбца, чтобы увидеть значение', 11, color=C['onSurfaceVariant'])]
+    values = [1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]
+    for i, v in enumerate(values):
+        x = 32 + i * 9.4
+        h = 110 if v else 2
+        out.append(rect(x, 530 - h, 7.4, h, C['primary'] if v else C['outlineVariant'], 2))
+    out.append(rect(32, 530, 282, 1, C['outlineVariant']))
+    out.append(text(32, 552, 'пт, 11 сен', 11, color=C['onSurfaceVariant']))
+    out.append(text(314, 552, 'сб, 10 окт', 11, color=C['onSurfaceVariant'], anchor='end'))
+    out.append(rect(16, 600, 328, 104, C['surfaceContainerLow'], 16, C['outlineVariant']))
+    out.append(text(32, 628, 'Статусы записей', 14, 500))
+    out.append(rect(32, 642, 168, 14, '#2A78D6', 4))
+    out.append(rect(202, 642, 110, 14, '#1BAF7A', 4))
+    out.append(text(32, 680, 'Состоялись: 6 (60 %)   Отменены: 4 (40 %)', 12))
+    out.append(nav_bar(0, [None, None, None, None, 'welcome'], items=OWNER_TABS))
+    return frame('11 Обзор владельца', ''.join(out))
+
+
+FRAMES = [('welcome', welcome), ('login', login), ('catalog', catalog), ('search', search_results),
+          ('organization', organization), ('details', details),
           ('booking', lambda: booking_form(False)), ('confirm', lambda: booking_form(True)),
-          ('bookings', bookings), ('profile', profile)]
+          ('bookings', bookings), ('profile', profile), ('dashboard', dashboard)]
 
 # ---------------------------------------------------------------- components (UI kit)
 
@@ -545,7 +681,7 @@ body.show-hotspots .hotspot {{ fill: #006A65; fill-opacity: .18; stroke: #006A65
   <div class="controls">
     <button id="restart" type="button">С начала</button>
     <button id="hotspots" type="button" aria-pressed="false">Показать кликабельные зоны</button>
-    <button id="all" type="button" aria-pressed="false">Все 8 фреймов</button>
+    <button id="all" type="button" aria-pressed="false">Все 11 фреймов</button>
   </div>
   <a href="ui-kit.html">UI kit</a>
 </header>
@@ -774,9 +910,10 @@ def ui_kit_page(component_svgs):
                                   radii=radii, icons=icons, components=components_html)
 
 
-TITLES = {'welcome': 'Welcome', 'catalog': 'Каталог', 'search': 'Результаты поиска', 'details': 'Детали услуги',
-          'booking': 'Выбор специалиста и времени', 'confirm': 'Подтверждение', 'bookings': 'Мои записи',
-          'profile': 'Профиль'}
+TITLES = {'welcome': 'Welcome', 'login': 'Вход', 'catalog': 'Каталог мест', 'search': 'Поиск услуг',
+          'organization': 'Организация', 'details': 'Детали услуги',
+          'booking': 'Вариант, специалист и время', 'confirm': 'Подтверждение', 'bookings': 'Мои записи',
+          'profile': 'Профиль', 'dashboard': 'Обзор владельца'}
 
 
 def main():
@@ -784,6 +921,10 @@ def main():
     frames_dir = os.path.join(DESIGN, 'figma-import', 'frames')
     comp_dir = os.path.join(DESIGN, 'figma-import', 'components')
     os.makedirs(frames_dir, exist_ok=True)
+    # Frames are renumbered when the set changes: remove stale files first.
+    for name in os.listdir(frames_dir):
+        if name.endswith('.svg'):
+            os.remove(os.path.join(frames_dir, name))
     os.makedirs(comp_dir, exist_ok=True)
     built = {}
     for i, (key, builder) in enumerate(FRAMES, start=1):
