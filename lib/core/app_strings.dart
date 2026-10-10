@@ -6,7 +6,7 @@ abstract final class AppStrings {
   // General
   static const appName = 'Slotly';
   static const appTagline = 'Запись на услуги без звонков';
-  static const appVersion = '0.1.0';
+  static const appVersion = '0.2.0';
   static const appVersionLabel = 'Версия $appVersion · учебный MVP';
   static const currencySymbol = '₸';
   static const demoDataNotice =

@@ -51,23 +51,26 @@ void main() {
   });
 
   group('FilePhotoStorage', () {
-    test('copies the picked file into the app directory and deletes it', () async {
-      final source = File('${directory.path}/picked.jpg')
-        ..writeAsBytesSync(List.filled(2048, 7));
-      final storage = FilePhotoStorage(Directory('${directory.path}/photos'));
+    test(
+      'copies the picked file into the app directory and deletes it',
+      () async {
+        final source = File('${directory.path}/picked.jpg')
+          ..writeAsBytesSync(List.filled(2048, 7));
+        final storage = FilePhotoStorage(Directory('${directory.path}/photos'));
 
-      expect(await storage.sizeOf(source.path), 2048);
-      final path = await storage.importPhoto(source.path, 'photo-1');
+        expect(await storage.sizeOf(source.path), 2048);
+        final path = await storage.importPhoto(source.path, 'photo-1');
 
-      expect(path, endsWith('photos/photo-1.jpg'));
-      expect(File(path).lengthSync(), 2048);
-      // The original may disappear later; the copy stays.
-      source.deleteSync();
-      expect(File(path).existsSync(), isTrue);
+        expect(path, endsWith('photos/photo-1.jpg'));
+        expect(File(path).lengthSync(), 2048);
+        // The original may disappear later; the copy stays.
+        source.deleteSync();
+        expect(File(path).existsSync(), isTrue);
 
-      await storage.delete(path);
-      expect(File(path).existsSync(), isFalse);
-      await storage.delete(path);
-    });
+        await storage.delete(path);
+        expect(File(path).existsSync(), isFalse);
+        await storage.delete(path);
+      },
+    );
   });
 }
