@@ -203,13 +203,8 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                       children: [
                         ..._profileForm(context),
                         ..._photos(context, data),
-                        const SectionTitle(
-                          AppStrings.businessSettingsSection,
-                          padding: EdgeInsets.only(
-                            top: AppSpacing.xl,
-                            bottom: AppSpacing.s,
-                          ),
-                        ),
+                        // Default padding: aligned with the list tiles below.
+                        const SectionTitle(AppStrings.businessSettingsSection),
                         ...widget.settings,
                       ],
                     ),
