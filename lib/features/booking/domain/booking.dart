@@ -1,6 +1,9 @@
 import '../../catalog/domain/service.dart';
 
-enum BookingStatus { confirmed, cancelled }
+/// `confirmed` — upcoming or not yet marked by the business;
+/// `completed` — the business confirmed the visit took place;
+/// `cancelled` — cancelled by the customer.
+enum BookingStatus { confirmed, completed, cancelled }
 
 /// Whether a booking can be checked in at a given moment.
 enum CheckInAvailability {
@@ -23,6 +26,12 @@ class Booking {
     required this.comment,
     required this.status,
     required this.createdAt,
+    this.clientId = '',
+    this.clientName = '',
+    this.organizationId = '',
+    this.organizationName = '',
+    this.priceKzt = 0,
+    this.priceLabel,
     this.checkedInAt,
   });
 
@@ -34,6 +43,12 @@ class Booking {
 
   /// Short numeric code the customer shows or draws on arrival.
   final String ticketNumber;
+  final String clientId;
+
+  /// Copied at booking time so the business sees who is coming.
+  final String clientName;
+  final String organizationId;
+  final String organizationName;
   final String serviceId;
 
   /// Copied from the service at booking time, so the record stays readable
@@ -42,6 +57,12 @@ class Booking {
   final Specialist specialist;
   final DateTime startAt;
   final Duration duration;
+
+  /// Price agreed at booking time, in tenge.
+  final int priceKzt;
+
+  /// Selected price option, for example "Длинные волосы".
+  final String? priceLabel;
 
   /// Empty string when the customer left no comment.
   final String comment;
@@ -55,9 +76,18 @@ class Booking {
 
   DateTime get checkInOpensAt => startAt.subtract(checkInOpensBefore);
 
+  /// Confirmed bookings occupy the specialist's time.
   bool get isActive => status == BookingStatus.confirmed;
 
+  bool get isCompleted => status == BookingStatus.completed;
+
+  bool get isCancelled => status == BookingStatus.cancelled;
+
   bool get isCheckedIn => checkedInAt != null;
+
+  /// The customer may still move or cancel a visit that has not started.
+  bool canBeChangedAt(DateTime now) =>
+      isActive && !isCheckedIn && now.isBefore(startAt);
 
   CheckInAvailability checkInAvailabilityAt(DateTime now) {
     if (!isActive) return CheckInAvailability.cancelled;
@@ -71,18 +101,30 @@ class Booking {
   bool overlaps(DateTime start, DateTime end) =>
       startAt.isBefore(end) && start.isBefore(endAt);
 
-  Booking copyWith({BookingStatus? status, DateTime? checkedInAt}) => Booking(
+  Booking copyWith({
+    BookingStatus? status,
+    DateTime? checkedInAt,
+    DateTime? startAt,
+    Specialist? specialist,
+    bool clearCheckIn = false,
+  }) => Booking(
     id: id,
     ticketNumber: ticketNumber,
+    clientId: clientId,
+    clientName: clientName,
+    organizationId: organizationId,
+    organizationName: organizationName,
     serviceId: serviceId,
     serviceTitle: serviceTitle,
-    specialist: specialist,
-    startAt: startAt,
+    specialist: specialist ?? this.specialist,
+    startAt: startAt ?? this.startAt,
     duration: duration,
+    priceKzt: priceKzt,
+    priceLabel: priceLabel,
     comment: comment,
     status: status ?? this.status,
     createdAt: createdAt,
-    checkedInAt: checkedInAt ?? this.checkedInAt,
+    checkedInAt: clearCheckIn ? null : checkedInAt ?? this.checkedInAt,
   );
 
   /// Chronological order; ties are broken by id to keep the order stable.

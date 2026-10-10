@@ -1,10 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:slotly/data/seed/demo_catalog.dart';
 import 'package:slotly/features/booking/domain/booking_draft.dart';
 import 'package:slotly/features/booking/domain/time_slot.dart';
-import 'package:slotly/features/catalog/data/demo_services.dart';
 
 void main() {
-  final service = demoServices.first;
+  // A service without a detailed price list.
+  final service = demoServices.firstWhere((s) => s.id == 'svc-beard');
+  final withOptions = demoServices.firstWhere((s) => s.id == 'svc-men-haircut');
   final specialist = service.availableSpecialists.first;
   final day = DateTime(2026, 10, 6);
   final freeSlot = TimeSlot(
@@ -72,5 +74,29 @@ void main() {
         .withComment('a' * (BookingDraft.maxCommentLength + 1));
 
     expect(draft.issues, [BookingDraftIssue.commentTooLong]);
+  });
+
+  test('a service with a price list needs a chosen option', () {
+    final draft = BookingDraft(service: withOptions)
+        .withSpecialist(withOptions.availableSpecialists.first)
+        .withDay(day)
+        .withSlot(freeSlot);
+    expect(draft.issues, [BookingDraftIssue.priceOptionMissing]);
+
+    final option = withOptions.priceOptions.last;
+    final complete = draft.withPriceOption(option);
+    expect(complete.isComplete, isTrue);
+    final request = complete.toRequest();
+    expect(request.priceOption, option);
+    expect(request.priceKzt, option.priceKzt);
+  });
+
+  test('the chosen option survives changing specialist and day', () {
+    final option = withOptions.priceOptions.first;
+    final draft = BookingDraft(service: withOptions)
+        .withPriceOption(option)
+        .withSpecialist(withOptions.availableSpecialists.last)
+        .withDay(day.add(const Duration(days: 1)));
+    expect(draft.priceOption, option);
   });
 }

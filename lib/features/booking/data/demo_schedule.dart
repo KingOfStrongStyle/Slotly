@@ -1,11 +1,11 @@
 import '../../catalog/domain/service.dart';
 
-/// Working hours of the demo businesses.
+/// Working hours of the demo businesses: hourly start times between
+/// [openingHour] and [closingHour] on the specialist's working days.
 ///
-/// Without a backend there are no other customers, so [isTakenByOthers]
-/// marks about every fourth slot as busy with a fixed formula. The result is
-/// deterministic: the same specialist, day and hour are always busy, which
-/// keeps tests and demonstrations repeatable.
+/// A time is busy when an active booking of the same specialist overlaps
+/// it; there are no artificial "taken by others" slots any more because the
+/// demo data contains bookings of other customers.
 class DemoSchedule {
   const DemoSchedule({
     this.openingHour = 10,
@@ -20,8 +20,13 @@ class DemoSchedule {
   final Duration minimumLeadTime;
 
   /// Hourly start times on [day] for a visit of [duration] that ends by
-  /// closing time.
-  List<DateTime> startTimes(DateTime day, Duration duration) {
+  /// closing time. Empty on the specialist's days off.
+  List<DateTime> startTimes(
+    DateTime day,
+    Duration duration, {
+    Specialist? specialist,
+  }) {
+    if (specialist != null && !specialist.worksOn(day)) return const [];
     final closing = DateTime(day.year, day.month, day.day, closingHour);
     final result = <DateTime>[];
     for (var hour = openingHour; hour < closingHour; hour++) {
@@ -29,10 +34,5 @@ class DemoSchedule {
       if (!start.add(duration).isAfter(closing)) result.add(start);
     }
     return result;
-  }
-
-  bool isTakenByOthers(Specialist specialist, DateTime startAt) {
-    final seed = specialist.id.codeUnits.fold(0, (sum, unit) => sum + unit);
-    return (seed + startAt.day + startAt.hour) % 4 == 0;
   }
 }

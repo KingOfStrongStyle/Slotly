@@ -3,6 +3,7 @@ import 'booking_repository.dart';
 import 'time_slot.dart';
 
 enum BookingDraftIssue {
+  priceOptionMissing,
   specialistMissing,
   dateMissing,
   timeMissing,
@@ -21,6 +22,7 @@ class BookingDraft {
     this.specialist,
     this.day,
     this.slot,
+    this.priceOption,
     this.comment = '',
   });
 
@@ -30,12 +32,16 @@ class BookingDraft {
   final Specialist? specialist;
   final DateTime? day;
   final TimeSlot? slot;
+
+  /// Chosen line of the detailed price list, if the service has one.
+  final PriceOption? priceOption;
   final String comment;
 
   BookingDraft withSpecialist(Specialist value) => BookingDraft(
     service: service,
     specialist: value,
     day: day,
+    priceOption: priceOption,
     comment: comment,
   );
 
@@ -43,6 +49,7 @@ class BookingDraft {
     service: service,
     specialist: specialist,
     day: DateTime(value.year, value.month, value.day),
+    priceOption: priceOption,
     comment: comment,
   );
 
@@ -51,6 +58,16 @@ class BookingDraft {
     specialist: specialist,
     day: day,
     slot: value,
+    priceOption: priceOption,
+    comment: comment,
+  );
+
+  BookingDraft withPriceOption(PriceOption value) => BookingDraft(
+    service: service,
+    specialist: specialist,
+    day: day,
+    slot: slot,
+    priceOption: value,
     comment: comment,
   );
 
@@ -59,12 +76,15 @@ class BookingDraft {
     specialist: specialist,
     day: day,
     slot: slot,
+    priceOption: priceOption,
     comment: value,
   );
 
   List<BookingDraftIssue> get issues {
     final slot = this.slot;
     return [
+      if (service.hasPriceOptions && priceOption == null)
+        BookingDraftIssue.priceOptionMissing,
       if (specialist == null) BookingDraftIssue.specialistMissing,
       if (day == null) BookingDraftIssue.dateMissing,
       if (slot == null) BookingDraftIssue.timeMissing,
@@ -87,6 +107,7 @@ class BookingDraft {
       service: service,
       specialist: specialist,
       startAt: slot.startAt,
+      priceOption: priceOption,
       comment: comment.trim(),
     );
   }

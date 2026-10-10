@@ -1,74 +1,74 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:slotly/features/booking/data/demo_schedule.dart';
-import 'package:slotly/features/booking/data/in_memory_booking_repository.dart';
-import 'package:slotly/features/booking/domain/booking_repository.dart';
+import 'package:slotly/features/booking/data/local_booking_repository.dart';
+import 'package:slotly/features/booking/domain/booking.dart';
 import 'package:slotly/features/booking/presentation/bookings_controller.dart';
-import 'package:slotly/features/catalog/data/demo_services.dart';
+
+import '../../helpers/booking_fixtures.dart';
+import '../../helpers/test_app.dart';
 
 void main() {
-  final service = demoServices.first;
-  final specialist = service.availableSpecialists.first;
-  const schedule = DemoSchedule();
+  late TestData data;
   late BookingsController controller;
 
-  List<DateTime> freeStarts(DateTime day) => schedule
-      .startTimes(day, service.duration)
-      .where((t) => !schedule.isTakenByOthers(specialist, t))
-      .toList();
-
-  setUp(() {
-    controller = BookingsController(
-      InMemoryBookingRepository(clock: () => DateTime(2026, 10, 5, 9)),
-    );
+  setUp(() async {
+    data = await TestData.create();
+    data.signInAs('aliya');
+    await data.database.update((t) {
+      for (final booking in [
+        fixtureBooking(id: 'later', startAt: DateTime(2026, 10, 9, 12)),
+        fixtureBooking(id: 'sooner', startAt: DateTime(2026, 10, 6, 12)),
+        fixtureBooking(
+          id: 'old',
+          startAt: DateTime(2026, 9, 1, 12),
+          status: BookingStatus.completed,
+        ),
+        fixtureBooking(
+          id: 'older',
+          startAt: DateTime(2026, 8, 1, 12),
+          status: BookingStatus.completed,
+        ),
+        fixtureBooking(
+          id: 'gone',
+          startAt: DateTime(2026, 9, 2, 12),
+          status: BookingStatus.cancelled,
+        ),
+      ]) {
+        t.bookings[booking.id] = booking;
+      }
+    });
+    controller = BookingsController(LocalBookingRepository(data.context));
   });
 
   tearDown(() => controller.dispose());
 
-  test('load finishes with an empty list for a new user', () async {
-    final loadingStates = <bool>[];
-    controller.addListener(() => loadingStates.add(controller.isLoading));
+  test('load reports progress and splits bookings by status', () async {
+    final loading = <bool>[];
+    controller.addListener(() => loading.add(controller.isLoading));
 
     await controller.load();
 
-    expect(loadingStates, [true, false]);
-    expect(controller.active, isEmpty);
-    expect(controller.cancelled, isEmpty);
-    expect(controller.hasLoadError, isFalse);
+    expect(loading, [true, false]);
+    expect(controller.active.map((b) => b.id), ['sooner', 'later']);
+    expect(controller.past.map((b) => b.id), ['old', 'older']);
+    expect(controller.cancelled.map((b) => b.id), ['gone']);
+    expect(controller.byId('old')?.isCompleted, isTrue);
   });
 
-  test('active bookings are sorted by start time', () async {
-    final later = freeStarts(DateTime(2026, 10, 8)).first;
-    final earlier = freeStarts(DateTime(2026, 10, 6)).last;
+  test('reloads by itself after a change in the repository', () async {
+    await controller.load();
+    await controller.cancel('sooner');
+    await pumpEventQueue();
 
-    await controller.book(
-      BookingRequest(service: service, specialist: specialist, startAt: later),
+    expect(controller.active.map((b) => b.id), ['later']);
+    expect(
+      controller.cancelled.map((b) => b.id),
+      containsAll(['sooner', 'gone']),
     );
-    await controller.book(
-      BookingRequest(
-        service: service,
-        specialist: specialist,
-        startAt: earlier,
-      ),
-    );
-
-    expect(controller.active.map((b) => b.startAt), [earlier, later]);
   });
 
-  test('cancel moves a booking to the cancelled list', () async {
-    final booking = await controller.book(
-      BookingRequest(
-        service: service,
-        specialist: specialist,
-        startAt: freeStarts(DateTime(2026, 10, 6)).first,
-      ),
-    );
-    var notifications = 0;
-    controller.addListener(() => notifications++);
-
-    await controller.cancel(booking.id);
-
-    expect(controller.active, isEmpty);
-    expect(controller.cancelled.single.id, booking.id);
-    expect(notifications, 1);
+  test('a load error is reported instead of thrown', () async {
+    data.signInAs('north');
+    await controller.load();
+    expect(controller.hasLoadError, isTrue);
   });
 }

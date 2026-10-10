@@ -1,3 +1,4 @@
+import 'organization.dart';
 import 'service.dart';
 
 /// Filters the catalog by title and category.
@@ -20,3 +21,25 @@ List<Service> filterServices(
 
 String normalizeSearchText(String value) =>
     value.trim().toLowerCase().replaceAll('ё', 'е');
+
+/// Organizations whose name or any of whose [services] match [query].
+List<Organization> filterOrganizations(
+  Iterable<Organization> organizations, {
+  required Iterable<Service> services,
+  String query = '',
+  ServiceCategory? category,
+}) {
+  final normalizedQuery = normalizeSearchText(query);
+  bool matchesService(Organization organization) => services.any(
+    (s) =>
+        s.organizationId == organization.id &&
+        normalizeSearchText(s.title).contains(normalizedQuery),
+  );
+  return [
+    for (final organization in organizations)
+      if ((category == null || organization.category == category) &&
+          (normalizeSearchText(organization.name).contains(normalizedQuery) ||
+              matchesService(organization)))
+        organization,
+  ];
+}

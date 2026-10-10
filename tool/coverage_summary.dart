@@ -31,7 +31,7 @@ void main(List<String> args) {
   }
 
   final groups = <String, bool Function(String)>{
-    'domain + data (features/*/domain, features/*/data)': (p) =>
+    'domain + data (lib/data, features/*/domain, features/*/data)': (p) =>
         p.contains('/domain/') || p.contains('/data/'),
     'core (lifecycle, utils, widgets, strings)': (p) =>
         p.startsWith('lib/core/'),
