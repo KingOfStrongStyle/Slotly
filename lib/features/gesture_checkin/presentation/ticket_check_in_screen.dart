@@ -5,7 +5,6 @@ import '../../../core/app_strings.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/responsive.dart';
 import '../../booking/domain/booking.dart';
-import '../../booking/presentation/bookings_controller.dart';
 import '../../booking/presentation/check_in_messages.dart';
 import '../domain/gesture_classifier.dart';
 import '../domain/gesture_template.dart';
@@ -13,12 +12,13 @@ import '../domain/ticket_entry.dart';
 import 'widgets/gesture_pad.dart';
 import 'widgets/template_preview.dart';
 
-/// Arrival check-in: the customer draws the ticket number of their booking
-/// digit by digit and finishes with "S". The booking with this number is
-/// then marked as arrived through [BookingsController.checkIn].
+/// Arrival check-in at the reception desk: the visitor draws the ticket
+/// number of their booking digit by digit and finishes with "S"; the
+/// booking is then marked as arrived through [checkIn].
 ///
-/// Handwriting works without a keyboard, so the same screen can run on a
-/// shared tablet at the reception desk.
+/// Opened from the owner's bookings: handwriting works without a keyboard,
+/// so a tablet at the reception can stay on this screen. Customers have a
+/// one-tap "Я на месте" button in their own booking instead.
 ///
 /// The screen does not scroll as a whole: a vertical scroll view would
 /// compete with the pad for vertical finger movements.
@@ -27,13 +27,16 @@ class TicketCheckInScreen extends StatefulWidget {
     super.key,
     required this.classifier,
     required this.templates,
-    required this.bookings,
+    required this.checkIn,
     required this.finishSymbol,
   });
 
   final GestureClassifier classifier;
   final List<GestureTemplate> templates;
-  final BookingsController bookings;
+
+  /// Checks in the booking with the given ticket number; throws the
+  /// errors of `BookingRepository.checkIn`.
+  final Future<Booking> Function(String ticketNumber) checkIn;
   final String finishSymbol;
 
   @override
@@ -96,9 +99,7 @@ class _TicketCheckInScreenState extends State<TicketCheckInScreen> {
     if (outcome == TicketEntryOutcome.completed) {
       _Feedback feedback;
       try {
-        feedback = _Feedback.checkedIn(
-          await widget.bookings.checkIn(entry.number),
-        );
+        feedback = _Feedback.checkedIn(await widget.checkIn(entry.number));
       } on Exception catch (error) {
         feedback = _Feedback.error(checkInErrorMessage(error));
       }

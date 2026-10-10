@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:slotly/core/app_strings.dart';
-import 'package:slotly/features/booking/data/in_memory_booking_repository.dart';
-import 'package:slotly/features/booking/presentation/bookings_controller.dart';
+import 'package:slotly/features/booking/data/local_booking_repository.dart';
 import 'package:slotly/features/gesture_checkin/data/symbol_templates.dart';
 import 'package:slotly/features/gesture_checkin/domain/gesture_classifier.dart';
 import 'package:slotly/features/gesture_checkin/domain/gesture_point.dart';
@@ -16,35 +15,36 @@ import '../../helpers/test_app.dart';
 
 void main() {
   final pad = find.byKey(const ValueKey('gesture-pad'));
-  late BookingsController bookings;
+  late TestData data;
 
-  /// Ticket 17 starts in 30 minutes, so check-in is already open.
+  /// Reception tablet of "Северный": ticket 17 starts in 30 minutes, so
+  /// check-in is already open; ticket 42 is tomorrow.
   Future<void> pumpCheckIn(WidgetTester tester) async {
-    bookings = BookingsController(
-      InMemoryBookingRepository(
-        clock: () => testNow,
-        initialBookings: [
-          fixtureBooking(
-            id: 'soon',
-            ticketNumber: '17',
-            startAt: testNow.add(const Duration(minutes: 30)),
-          ),
-          fixtureBooking(
-            id: 'later',
-            ticketNumber: '42',
-            startAt: DateTime(2026, 10, 6, 12),
-          ),
-        ],
-      ),
-    );
-    addTearDown(bookings.dispose);
-    await bookings.load();
+    data = await TestData.create();
+    data.signInAs('north');
+    await data.database.update((t) {
+      for (final booking in [
+        fixtureBooking(
+          id: 'soon',
+          ticketNumber: '17',
+          startAt: testNow.add(const Duration(minutes: 30)),
+        ),
+        fixtureBooking(
+          id: 'later',
+          ticketNumber: '42',
+          startAt: DateTime(2026, 10, 6, 12),
+        ),
+      ]) {
+        t.bookings[booking.id] = booking;
+      }
+    });
+    final repository = LocalBookingRepository(data.context);
     await pumpScreen(
       tester,
       TicketCheckInScreen(
         classifier: GestureClassifier(templates: symbolTemplates),
         templates: symbolTemplates,
-        bookings: bookings,
+        checkIn: repository.checkIn,
         finishSymbol: finishSymbol,
       ),
     );
@@ -151,10 +151,7 @@ void main() {
     await enter(tester, ['1', '7', finishSymbol]);
 
     expect(find.text(AppStrings.checkInSuccess('17')), findsOneWidget);
-    expect(
-      bookings.active.firstWhere((b) => b.ticketNumber == '17').isCheckedIn,
-      isTrue,
-    );
+    expect(data.database.tables.bookings['soon']!.isCheckedIn, isTrue);
     expect(find.text(AppStrings.checkInReset), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.checkInReset));
@@ -183,7 +180,10 @@ void main() {
     await enter(tester, ['4', '2', finishSymbol]);
 
     expect(find.textContaining('Отметиться по талону 42 можно с'), findsOne);
-    expect(bookings.active.every((b) => !b.isCheckedIn), isTrue);
+    expect(
+      data.database.tables.bookings.values.every((b) => !b.isCheckedIn),
+      isTrue,
+    );
   });
 
   testWidgets('template hints show every symbol', (tester) async {
