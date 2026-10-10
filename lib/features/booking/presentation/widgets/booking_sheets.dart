@@ -6,9 +6,11 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/info_row.dart';
 import '../../domain/booking.dart';
 
-enum BookingAction { details, cancel }
+enum BookingAction { details, reschedule, cancel, review }
 
-/// Opened by a tap: main information about the booking.
+/// Opened by a tap: everything about the booking and the buttons for each
+/// available action. These buttons are the accessible alternative to the
+/// swipe and long-press gestures.
 ///
 /// [onCheckIn] is passed only while check-in is open; otherwise
 /// [checkInAvailability] explains when it will be possible.
@@ -17,7 +19,10 @@ Future<void> showBookingDetailsSheet(
   Booking booking, {
   CheckInAvailability? checkInAvailability,
   VoidCallback? onCheckIn,
+  VoidCallback? onReschedule,
   VoidCallback? onCancel,
+  VoidCallback? onWriteReview,
+  VoidCallback? onComplete,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -25,6 +30,11 @@ Future<void> showBookingDetailsSheet(
     isScrollControlled: true,
     builder: (context) {
       final theme = Theme.of(context);
+      void run(VoidCallback action) {
+        Navigator.of(context).pop();
+        action();
+      }
+
       return SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
@@ -47,10 +57,18 @@ Future<void> showBookingDetailsSheet(
                 label: AppStrings.bookingTicket,
                 value: booking.ticketNumber,
               ),
+              if (booking.organizationName.isNotEmpty)
+                InfoRow(
+                  icon: Icons.storefront_outlined,
+                  label: AppStrings.bookingDetailsPlace,
+                  value: booking.organizationName,
+                ),
               InfoRow(
-                icon: Icons.storefront_outlined,
+                icon: Icons.content_cut,
                 label: AppStrings.confirmService,
-                value: booking.serviceTitle,
+                value: booking.priceLabel == null
+                    ? booking.serviceTitle
+                    : '${booking.serviceTitle} · ${booking.priceLabel}',
               ),
               InfoRow(
                 icon: Icons.person_outline,
@@ -67,14 +85,16 @@ Future<void> showBookingDetailsSheet(
                 label: AppStrings.confirmTime,
                 value: Formatters.timeRange(booking.startAt, booking.endAt),
               ),
+              if (booking.priceKzt > 0)
+                InfoRow(
+                  icon: Icons.payments_outlined,
+                  label: AppStrings.bookingDetailsPrice,
+                  value: Formatters.price(booking.priceKzt),
+                ),
               InfoRow(
-                icon: !booking.isActive
-                    ? Icons.cancel_outlined
-                    : booking.isCheckedIn
-                    ? Icons.how_to_reg
-                    : Icons.check_circle_outline,
+                icon: _statusIcon(booking),
                 label: AppStrings.bookingDetailsStatus,
-                value: _statusText(booking),
+                value: bookingStatusText(booking),
               ),
               if (booking.comment.isNotEmpty)
                 InfoRow(
@@ -87,18 +107,8 @@ Future<void> showBookingDetailsSheet(
                 label: AppStrings.bookingDetailsCreatedAt,
                 value: Formatters.dateTime(booking.createdAt),
               ),
-              if (onCheckIn != null) ...[
-                const SizedBox(height: AppSpacing.l),
-                FilledButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    onCheckIn();
-                  },
-                  icon: const Icon(Icons.how_to_reg),
-                  label: const Text(AppStrings.bookingCheckInAction),
-                ),
-              ] else if (checkInAvailability ==
-                  CheckInAvailability.tooEarly) ...[
+              if (checkInAvailability == CheckInAvailability.tooEarly &&
+                  onCheckIn == null) ...[
                 const SizedBox(height: AppSpacing.s),
                 Text(
                   AppStrings.bookingCheckInOpensAt(
@@ -109,20 +119,38 @@ Future<void> showBookingDetailsSheet(
                   ),
                 ),
               ],
-              if (onCancel != null) ...[
-                const SizedBox(height: AppSpacing.l),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.colorScheme.error,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    onCancel();
-                  },
-                  icon: const Icon(Icons.event_busy),
-                  label: const Text(AppStrings.bookingActionCancel),
+              const SizedBox(height: AppSpacing.l),
+              if (onCheckIn != null)
+                _SheetButton.primary(
+                  icon: Icons.how_to_reg,
+                  label: AppStrings.bookingCheckInAction,
+                  onPressed: () => run(onCheckIn),
                 ),
-              ],
+              if (onComplete != null)
+                _SheetButton.primary(
+                  icon: Icons.task_alt,
+                  label: AppStrings.ownerBookingComplete,
+                  onPressed: () => run(onComplete),
+                ),
+              if (onWriteReview != null)
+                _SheetButton.primary(
+                  icon: Icons.rate_review_outlined,
+                  label: AppStrings.reviewWrite,
+                  onPressed: () => run(onWriteReview),
+                ),
+              if (onReschedule != null)
+                _SheetButton.outlined(
+                  icon: Icons.update,
+                  label: AppStrings.bookingActionReschedule,
+                  onPressed: () => run(onReschedule),
+                ),
+              if (onCancel != null)
+                _SheetButton.outlined(
+                  icon: Icons.event_busy,
+                  label: AppStrings.bookingActionCancel,
+                  color: theme.colorScheme.error,
+                  onPressed: () => run(onCancel),
+                ),
             ],
           ),
         ),
@@ -131,20 +159,76 @@ Future<void> showBookingDetailsSheet(
   );
 }
 
-String _statusText(Booking booking) {
-  if (!booking.isActive) return AppStrings.bookingStatusCancelled;
-  final checkedInAt = booking.checkedInAt;
-  if (checkedInAt != null) {
-    return AppStrings.bookingCheckedInAt(Formatters.time(checkedInAt));
+class _SheetButton extends StatelessWidget {
+  const _SheetButton.primary({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  }) : filled = true,
+       color = null;
+
+  const _SheetButton.outlined({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.color,
+  }) : filled = false;
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final bool filled;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.s),
+      child: filled
+          ? FilledButton.icon(
+              onPressed: onPressed,
+              icon: Icon(icon),
+              label: Text(label),
+            )
+          : OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(foregroundColor: color),
+              onPressed: onPressed,
+              icon: Icon(icon),
+              label: Text(label),
+            ),
+    );
   }
-  return AppStrings.bookingStatusConfirmed;
 }
 
-/// Opened by a long press: list of actions for the booking.
+IconData _statusIcon(Booking booking) => switch (booking.status) {
+  BookingStatus.cancelled => Icons.cancel_outlined,
+  BookingStatus.completed => Icons.task_alt,
+  BookingStatus.confirmed =>
+    booking.isCheckedIn ? Icons.how_to_reg : Icons.check_circle_outline,
+};
+
+String bookingStatusText(Booking booking) {
+  switch (booking.status) {
+    case BookingStatus.cancelled:
+      return AppStrings.bookingStatusCancelled;
+    case BookingStatus.completed:
+      return AppStrings.bookingStatusCompleted;
+    case BookingStatus.confirmed:
+      final checkedInAt = booking.checkedInAt;
+      return checkedInAt == null
+          ? AppStrings.bookingStatusConfirmed
+          : AppStrings.bookingCheckedInAt(Formatters.time(checkedInAt));
+  }
+}
+
+/// Opened by a long press: the same actions as the details sheet, as a
+/// short menu.
 Future<BookingAction?> showBookingActionsSheet(
   BuildContext context,
-  Booking booking,
-) {
+  Booking booking, {
+  required bool canChange,
+  required bool canReview,
+}) {
   return showModalBottomSheet<BookingAction>(
     context: context,
     showDragHandle: true,
@@ -170,7 +254,20 @@ Future<BookingAction?> showBookingActionsSheet(
               title: const Text(AppStrings.bookingActionDetails),
               onTap: () => Navigator.of(context).pop(BookingAction.details),
             ),
-            if (booking.isActive)
+            if (canReview)
+              ListTile(
+                leading: const Icon(Icons.rate_review_outlined),
+                title: const Text(AppStrings.reviewWrite),
+                onTap: () => Navigator.of(context).pop(BookingAction.review),
+              ),
+            if (canChange)
+              ListTile(
+                leading: const Icon(Icons.update),
+                title: const Text(AppStrings.bookingActionReschedule),
+                onTap: () =>
+                    Navigator.of(context).pop(BookingAction.reschedule),
+              ),
+            if (canChange)
               ListTile(
                 leading: Icon(Icons.event_busy, color: colors.error),
                 title: Text(

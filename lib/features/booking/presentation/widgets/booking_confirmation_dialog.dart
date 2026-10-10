@@ -46,7 +46,10 @@ Future<bool> showBookingConfirmationDialog(
             InfoRow(
               icon: Icons.payments_outlined,
               label: AppStrings.confirmPrice,
-              value: Formatters.price(request.service.priceKzt),
+              value: request.priceOption == null
+                  ? Formatters.price(request.priceKzt)
+                  : '${request.priceOption!.label}, '
+                        '${Formatters.price(request.priceKzt)}',
             ),
             if (request.comment.isNotEmpty)
               InfoRow(

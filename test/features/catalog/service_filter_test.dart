@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:slotly/features/catalog/data/demo_services.dart';
+import 'package:slotly/data/seed/demo_catalog.dart';
 import 'package:slotly/features/catalog/domain/service.dart';
 import 'package:slotly/features/catalog/domain/service_filter.dart';
 
@@ -10,7 +10,11 @@ void main() {
 
   test('search is case-insensitive for Russian text', () {
     final results = filterServices(demoServices, query: 'СТРИЖКА');
-    expect(results.map((s) => s.id), ['svc-men-haircut']);
+    expect(results.map((s) => s.id), [
+      'svc-men-haircut',
+      'svc-haircut-beard',
+      'svc-kids-haircut',
+    ]);
   });
 
   test('search ignores surrounding spaces and treats ё as е', () {

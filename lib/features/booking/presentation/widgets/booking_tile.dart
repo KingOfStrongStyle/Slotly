@@ -5,29 +5,52 @@ import '../../../../core/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/booking.dart';
 
-/// One booking in "Мои записи": date badge, service, time, specialist and
-/// ticket number.
+/// One booking: date badge, service, time, specialist and ticket number.
+///
+/// [subtitle] replaces the place name (the owner sees the client instead);
+/// [trailing] holds an inline action such as "Оставить отзыв".
 class BookingTile extends StatelessWidget {
   const BookingTile({
     super.key,
     required this.booking,
     required this.onTap,
     this.onLongPress,
+    this.trailing,
+    this.note,
+    this.subtitle,
   });
 
   final Booking booking;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
+  final Widget? trailing;
+  final String? note;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final isActive = booking.isActive;
     final details =
         '${Formatters.timeRange(booking.startAt, booking.endAt)} · '
         '${booking.specialist.name} · '
         '${AppStrings.bookingTicketShort(booking.ticketNumber)}';
+    final place = subtitle ?? booking.organizationName;
+    final (statusText, statusColor) = switch (booking.status) {
+      BookingStatus.cancelled => (
+        AppStrings.bookingStatusCancelled,
+        colors.error,
+      ),
+      BookingStatus.completed => (
+        note ?? AppStrings.bookingStatusCompleted,
+        SlotlyColors.of(context).success,
+      ),
+      BookingStatus.confirmed when booking.isCheckedIn => (
+        AppStrings.bookingStatusCheckedIn,
+        colors.primary,
+      ),
+      BookingStatus.confirmed => (null, null),
+    };
 
     return Card(
       child: InkWell(
@@ -37,7 +60,7 @@ class BookingTile extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.m),
           child: Row(
             children: [
-              _DateBadge(date: booking.startAt, isActive: isActive),
+              _DateBadge(date: booking.startAt, isActive: booking.isActive),
               const SizedBox(width: AppSpacing.m),
               Expanded(
                 child: Column(
@@ -46,11 +69,18 @@ class BookingTile extends StatelessWidget {
                     Text(
                       booking.serviceTitle,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        decoration: isActive
-                            ? null
-                            : TextDecoration.lineThrough,
+                        decoration: booking.isCancelled
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
+                    if (place.isNotEmpty)
+                      Text(
+                        place,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       details,
@@ -58,17 +88,17 @@ class BookingTile extends StatelessWidget {
                         color: colors.onSurfaceVariant,
                       ),
                     ),
-                    if (!isActive || booking.isCheckedIn) ...[
+                    if (statusText != null) ...[
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        isActive
-                            ? AppStrings.bookingStatusCheckedIn
-                            : AppStrings.bookingStatusCancelled,
+                        statusText,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: isActive ? colors.primary : colors.error,
+                          color: statusColor,
                         ),
                       ),
                     ],
+                    if (trailing case final action?)
+                      Align(alignment: Alignment.centerLeft, child: action),
                   ],
                 ),
               ),

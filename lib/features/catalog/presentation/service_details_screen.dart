@@ -20,7 +20,9 @@ class ServiceDetailsScreen extends StatelessWidget {
   });
 
   final Service service;
-  final VoidCallback onBook;
+
+  /// Null when the viewer cannot book (an owner previewing the catalog).
+  final VoidCallback? onBook;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,13 @@ class ServiceDetailsScreen extends StatelessWidget {
                     InfoRow(
                       icon: Icons.payments_outlined,
                       label: AppStrings.detailsPrice,
-                      value: Formatters.price(service.priceKzt),
+                      value: service.hasPriceOptions
+                          ? [
+                              for (final option in service.priceOptions)
+                                '${option.label} — '
+                                    '${Formatters.price(option.priceKzt)}',
+                            ].join('\n')
+                          : Formatters.price(service.priceKzt),
                     ),
                     InfoRow(
                       icon: Icons.schedule,
@@ -87,21 +95,23 @@ class ServiceDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.l,
-            AppSpacing.s,
-            AppSpacing.l,
-            AppSpacing.l,
-          ),
-          child: FilledButton.icon(
-            onPressed: onBook,
-            icon: const Icon(Icons.event_available),
-            label: const Text(AppStrings.detailsBook),
-          ),
-        ),
-      ),
+      bottomNavigationBar: onBook == null
+          ? null
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.l,
+                  AppSpacing.s,
+                  AppSpacing.l,
+                  AppSpacing.l,
+                ),
+                child: FilledButton.icon(
+                  onPressed: onBook,
+                  icon: const Icon(Icons.event_available),
+                  label: const Text(AppStrings.detailsBook),
+                ),
+              ),
+            ),
     );
   }
 }

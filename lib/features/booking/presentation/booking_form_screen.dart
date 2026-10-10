@@ -18,11 +18,15 @@ import 'widgets/booking_confirmation_dialog.dart';
 import 'widgets/date_selector.dart';
 import 'widgets/specialist_selector.dart';
 
-/// Booking form: specialist, date, time and an optional comment.
+/// Booking form: price option, specialist, date, time and a comment.
 ///
 /// The screen keeps a [BookingDraft] and only renders it; validation rules
 /// are in the draft. The booking is created through [BookingsController]
 /// after the user confirms the summary dialog.
+///
+/// With [rescheduling] the same form moves an existing booking: only the
+/// specialist, the date and the time can change, and the current time of
+/// the booking is shown as free.
 class BookingFormScreen extends StatefulWidget {
   const BookingFormScreen({
     super.key,
@@ -30,12 +34,16 @@ class BookingFormScreen extends StatefulWidget {
     required this.bookings,
     required this.clock,
     required this.onBooked,
+    this.rescheduling,
   });
 
   final Service service;
   final BookingsController bookings;
   final Clock clock;
+
+  /// Called with the created or moved booking.
   final ValueChanged<Booking> onBooked;
+  final Booking? rescheduling;
 
   @override
   State<BookingFormScreen> createState() => _BookingFormScreenState();
@@ -57,11 +65,28 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   void initState() {
     super.initState();
     final specialists = widget.service.availableSpecialists;
-    _draft = BookingDraft(
-      service: widget.service,
-      day: widget.clock().dateOnly,
-      specialist: specialists.length == 1 ? specialists.single : null,
-    );
+    final moving = widget.rescheduling;
+    if (moving != null) {
+      _draft = BookingDraft(
+        service: widget.service,
+        day: moving.startAt.dateOnly,
+        specialist: specialists
+            .where((s) => s.id == moving.specialist.id)
+            .firstOrNull,
+        priceOption: widget.service.priceOptions
+            .where((o) => o.label == moving.priceLabel)
+            .firstOrNull,
+      );
+    } else {
+      _draft = BookingDraft(
+        service: widget.service,
+        day: widget.clock().dateOnly,
+        specialist: specialists.length == 1 ? specialists.single : null,
+        priceOption: widget.service.priceOptions.length == 1
+            ? widget.service.priceOptions.single
+            : null,
+      );
+    }
     _loadSlots();
   }
 
@@ -88,6 +113,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
         service: widget.service,
         specialist: specialist,
         day: day,
+        ignoreBookingId: widget.rescheduling?.id,
       );
       if (!mounted || requestId != _slotsRequestId) return;
       setState(() => _slots = slots);
@@ -113,12 +139,21 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   Future<void> _submit() async {
     final request = _draft.toRequest();
-    final confirmed = await showBookingConfirmationDialog(context, request);
+    final moving = widget.rescheduling;
+    final confirmed = moving == null
+        ? await showBookingConfirmationDialog(context, request)
+        : await _confirmReschedule(moving, request.startAt);
     if (!confirmed || !mounted) return;
 
     setState(() => _isSubmitting = true);
     try {
-      final booking = await widget.bookings.book(request);
+      final booking = moving == null
+          ? await widget.bookings.book(request)
+          : await widget.bookings.reschedule(
+              moving,
+              startAt: request.startAt,
+              specialist: request.specialist,
+            );
       if (mounted) widget.onBooked(booking);
     } on SlotUnavailableException {
       if (!mounted) return;
@@ -127,15 +162,53 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
         const SnackBar(content: Text(AppStrings.bookingSlotNoLongerAvailable)),
       );
       await _loadSlots();
+    } on BookingLockedException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.bookingLocked)));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
+  Future<bool> _confirmReschedule(Booking booking, DateTime startAt) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.update),
+        title: const Text(AppStrings.rescheduleConfirmTitle),
+        content: Text(
+          AppStrings.rescheduleConfirmMessage(
+            Formatters.dateTime(booking.startAt),
+            Formatters.dateTime(startAt),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text(AppStrings.confirmEdit),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text(AppStrings.rescheduleSubmit),
+          ),
+        ],
+      ),
+    );
+    return confirmed ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.bookingTitle)),
+      appBar: AppBar(
+        title: Text(
+          widget.rescheduling == null
+              ? AppStrings.bookingTitle
+              : AppStrings.rescheduleTitle,
+        ),
+      ),
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
@@ -145,7 +218,31 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ServiceSummary(service: widget.service),
+                _ServiceSummary(
+                  service: widget.service,
+                  current: widget.rescheduling,
+                ),
+                if (widget.service.hasPriceOptions &&
+                    widget.rescheduling == null) ...[
+                  const _FormSectionTitle(AppStrings.bookingPriceSection),
+                  Wrap(
+                    spacing: AppSpacing.s,
+                    runSpacing: AppSpacing.s,
+                    children: [
+                      for (final option in widget.service.priceOptions)
+                        ChoiceChip(
+                          label: Text(
+                            '${option.label} · '
+                            '${Formatters.price(option.priceKzt)}',
+                          ),
+                          selected: option == _draft.priceOption,
+                          onSelected: (_) => setState(
+                            () => _draft = _draft.withPriceOption(option),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
                 const _FormSectionTitle(AppStrings.bookingSpecialistSection),
                 SpecialistSelector(
                   specialists: widget.service.availableSpecialists,
@@ -160,8 +257,10 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 ),
                 const _FormSectionTitle(AppStrings.bookingTimeSection),
                 _buildSlots(),
-                const _FormSectionTitle(AppStrings.bookingCommentSection),
-                _buildCommentField(),
+                if (widget.rescheduling == null) ...[
+                  const _FormSectionTitle(AppStrings.bookingCommentSection),
+                  _buildCommentField(),
+                ],
               ],
             ),
           ),
@@ -171,6 +270,9 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
         draft: _draft,
         isSubmitting: _isSubmitting,
         onSubmit: _submit,
+        submitLabel: widget.rescheduling == null
+            ? AppStrings.bookingContinue
+            : AppStrings.rescheduleSubmit,
       ),
     );
   }
@@ -247,9 +349,12 @@ class _FormSectionTitle extends StatelessWidget {
 }
 
 class _ServiceSummary extends StatelessWidget {
-  const _ServiceSummary({required this.service});
+  const _ServiceSummary({required this.service, this.current});
 
   final Service service;
+
+  /// The booking being moved, shown with its current time.
+  final Booking? current;
 
   @override
   Widget build(BuildContext context) {
@@ -262,8 +367,12 @@ class _ServiceSummary extends StatelessWidget {
         ),
         title: Text(service.title, style: theme.textTheme.titleMedium),
         subtitle: Text(
-          '${Formatters.duration(service.duration)} · '
-          '${Formatters.price(service.priceKzt)}',
+          current != null
+              ? '${AppStrings.rescheduleCurrent}: '
+                    '${Formatters.dateTime(current!.startAt)}, '
+                    '${current!.specialist.name}'
+              : '${Formatters.duration(service.duration)} · '
+                    '${service.hasPriceOptions ? AppStrings.priceFrom(Formatters.price(service.minPriceKzt)) : Formatters.price(service.priceKzt)}',
         ),
       ),
     );
@@ -316,16 +425,20 @@ class _SubmitBar extends StatelessWidget {
     required this.draft,
     required this.isSubmitting,
     required this.onSubmit,
+    required this.submitLabel,
   });
 
   final BookingDraft draft;
   final bool isSubmitting;
   final VoidCallback onSubmit;
+  final String submitLabel;
 
   String? get _missingHint {
     final missing = [
       for (final issue in draft.issues)
         switch (issue) {
+          BookingDraftIssue.priceOptionMissing =>
+            AppStrings.bookingMissingPriceOption,
           BookingDraftIssue.specialistMissing =>
             AppStrings.bookingMissingSpecialist,
           BookingDraftIssue.dateMissing => AppStrings.bookingMissingDate,
@@ -373,7 +486,7 @@ class _SubmitBar extends StatelessWidget {
                         dimension: 24,
                         child: CircularProgressIndicator(strokeWidth: 3),
                       )
-                    : const Text(AppStrings.bookingContinue),
+                    : Text(submitLabel),
               ),
             ],
           ),

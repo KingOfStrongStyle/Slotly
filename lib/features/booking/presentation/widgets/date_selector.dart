@@ -34,6 +34,7 @@ class DateSelector extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.s),
               child: _DayOption(
+                key: ValueKey('day-$offset'),
                 day: day,
                 offset: offset,
                 isSelected: selected?.isSameDay(day) ?? false,
@@ -48,6 +49,7 @@ class DateSelector extends StatelessWidget {
 
 class _DayOption extends StatelessWidget {
   const _DayOption({
+    super.key,
     required this.day,
     required this.offset,
     required this.isSelected,

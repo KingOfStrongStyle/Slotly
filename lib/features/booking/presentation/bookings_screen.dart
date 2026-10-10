@@ -6,33 +6,66 @@ import '../../../core/utils/clock.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/responsive.dart';
 import '../domain/booking.dart';
+import '../domain/booking_repository.dart';
 import 'bookings_controller.dart';
 import 'check_in_messages.dart';
 import 'widgets/booking_sheets.dart';
 import 'widgets/booking_tile.dart';
 import 'widgets/cancel_booking_dialog.dart';
 
-/// "Записи" tab with two inner tabs: active and cancelled bookings.
+/// "Записи" tab of the customer: active, past and cancelled bookings.
 ///
-/// Product gestures on an active booking: tap opens details, long press
-/// opens the action menu, swipe to the left asks to cancel. Nothing is
-/// cancelled without an explicit confirmation in a dialog.
-///
-/// On arrival the customer checks in either with "Я на месте" in the
-/// booking details or by drawing the ticket number ([onOpenCheckIn]).
+/// Gestures on an active booking: tap opens details, long press opens the
+/// action menu, swipe left asks to cancel, swipe right opens rescheduling.
+/// Every gesture has a button alternative in the details sheet, and
+/// nothing is changed without an explicit confirmation.
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({
     super.key,
     required this.bookings,
     required this.clock,
+    required this.reviewedBookingIds,
     required this.onBrowseServices,
-    required this.onOpenCheckIn,
+    required this.onReschedule,
+    required this.onWriteReview,
   });
 
   final BookingsController bookings;
   final Clock clock;
+
+  /// Completed bookings that already have a review.
+  final Set<String> reviewedBookingIds;
   final VoidCallback onBrowseServices;
-  final VoidCallback onOpenCheckIn;
+  final ValueChanged<Booking> onReschedule;
+  final ValueChanged<Booking> onWriteReview;
+
+  Future<void> _requestCancel(BuildContext context, Booking booking) async {
+    final confirmed = await showCancelBookingDialog(context, booking);
+    if (!confirmed || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    String message;
+    try {
+      await bookings.cancel(booking.id);
+      message = AppStrings.bookingCancelled;
+    } on BookingLockedException {
+      message = AppStrings.bookingLocked;
+    } on Exception {
+      message = AppStrings.bookingCancelFailed;
+    }
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _requestReschedule(BuildContext context, Booking booking) {
+    if (!booking.canBeChangedAt(clock())) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text(AppStrings.bookingLocked)));
+      return;
+    }
+    onReschedule(booking);
+  }
 
   Future<void> _checkIn(BuildContext context, Booking booking) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -48,26 +81,14 @@ class BookingsScreen extends StatelessWidget {
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _requestCancel(BuildContext context, Booking booking) async {
-    final confirmed = await showCancelBookingDialog(context, booking);
-    if (!confirmed || !context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      await bookings.cancel(booking.id);
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text(AppStrings.bookingCancelled)),
-        );
-    } on Exception {
-      messenger.showSnackBar(
-        const SnackBar(content: Text(AppStrings.bookingCancelFailed)),
-      );
-    }
-  }
+  bool _canReview(Booking booking) =>
+      booking.isCompleted && !reviewedBookingIds.contains(booking.id);
 
-  void _showDetails(BuildContext context, Booking booking) {
-    final availability = booking.checkInAvailabilityAt(clock());
+  /// Opens the details sheet; also used when a reminder is tapped.
+  void showDetails(BuildContext context, Booking booking) {
+    final now = clock();
+    final availability = booking.checkInAvailabilityAt(now);
+    final changeable = booking.canBeChangedAt(now);
     showBookingDetailsSheet(
       context,
       booking,
@@ -75,20 +96,30 @@ class BookingsScreen extends StatelessWidget {
       onCheckIn: availability == CheckInAvailability.available
           ? () => _checkIn(context, booking)
           : null,
-      onCancel: booking.isActive
-          ? () => _requestCancel(context, booking)
-          : null,
+      onReschedule: changeable ? () => onReschedule(booking) : null,
+      onCancel: changeable ? () => _requestCancel(context, booking) : null,
+      onWriteReview: _canReview(booking) ? () => onWriteReview(booking) : null,
     );
   }
 
   Future<void> _showActions(BuildContext context, Booking booking) async {
-    final action = await showBookingActionsSheet(context, booking);
+    final changeable = booking.canBeChangedAt(clock());
+    final action = await showBookingActionsSheet(
+      context,
+      booking,
+      canChange: changeable,
+      canReview: _canReview(booking),
+    );
     if (!context.mounted) return;
     switch (action) {
       case BookingAction.details:
-        _showDetails(context, booking);
+        showDetails(context, booking);
+      case BookingAction.reschedule:
+        _requestReschedule(context, booking);
       case BookingAction.cancel:
         await _requestCancel(context, booking);
+      case BookingAction.review:
+        onWriteReview(booking);
       case null:
         break;
     }
@@ -100,24 +131,22 @@ class BookingsScreen extends StatelessWidget {
       listenable: bookings,
       builder: (context, _) {
         final active = bookings.active;
+        final past = bookings.past;
         final cancelled = bookings.cancelled;
         return DefaultTabController(
-          length: 2,
+          length: 3,
           child: NestedScrollView(
             headerSliverBuilder: (context, _) => [
               SliverAppBar(
                 pinned: true,
                 title: const Text(AppStrings.bookingsTitle),
-                actions: [
-                  IconButton(
-                    tooltip: AppStrings.bookingsOpenCheckIn,
-                    icon: const Icon(Icons.how_to_reg_outlined),
-                    onPressed: onOpenCheckIn,
-                  ),
-                ],
+                // Three fixed tabs fit a 360 dp phone; a scrollable bar
+                // would hide "Отменённые" behind the edge.
                 bottom: TabBar(
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                   tabs: [
                     Tab(text: AppStrings.bookingsActiveTab(active.length)),
+                    Tab(text: AppStrings.bookingsPastTab(past.length)),
                     Tab(
                       text: AppStrings.bookingsCancelledTab(cancelled.length),
                     ),
@@ -128,6 +157,7 @@ class BookingsScreen extends StatelessWidget {
             body: TabBarView(
               children: [
                 _buildActive(context, active),
+                _buildPast(context, past),
                 _buildCancelled(context, cancelled),
               ],
             ),
@@ -138,7 +168,7 @@ class BookingsScreen extends StatelessWidget {
   }
 
   Widget _buildActive(BuildContext context, List<Booking> active) {
-    if (bookings.isLoading && active.isEmpty) {
+    if (bookings.isLoading && bookings.all.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
     if (bookings.hasLoadError) {
@@ -165,15 +195,57 @@ class BookingsScreen extends StatelessWidget {
         ),
       );
     }
+    final now = clock();
     return _BookingList(
       header: AppStrings.bookingsGestureHint,
       bookings: active,
-      itemBuilder: (booking) => _CancellableBookingTile(
+      itemBuilder: (booking) => booking.canBeChangedAt(now)
+          ? _SwipeableBookingTile(
+              key: ValueKey(booking.id),
+              booking: booking,
+              onTap: () => showDetails(context, booking),
+              onLongPress: () => _showActions(context, booking),
+              onSwipeCancel: () => _requestCancel(context, booking),
+              onSwipeReschedule: () async =>
+                  _requestReschedule(context, booking),
+            )
+          : BookingTile(
+              key: ValueKey(booking.id),
+              booking: booking,
+              onTap: () => showDetails(context, booking),
+              onLongPress: () => _showActions(context, booking),
+            ),
+    );
+  }
+
+  Widget _buildPast(BuildContext context, List<Booking> past) {
+    if (past.isEmpty) {
+      return const Center(
+        child: SingleChildScrollView(
+          child: EmptyState(
+            icon: Icons.history,
+            title: AppStrings.bookingsPastEmptyTitle,
+            message: AppStrings.bookingsPastEmptyMessage,
+          ),
+        ),
+      );
+    }
+    return _BookingList(
+      bookings: past,
+      itemBuilder: (booking) => BookingTile(
         key: ValueKey(booking.id),
         booking: booking,
-        onTap: () => _showDetails(context, booking),
+        onTap: () => showDetails(context, booking),
         onLongPress: () => _showActions(context, booking),
-        confirmCancel: () => _requestCancel(context, booking),
+        trailing: _canReview(booking)
+            ? TextButton(
+                onPressed: () => onWriteReview(booking),
+                child: const Text(AppStrings.reviewWrite),
+              )
+            : null,
+        note: reviewedBookingIds.contains(booking.id)
+            ? AppStrings.bookingReviewed
+            : null,
       ),
     );
   }
@@ -195,7 +267,7 @@ class BookingsScreen extends StatelessWidget {
       itemBuilder: (booking) => BookingTile(
         key: ValueKey(booking.id),
         booking: booking,
-        onTap: () => _showDetails(context, booking),
+        onTap: () => showDetails(context, booking),
       ),
     );
   }
@@ -215,93 +287,138 @@ class _BookingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final header = this.header;
+    final theme = Theme.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final gutter = responsiveGutter(constraints.maxWidth);
-        return ListView(
+        // Lazy builder: the list of past visits can be long.
+        return ListView.builder(
           padding: EdgeInsets.fromLTRB(
             gutter,
             AppSpacing.l,
             gutter,
             AppSpacing.xl,
           ),
-          children: [
-            if (header != null)
-              Padding(
+          itemCount: bookings.length + (header == null ? 0 : 1),
+          itemBuilder: (context, index) {
+            if (header != null && index == 0) {
+              return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.m),
                 child: Text(
                   header,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-            for (final booking in bookings)
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.m),
-                child: itemBuilder(booking),
-              ),
-          ],
+              );
+            }
+            final booking = bookings[index - (header == null ? 0 : 1)];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.m),
+              child: itemBuilder(booking),
+            );
+          },
         );
       },
     );
   }
 }
 
-/// Active booking that can be swiped to the left to request cancellation.
-class _CancellableBookingTile extends StatelessWidget {
-  const _CancellableBookingTile({
+/// Active booking with two swipe directions: left asks to cancel, right
+/// opens rescheduling. Both only start the action — nothing changes
+/// without confirmation.
+class _SwipeableBookingTile extends StatelessWidget {
+  const _SwipeableBookingTile({
     super.key,
     required this.booking,
     required this.onTap,
     required this.onLongPress,
-    required this.confirmCancel,
+    required this.onSwipeCancel,
+    required this.onSwipeReschedule,
   });
 
   final Booking booking;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
-  final Future<void> Function() confirmCancel;
+  final Future<void> Function() onSwipeCancel;
+  final Future<void> Function() onSwipeReschedule;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Dismissible(
       key: ValueKey('dismiss-${booking.id}'),
-      direction: DismissDirection.endToStart,
       // Always returns false: Dismissible must not remove the tile by
       // itself. If the user confirms, the controller updates the list and
-      // the tile disappears on rebuild; otherwise it slides back.
-      confirmDismiss: (_) async {
-        await confirmCancel();
+      // the tile moves to another tab; otherwise it slides back.
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.endToStart) {
+          await onSwipeCancel();
+        } else {
+          await onSwipeReschedule();
+        }
         return false;
       },
-      background: Container(
+      background: _SwipeBackground(
+        alignment: Alignment.centerLeft,
+        color: colors.secondaryContainer,
+        foreground: colors.onSecondaryContainer,
+        icon: Icons.update,
+        label: AppStrings.bookingsSwipeToReschedule,
+      ),
+      secondaryBackground: _SwipeBackground(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        decoration: BoxDecoration(
-          color: colors.errorContainer,
-          borderRadius: BorderRadius.circular(AppRadii.l),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              AppStrings.bookingsSwipeToCancel,
-              style: TextStyle(
-                color: colors.onErrorContainer,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.s),
-            Icon(Icons.event_busy, color: colors.onErrorContainer),
-          ],
-        ),
+        color: colors.errorContainer,
+        foreground: colors.onErrorContainer,
+        icon: Icons.event_busy,
+        label: AppStrings.bookingsSwipeToCancel,
       ),
       child: BookingTile(
         booking: booking,
         onTap: onTap,
         onLongPress: onLongPress,
+      ),
+    );
+  }
+}
+
+class _SwipeBackground extends StatelessWidget {
+  const _SwipeBackground({
+    required this.alignment,
+    required this.color,
+    required this.foreground,
+    required this.icon,
+    required this.label,
+  });
+
+  final Alignment alignment;
+  final Color color;
+  final Color foreground;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final children = [
+      Icon(icon, color: foreground),
+      const SizedBox(width: AppSpacing.s),
+      Text(
+        label,
+        style: TextStyle(color: foreground, fontWeight: FontWeight.w600),
+      ),
+    ];
+    return Container(
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(AppRadii.l),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: alignment == Alignment.centerRight
+            ? children.reversed.toList()
+            : children,
       ),
     );
   }
