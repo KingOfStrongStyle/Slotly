@@ -5,14 +5,18 @@
       "name": "Slotly (debug)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart"
+      "program": "lib/main.dart",
+      "deviceId": "emulator-5554",
+      "preLaunchTask": "Start Android emulator"
     },
     {
       "name": "Slotly (profile)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "deviceId": "emulator-5554",
+      "preLaunchTask": "Start Android emulator"
     }
   ]
 }
