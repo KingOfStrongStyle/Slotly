@@ -37,7 +37,7 @@ abstract final class AppRoutes {
       return TicketCheckInScreen(
         classifier: dependencies.gestureClassifier,
         templates: symbolTemplates,
-        tickets: dependencies.tickets,
+        bookings: dependencies.bookings,
         finishSymbol: finishSymbol,
       );
     },
@@ -87,6 +87,7 @@ abstract final class AppRoutes {
       booking.serviceTitle,
       Formatters.dateTime(booking.startAt),
     );
+    message += AppStrings.bookingCreatedTicket(booking.ticketNumber);
     if (appController.demoNotificationsEnabled) {
       message += AppStrings.bookingReminderSuffix;
     }

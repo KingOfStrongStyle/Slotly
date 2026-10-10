@@ -9,9 +9,14 @@ import '../../domain/booking.dart';
 enum BookingAction { details, cancel }
 
 /// Opened by a tap: main information about the booking.
+///
+/// [onCheckIn] is passed only while check-in is open; otherwise
+/// [checkInAvailability] explains when it will be possible.
 Future<void> showBookingDetailsSheet(
   BuildContext context,
   Booking booking, {
+  CheckInAvailability? checkInAvailability,
+  VoidCallback? onCheckIn,
   VoidCallback? onCancel,
 }) {
   return showModalBottomSheet<void>(
@@ -38,6 +43,11 @@ Future<void> showBookingDetailsSheet(
               ),
               const SizedBox(height: AppSpacing.m),
               InfoRow(
+                icon: Icons.confirmation_number_outlined,
+                label: AppStrings.bookingTicket,
+                value: booking.ticketNumber,
+              ),
+              InfoRow(
                 icon: Icons.storefront_outlined,
                 label: AppStrings.confirmService,
                 value: booking.serviceTitle,
@@ -58,13 +68,13 @@ Future<void> showBookingDetailsSheet(
                 value: Formatters.timeRange(booking.startAt, booking.endAt),
               ),
               InfoRow(
-                icon: booking.isActive
-                    ? Icons.check_circle_outline
-                    : Icons.cancel_outlined,
+                icon: !booking.isActive
+                    ? Icons.cancel_outlined
+                    : booking.isCheckedIn
+                    ? Icons.how_to_reg
+                    : Icons.check_circle_outline,
                 label: AppStrings.bookingDetailsStatus,
-                value: booking.isActive
-                    ? AppStrings.bookingStatusConfirmed
-                    : AppStrings.bookingStatusCancelled,
+                value: _statusText(booking),
               ),
               if (booking.comment.isNotEmpty)
                 InfoRow(
@@ -77,6 +87,28 @@ Future<void> showBookingDetailsSheet(
                 label: AppStrings.bookingDetailsCreatedAt,
                 value: Formatters.dateTime(booking.createdAt),
               ),
+              if (onCheckIn != null) ...[
+                const SizedBox(height: AppSpacing.l),
+                FilledButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    onCheckIn();
+                  },
+                  icon: const Icon(Icons.how_to_reg),
+                  label: const Text(AppStrings.bookingCheckInAction),
+                ),
+              ] else if (checkInAvailability ==
+                  CheckInAvailability.tooEarly) ...[
+                const SizedBox(height: AppSpacing.s),
+                Text(
+                  AppStrings.bookingCheckInOpensAt(
+                    Formatters.dateTime(booking.checkInOpensAt),
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
               if (onCancel != null) ...[
                 const SizedBox(height: AppSpacing.l),
                 OutlinedButton.icon(
@@ -97,6 +129,15 @@ Future<void> showBookingDetailsSheet(
       );
     },
   );
+}
+
+String _statusText(Booking booking) {
+  if (!booking.isActive) return AppStrings.bookingStatusCancelled;
+  final checkedInAt = booking.checkedInAt;
+  if (checkedInAt != null) {
+    return AppStrings.bookingCheckedInAt(Formatters.time(checkedInAt));
+  }
+  return AppStrings.bookingStatusConfirmed;
 }
 
 /// Opened by a long press: list of actions for the booking.

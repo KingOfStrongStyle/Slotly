@@ -91,7 +91,12 @@ void main() {
     await pumpGolden(
       tester,
       Scaffold(
-        body: BookingsScreen(bookings: controller, onBrowseServices: () {}),
+        body: BookingsScreen(
+          bookings: controller,
+          clock: () => testNow,
+          onBrowseServices: () {},
+          onOpenCheckIn: () {},
+        ),
       ),
       theme: AppTheme.dark(),
     );

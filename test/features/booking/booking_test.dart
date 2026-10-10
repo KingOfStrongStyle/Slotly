@@ -4,6 +4,7 @@ import 'package:slotly/features/catalog/domain/service.dart';
 
 Booking _booking(String id, DateTime startAt) => Booking(
   id: id,
+  ticketNumber: '101',
   serviceId: 'svc',
   serviceTitle: 'Стрижка',
   specialist: const Specialist(id: 'sp', name: 'Мастер', role: 'Барбер'),
@@ -58,5 +59,44 @@ void main() {
       booking.overlaps(DateTime(2026, 10, 7, 11), DateTime(2026, 10, 7, 12)),
       isFalse,
     );
+  });
+
+  group('checkInAvailabilityAt', () {
+    final booking = _booking('a', DateTime(2026, 10, 7, 12));
+
+    test('opens an hour before the visit and closes when it ends', () {
+      expect(
+        booking.checkInAvailabilityAt(DateTime(2026, 10, 7, 10, 59)),
+        CheckInAvailability.tooEarly,
+      );
+      expect(
+        booking.checkInAvailabilityAt(DateTime(2026, 10, 7, 11)),
+        CheckInAvailability.available,
+      );
+      expect(
+        booking.checkInAvailabilityAt(DateTime(2026, 10, 7, 12, 44)),
+        CheckInAvailability.available,
+      );
+      expect(
+        booking.checkInAvailabilityAt(DateTime(2026, 10, 7, 12, 45)),
+        CheckInAvailability.expired,
+      );
+    });
+
+    test('cancelled and already checked in bookings are reported', () {
+      final now = DateTime(2026, 10, 7, 11, 30);
+      expect(
+        booking
+            .copyWith(status: BookingStatus.cancelled)
+            .checkInAvailabilityAt(now),
+        CheckInAvailability.cancelled,
+      );
+      final checkedIn = booking.copyWith(checkedInAt: now);
+      expect(checkedIn.isCheckedIn, isTrue);
+      expect(
+        checkedIn.checkInAvailabilityAt(now),
+        CheckInAvailability.alreadyCheckedIn,
+      );
+    });
   });
 }

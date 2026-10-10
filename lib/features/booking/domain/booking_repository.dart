@@ -41,6 +41,13 @@ abstract interface class BookingRepository {
   /// Marks the booking as cancelled. The record is kept, not deleted.
   /// Throws [BookingNotFoundException] for an unknown id.
   Future<Booking> cancelBooking(String bookingId);
+
+  /// Confirms that the customer with [ticketNumber] has arrived.
+  ///
+  /// Throws [TicketNotFoundException] for an unknown number and
+  /// [CheckInUnavailableException] when the booking cannot be checked in
+  /// right now (see [Booking.checkInAvailabilityAt]).
+  Future<Booking> checkIn(String ticketNumber);
 }
 
 class SlotUnavailableException implements Exception {
@@ -59,4 +66,24 @@ class BookingNotFoundException implements Exception {
 
   @override
   String toString() => 'BookingNotFoundException($bookingId)';
+}
+
+class TicketNotFoundException implements Exception {
+  const TicketNotFoundException(this.ticketNumber);
+
+  final String ticketNumber;
+
+  @override
+  String toString() => 'TicketNotFoundException($ticketNumber)';
+}
+
+class CheckInUnavailableException implements Exception {
+  const CheckInUnavailableException(this.booking, this.reason);
+
+  final Booking booking;
+  final CheckInAvailability reason;
+
+  @override
+  String toString() =>
+      'CheckInUnavailableException(${booking.id}, ${reason.name})';
 }

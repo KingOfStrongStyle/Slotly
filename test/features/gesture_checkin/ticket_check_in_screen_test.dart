@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:slotly/core/app_strings.dart';
-import 'package:slotly/features/gesture_checkin/data/mock_ticket_repository.dart';
+import 'package:slotly/features/booking/data/in_memory_booking_repository.dart';
+import 'package:slotly/features/booking/presentation/bookings_controller.dart';
 import 'package:slotly/features/gesture_checkin/data/symbol_templates.dart';
 import 'package:slotly/features/gesture_checkin/domain/gesture_classifier.dart';
 import 'package:slotly/features/gesture_checkin/domain/gesture_point.dart';
@@ -9,21 +10,45 @@ import 'package:slotly/features/gesture_checkin/presentation/ticket_check_in_scr
 import 'package:slotly/features/gesture_checkin/presentation/widgets/gesture_pad.dart';
 import 'package:slotly/features/gesture_checkin/presentation/widgets/template_preview.dart';
 
+import '../../helpers/booking_fixtures.dart';
 import '../../helpers/gesture_shapes.dart';
 import '../../helpers/test_app.dart';
 
 void main() {
   final pad = find.byKey(const ValueKey('gesture-pad'));
+  late BookingsController bookings;
 
-  Future<void> pumpCheckIn(WidgetTester tester) => pumpScreen(
-    tester,
-    TicketCheckInScreen(
-      classifier: GestureClassifier(templates: symbolTemplates),
-      templates: symbolTemplates,
-      tickets: const MockTicketRepository(),
-      finishSymbol: finishSymbol,
-    ),
-  );
+  /// Ticket 17 starts in 30 minutes, so check-in is already open.
+  Future<void> pumpCheckIn(WidgetTester tester) async {
+    bookings = BookingsController(
+      InMemoryBookingRepository(
+        clock: () => testNow,
+        initialBookings: [
+          fixtureBooking(
+            id: 'soon',
+            ticketNumber: '17',
+            startAt: testNow.add(const Duration(minutes: 30)),
+          ),
+          fixtureBooking(
+            id: 'later',
+            ticketNumber: '42',
+            startAt: DateTime(2026, 10, 6, 12),
+          ),
+        ],
+      ),
+    );
+    addTearDown(bookings.dispose);
+    await bookings.load();
+    await pumpScreen(
+      tester,
+      TicketCheckInScreen(
+        classifier: GestureClassifier(templates: symbolTemplates),
+        templates: symbolTemplates,
+        bookings: bookings,
+        finishSymbol: finishSymbol,
+      ),
+    );
+  }
 
   /// Draws strokes given in a 0..100 box inside the pad, like a finger.
   Future<void> draw(WidgetTester tester, List<GestureStroke> strokes) async {
@@ -52,6 +77,13 @@ void main() {
 
   List<GestureStroke> template(String label) =>
       symbolTemplates.firstWhere((t) => t.label == label).strokes;
+
+  Future<void> enter(WidgetTester tester, List<String> labels) async {
+    for (final label in labels) {
+      await draw(tester, template(label));
+      await recognize(tester);
+    }
+  }
 
   testWidgets('drawing shows strokes and recognized digits build a number', (
     tester,
@@ -113,16 +145,16 @@ void main() {
     expect(controller.strokes, hasLength(1));
   });
 
-  testWidgets('S finishes the input and shows a found ticket', (tester) async {
+  testWidgets('S finishes the input and checks the booking in', (tester) async {
     await pumpCheckIn(tester);
 
-    for (final label in ['1', '7', finishSymbol]) {
-      await draw(tester, template(label));
-      await recognize(tester);
-    }
+    await enter(tester, ['1', '7', finishSymbol]);
 
-    expect(find.text(AppStrings.checkInFound('17')), findsOneWidget);
-    expect(find.textContaining('Демо-клиент А.'), findsOneWidget);
+    expect(find.text(AppStrings.checkInSuccess('17')), findsOneWidget);
+    expect(
+      bookings.active.firstWhere((b) => b.ticketNumber == '17').isCheckedIn,
+      isTrue,
+    );
     expect(find.text(AppStrings.checkInReset), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.checkInReset));
@@ -139,11 +171,19 @@ void main() {
     await recognize(tester);
     expect(find.text(AppStrings.checkInNumberEmpty), findsOneWidget);
 
-    for (final label in ['9', '9', finishSymbol]) {
-      await draw(tester, template(label));
-      await recognize(tester);
-    }
+    await enter(tester, ['9', '9', finishSymbol]);
     expect(find.text(AppStrings.checkInNotFound('99')), findsOneWidget);
+  });
+
+  testWidgets('a ticket for a later visit explains when check-in opens', (
+    tester,
+  ) async {
+    await pumpCheckIn(tester);
+
+    await enter(tester, ['4', '2', finishSymbol]);
+
+    expect(find.textContaining('Отметиться по талону 42 можно с'), findsOne);
+    expect(bookings.active.every((b) => !b.isCheckedIn), isTrue);
   });
 
   testWidgets('template hints show every symbol', (tester) async {

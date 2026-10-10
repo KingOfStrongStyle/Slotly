@@ -191,6 +191,7 @@ void main() {
   test('generated ids do not clash with initial bookings', () async {
     final existing = Booking(
       id: 'booking-1',
+      ticketNumber: '150',
       serviceId: haircut.id,
       serviceTitle: haircut.title,
       specialist: barber,
@@ -215,5 +216,99 @@ void main() {
 
     expect(created.id, isNot(existing.id));
     expect(await repository.fetchBookings(), hasLength(2));
+  });
+
+  test('tickets are numbered sequentially from 101', () async {
+    final first = await repository.createBooking(
+      BookingRequest(
+        service: haircut,
+        specialist: barber,
+        startAt: _freeStart(barber, _tomorrow, haircut.duration),
+      ),
+    );
+    final second = await repository.createBooking(
+      BookingRequest(
+        service: haircut,
+        specialist: barber,
+        startAt: _schedule
+            .startTimes(_tomorrow, haircut.duration)
+            .lastWhere((t) => !_schedule.isTakenByOthers(barber, t)),
+      ),
+    );
+
+    expect(first.ticketNumber, '101');
+    expect(second.ticketNumber, '102');
+  });
+
+  group('checkIn', () {
+    late DateTime now;
+    late Booking booking;
+
+    setUp(() async {
+      now = _now;
+      repository = InMemoryBookingRepository(clock: () => now);
+      booking = await repository.createBooking(
+        BookingRequest(
+          service: haircut,
+          specialist: barber,
+          startAt: _freeStart(barber, _tomorrow, haircut.duration),
+        ),
+      );
+    });
+
+    test('marks the booking as arrived inside the check-in window', () async {
+      now = booking.startAt.subtract(const Duration(minutes: 10));
+
+      final checkedIn = await repository.checkIn(booking.ticketNumber);
+
+      expect(checkedIn.checkedInAt, now);
+      final stored = (await repository.fetchBookings()).single;
+      expect(stored.isCheckedIn, isTrue);
+    });
+
+    test('rejects early, repeated and cancelled check-ins', () async {
+      await expectLater(
+        repository.checkIn(booking.ticketNumber),
+        throwsA(
+          isA<CheckInUnavailableException>().having(
+            (e) => e.reason,
+            'reason',
+            CheckInAvailability.tooEarly,
+          ),
+        ),
+      );
+
+      now = booking.startAt;
+      await repository.checkIn(booking.ticketNumber);
+      await expectLater(
+        repository.checkIn(booking.ticketNumber),
+        throwsA(
+          isA<CheckInUnavailableException>().having(
+            (e) => e.reason,
+            'reason',
+            CheckInAvailability.alreadyCheckedIn,
+          ),
+        ),
+      );
+
+      await repository.cancelBooking(booking.id);
+      await expectLater(
+        repository.checkIn(booking.ticketNumber),
+        throwsA(
+          isA<CheckInUnavailableException>().having(
+            (e) => e.reason,
+            'reason',
+            CheckInAvailability.cancelled,
+          ),
+        ),
+      );
+    });
+
+    test('throws for an unknown ticket', () {
+      expect(
+        () => repository.checkIn('999'),
+        throwsA(isA<TicketNotFoundException>()),
+      );
+    });
   });
 }

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
 import '../../../core/app_strings.dart';
+import '../../../core/utils/clock.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/responsive.dart';
 import '../domain/booking.dart';
 import 'bookings_controller.dart';
+import 'check_in_messages.dart';
 import 'widgets/booking_sheets.dart';
 import 'widgets/booking_tile.dart';
 import 'widgets/cancel_booking_dialog.dart';
@@ -15,15 +17,36 @@ import 'widgets/cancel_booking_dialog.dart';
 /// Product gestures on an active booking: tap opens details, long press
 /// opens the action menu, swipe to the left asks to cancel. Nothing is
 /// cancelled without an explicit confirmation in a dialog.
+///
+/// On arrival the customer checks in either with "Я на месте" in the
+/// booking details or by drawing the ticket number ([onOpenCheckIn]).
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({
     super.key,
     required this.bookings,
+    required this.clock,
     required this.onBrowseServices,
+    required this.onOpenCheckIn,
   });
 
   final BookingsController bookings;
+  final Clock clock;
   final VoidCallback onBrowseServices;
+  final VoidCallback onOpenCheckIn;
+
+  Future<void> _checkIn(BuildContext context, Booking booking) async {
+    final messenger = ScaffoldMessenger.of(context);
+    String message;
+    try {
+      final checkedIn = await bookings.checkIn(booking.ticketNumber);
+      message = AppStrings.checkInSuccess(checkedIn.ticketNumber);
+    } on Exception catch (error) {
+      message = checkInErrorMessage(error);
+    }
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 
   Future<void> _requestCancel(BuildContext context, Booking booking) async {
     final confirmed = await showCancelBookingDialog(context, booking);
@@ -44,9 +67,14 @@ class BookingsScreen extends StatelessWidget {
   }
 
   void _showDetails(BuildContext context, Booking booking) {
+    final availability = booking.checkInAvailabilityAt(clock());
     showBookingDetailsSheet(
       context,
       booking,
+      checkInAvailability: availability,
+      onCheckIn: availability == CheckInAvailability.available
+          ? () => _checkIn(context, booking)
+          : null,
       onCancel: booking.isActive
           ? () => _requestCancel(context, booking)
           : null,
@@ -80,6 +108,13 @@ class BookingsScreen extends StatelessWidget {
               SliverAppBar(
                 pinned: true,
                 title: const Text(AppStrings.bookingsTitle),
+                actions: [
+                  IconButton(
+                    tooltip: AppStrings.bookingsOpenCheckIn,
+                    icon: const Icon(Icons.how_to_reg_outlined),
+                    onPressed: onOpenCheckIn,
+                  ),
+                ],
                 bottom: TabBar(
                   tabs: [
                     Tab(text: AppStrings.bookingsActiveTab(active.length)),

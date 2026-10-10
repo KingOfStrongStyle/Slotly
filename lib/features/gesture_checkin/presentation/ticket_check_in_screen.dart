@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
 import '../../../core/app_strings.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/responsive.dart';
+import '../../booking/domain/booking.dart';
+import '../../booking/presentation/bookings_controller.dart';
+import '../../booking/presentation/check_in_messages.dart';
 import '../domain/gesture_classifier.dart';
 import '../domain/gesture_template.dart';
-import '../domain/ticket.dart';
 import '../domain/ticket_entry.dart';
-import '../domain/ticket_repository.dart';
 import 'widgets/gesture_pad.dart';
 import 'widgets/template_preview.dart';
 
-/// Lab 3: the customer draws the ticket number digit by digit and finishes
-/// with "S". The number is then checked in the [TicketRepository].
+/// Arrival check-in: the customer draws the ticket number of their booking
+/// digit by digit and finishes with "S". The booking with this number is
+/// then marked as arrived through [BookingsController.checkIn].
+///
+/// Handwriting works without a keyboard, so the same screen can run on a
+/// shared tablet at the reception desk.
 ///
 /// The screen does not scroll as a whole: a vertical scroll view would
 /// compete with the pad for vertical finger movements.
@@ -21,13 +27,13 @@ class TicketCheckInScreen extends StatefulWidget {
     super.key,
     required this.classifier,
     required this.templates,
-    required this.tickets,
+    required this.bookings,
     required this.finishSymbol,
   });
 
   final GestureClassifier classifier;
   final List<GestureTemplate> templates;
-  final TicketRepository tickets;
+  final BookingsController bookings;
   final String finishSymbol;
 
   @override
@@ -88,13 +94,16 @@ class _TicketCheckInScreenState extends State<TicketCheckInScreen> {
     });
 
     if (outcome == TicketEntryOutcome.completed) {
-      final ticket = await widget.tickets.findByNumber(entry.number);
+      _Feedback feedback;
+      try {
+        feedback = _Feedback.checkedIn(
+          await widget.bookings.checkIn(entry.number),
+        );
+      } on Exception catch (error) {
+        feedback = _Feedback.error(checkInErrorMessage(error));
+      }
       if (!mounted) return;
-      setState(() {
-        _feedback = ticket == null
-            ? _Feedback.error(AppStrings.checkInNotFound(entry.number))
-            : _Feedback.ticket(ticket);
-      });
+      setState(() => _feedback = feedback);
     }
   }
 
@@ -207,19 +216,23 @@ class _TicketCheckInScreenState extends State<TicketCheckInScreen> {
 }
 
 class _Feedback {
-  const _Feedback._(this.message, {this.isError = false, this.ticket});
+  const _Feedback._(this.message, {this.isError = false, this.booking});
 
   factory _Feedback.info(String message) => _Feedback._(message);
 
   factory _Feedback.error(String message) =>
       _Feedback._(message, isError: true);
 
-  factory _Feedback.ticket(Ticket ticket) =>
-      _Feedback._(AppStrings.checkInFound(ticket.number), ticket: ticket);
+  factory _Feedback.checkedIn(Booking booking) => _Feedback._(
+    AppStrings.checkInSuccess(booking.ticketNumber),
+    booking: booking,
+  );
 
   final String message;
   final bool isError;
-  final Ticket? ticket;
+
+  /// Set after a successful check-in.
+  final Booking? booking;
 }
 
 class _NumberDisplay extends StatelessWidget {
@@ -294,15 +307,15 @@ class _FeedbackCard extends StatelessWidget {
       );
     }
 
-    final ticket = feedback.ticket;
+    final booking = feedback.booking;
     final background = feedback.isError
         ? colors.errorContainer
-        : ticket != null
+        : booking != null
         ? colors.primaryContainer
         : colors.secondaryContainer;
     final foreground = feedback.isError
         ? colors.onErrorContainer
-        : ticket != null
+        : booking != null
         ? colors.onPrimaryContainer
         : colors.onSecondaryContainer;
 
@@ -323,7 +336,7 @@ class _FeedbackCard extends StatelessWidget {
               Icon(
                 feedback.isError
                     ? Icons.error_outline
-                    : ticket != null
+                    : booking != null
                     ? Icons.confirmation_number_outlined
                     : Icons.check_circle_outline,
                 color: foreground,
@@ -335,15 +348,20 @@ class _FeedbackCard extends StatelessWidget {
                   children: [
                     Text(
                       feedback.message,
-                      style: ticket == null
+                      style: booking == null
                           ? null
                           : theme.textTheme.titleMedium?.copyWith(
                               color: foreground,
                             ),
                     ),
-                    if (ticket != null) ...[
-                      Text('${ticket.customerName} · ${ticket.serviceTitle}'),
-                      Text(_statusText(ticket)),
+                    if (booking != null) ...[
+                      Text(booking.serviceTitle),
+                      Text(
+                        AppStrings.checkInStartsAt(
+                          Formatters.time(booking.startAt),
+                          booking.specialist.name,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -354,14 +372,6 @@ class _FeedbackCard extends StatelessWidget {
       ),
     );
   }
-
-  String _statusText(Ticket ticket) => switch (ticket.status) {
-    TicketStatus.waiting =>
-      '${AppStrings.ticketWaiting}. '
-          '${AppStrings.checkInPeopleAhead(ticket.peopleAhead)}',
-    TicketStatus.called => AppStrings.ticketCalled,
-    TicketStatus.completed => AppStrings.ticketCompleted,
-  };
 }
 
 class _PadActions extends StatelessWidget {

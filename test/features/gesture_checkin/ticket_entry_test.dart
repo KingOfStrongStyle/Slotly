@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:slotly/features/gesture_checkin/data/mock_ticket_repository.dart';
 import 'package:slotly/features/gesture_checkin/data/symbol_templates.dart';
 import 'package:slotly/features/gesture_checkin/domain/gesture_template.dart';
-import 'package:slotly/features/gesture_checkin/domain/ticket.dart';
 import 'package:slotly/features/gesture_checkin/domain/ticket_entry.dart';
 
 GestureRecognitionResult accepted(String label) =>
@@ -67,28 +65,6 @@ void main() {
       expect(longer.removeLastDigit().number, '3');
       expect(empty.removeLastDigit().number, isEmpty);
       expect(longer.cleared().number, isEmpty);
-    });
-  });
-
-  group('MockTicketRepository', () {
-    const repository = MockTicketRepository();
-
-    test('finds a demo ticket by number', () async {
-      final ticket = await repository.findByNumber('17');
-
-      expect(ticket, isNotNull);
-      expect(ticket!.status, TicketStatus.waiting);
-      expect(ticket.peopleAhead, 2);
-    });
-
-    test('returns null for an unknown number', () async {
-      expect(await repository.findByNumber('9999'), isNull);
-      expect(await repository.findByNumber('017'), isNull);
-    });
-
-    test('demo tickets have unique numbers', () {
-      final numbers = demoTickets.map((t) => t.number).toSet();
-      expect(numbers.length, demoTickets.length);
     });
   });
 }

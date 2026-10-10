@@ -33,7 +33,10 @@ class HomeShell extends StatelessWidget {
       ),
       BookingsScreen(
         bookings: dependencies.bookings,
+        clock: dependencies.clock,
         onBrowseServices: () => controller.selectTab(HomeTab.services),
+        onOpenCheckIn: () =>
+            Navigator.of(context).pushNamed(AppRoutes.ticketCheckIn),
       ),
       ProfileScreen(
         appController: controller,
@@ -41,8 +44,6 @@ class HomeShell extends StatelessWidget {
             Navigator.of(context).pushNamed(AppRoutes.diagnostics),
         onOpenGestureLab: () =>
             Navigator.of(context).pushNamed(AppRoutes.gestureLab),
-        onOpenTicketCheckIn: () =>
-            Navigator.of(context).pushNamed(AppRoutes.ticketCheckIn),
       ),
     ];
 

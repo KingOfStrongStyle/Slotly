@@ -5,7 +5,8 @@ import '../../../../core/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/booking.dart';
 
-/// One booking in "Мои записи": date badge, service, time and specialist.
+/// One booking in "Мои записи": date badge, service, time, specialist and
+/// ticket number.
 class BookingTile extends StatelessWidget {
   const BookingTile({
     super.key,
@@ -25,7 +26,8 @@ class BookingTile extends StatelessWidget {
     final isActive = booking.isActive;
     final details =
         '${Formatters.timeRange(booking.startAt, booking.endAt)} · '
-        '${booking.specialist.name}';
+        '${booking.specialist.name} · '
+        '${AppStrings.bookingTicketShort(booking.ticketNumber)}';
 
     return Card(
       child: InkWell(
@@ -56,12 +58,14 @@ class BookingTile extends StatelessWidget {
                         color: colors.onSurfaceVariant,
                       ),
                     ),
-                    if (!isActive) ...[
+                    if (!isActive || booking.isCheckedIn) ...[
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        AppStrings.bookingStatusCancelled,
+                        isActive
+                            ? AppStrings.bookingStatusCheckedIn
+                            : AppStrings.bookingStatusCancelled,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: colors.error,
+                          color: isActive ? colors.primary : colors.error,
                         ),
                       ),
                     ],

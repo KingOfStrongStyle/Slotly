@@ -63,11 +63,22 @@ class BookingsController extends ChangeNotifier {
     return booking;
   }
 
+  /// Throws [TicketNotFoundException] or [CheckInUnavailableException]
+  /// when the customer cannot be checked in.
+  Future<Booking> checkIn(String ticketNumber) async {
+    final checkedIn = await _repository.checkIn(ticketNumber);
+    _replace(checkedIn);
+    return checkedIn;
+  }
+
   Future<void> cancel(String bookingId) async {
-    final cancelled = await _repository.cancelBooking(bookingId);
+    _replace(await _repository.cancelBooking(bookingId));
+  }
+
+  void _replace(Booking updated) {
     _bookings = [
       for (final booking in _bookings)
-        booking.id == bookingId ? cancelled : booking,
+        booking.id == updated.id ? updated : booking,
     ];
     notifyListeners();
   }

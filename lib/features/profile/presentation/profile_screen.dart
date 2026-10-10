@@ -7,20 +7,18 @@ import '../../../core/widgets/responsive.dart';
 import '../../../core/widgets/section_title.dart';
 import '../../../core/widgets/slotly_logo.dart';
 
-/// "Профиль" tab: demo user, local settings and links to the lab tools.
+/// "Профиль" tab: demo user, local settings and developer tools.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
     super.key,
     required this.appController,
     required this.onOpenDiagnostics,
     required this.onOpenGestureLab,
-    required this.onOpenTicketCheckIn,
   });
 
   final AppController appController;
   final VoidCallback onOpenDiagnostics;
   final VoidCallback onOpenGestureLab;
-  final VoidCallback onOpenTicketCheckIn;
 
   @override
   Widget build(BuildContext context) {
@@ -69,13 +67,6 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: const Text(AppStrings.gestureLabHint),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: onOpenGestureLab,
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.draw_outlined),
-                      title: const Text(AppStrings.checkInTitle),
-                      subtitle: const Text(AppStrings.checkInProfileHint),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: onOpenTicketCheckIn,
                     ),
                     const SectionTitle(AppStrings.profileAboutSection),
                     ListTile(

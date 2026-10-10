@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:slotly/core/app_strings.dart';
+import 'package:slotly/core/utils/formatters.dart';
 import 'package:slotly/features/booking/data/in_memory_booking_repository.dart';
 import 'package:slotly/features/booking/domain/booking.dart';
 import 'package:slotly/features/booking/presentation/bookings_controller.dart';
@@ -13,6 +14,7 @@ import '../../helpers/test_app.dart';
 void main() {
   late BookingsController controller;
   late int browseTaps;
+  late int checkInTaps;
 
   Future<void> pumpBookings(
     WidgetTester tester, {
@@ -24,12 +26,15 @@ void main() {
     addTearDown(controller.dispose);
     await controller.load();
     browseTaps = 0;
+    checkInTaps = 0;
     await pumpScreen(
       tester,
       Scaffold(
         body: BookingsScreen(
           bookings: controller,
+          clock: () => testNow,
           onBrowseServices: () => browseTaps++,
+          onOpenCheckIn: () => checkInTaps++,
         ),
       ),
     );
@@ -132,5 +137,60 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.cancelDialogTitle), findsOneWidget);
     expect(controller.active, hasLength(1), reason: 'not cancelled yet');
+  });
+
+  testWidgets('"Я на месте" checks in a booking that starts soon', (
+    tester,
+  ) async {
+    await pumpBookings(
+      tester,
+      initial: [
+        fixtureBooking(
+          id: 'soon',
+          ticketNumber: '117',
+          startAt: testNow.add(const Duration(minutes: 30)),
+        ),
+      ],
+    );
+    expect(find.textContaining(AppStrings.bookingTicketShort('117')), findsOne);
+
+    await tester.tap(find.byType(BookingTile));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.bookingCheckInAction));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.checkInSuccess('117')), findsOneWidget);
+    expect(controller.active.single.isCheckedIn, isTrue);
+    expect(find.text(AppStrings.bookingStatusCheckedIn), findsOneWidget);
+  });
+
+  testWidgets('check-in is not offered before the window opens', (
+    tester,
+  ) async {
+    final startAt = DateTime(2026, 10, 6, 12);
+    await pumpBookings(
+      tester,
+      initial: [fixtureBooking(id: 'b1', startAt: startAt)],
+    );
+
+    await tester.tap(find.byType(BookingTile));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.bookingCheckInAction), findsNothing);
+    expect(
+      find.text(
+        AppStrings.bookingCheckInOpensAt(
+          Formatters.dateTime(DateTime(2026, 10, 6, 11)),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('app bar action opens handwritten check-in', (tester) async {
+    await pumpBookings(tester);
+
+    await tester.tap(find.byTooltip(AppStrings.bookingsOpenCheckIn));
+    expect(checkInTaps, 1);
   });
 }

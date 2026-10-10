@@ -15,13 +15,20 @@ class InMemoryBookingRepository implements BookingRepository {
   }) {
     for (final booking in initialBookings) {
       _bookings[booking.id] = booking;
+      final ticket = int.tryParse(booking.ticketNumber);
+      if (ticket != null && ticket > _lastTicket) _lastTicket = ticket;
     }
   }
+
+  /// Tickets are numbered from 101: three digits are quick to draw and do
+  /// not look like a queue position.
+  static const firstTicketNumber = 101;
 
   final Clock clock;
   final DemoSchedule schedule;
   final Map<String, Booking> _bookings = {};
   int _lastId = 0;
+  int _lastTicket = firstTicketNumber - 1;
 
   @override
   Future<List<Booking>> fetchBookings() async =>
@@ -45,6 +52,7 @@ class InMemoryBookingRepository implements BookingRepository {
 
     final booking = Booking(
       id: _generateId(),
+      ticketNumber: '${++_lastTicket}',
       serviceId: request.service.id,
       serviceTitle: request.service.title,
       specialist: request.specialist,
@@ -65,6 +73,23 @@ class InMemoryBookingRepository implements BookingRepository {
     final cancelled = booking.copyWith(status: BookingStatus.cancelled);
     _bookings[bookingId] = cancelled;
     return cancelled;
+  }
+
+  @override
+  Future<Booking> checkIn(String ticketNumber) async {
+    final booking = _bookings.values
+        .where((b) => b.ticketNumber == ticketNumber)
+        .firstOrNull;
+    if (booking == null) throw TicketNotFoundException(ticketNumber);
+
+    final now = clock();
+    final availability = booking.checkInAvailabilityAt(now);
+    if (availability != CheckInAvailability.available) {
+      throw CheckInUnavailableException(booking, availability);
+    }
+    final checkedIn = booking.copyWith(checkedInAt: now);
+    _bookings[booking.id] = checkedIn;
+    return checkedIn;
   }
 
   List<TimeSlot> _slotsFor(

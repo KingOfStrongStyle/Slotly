@@ -108,7 +108,7 @@ abstract final class AppStrings {
   static const profileNotifications = 'Демо-уведомления';
   static const profileNotificationsHint =
       'Напоминание о записи в сообщении после бронирования';
-  static const profileToolsSection = 'Учебные инструменты';
+  static const profileToolsSection = 'Для разработчиков';
   static const profileDiagnosticsHint = 'Жизненный цикл приложения';
   static const profileAboutSection = 'О приложении';
   static const profileAbout = 'О Slotly';
@@ -164,6 +164,8 @@ abstract final class AppStrings {
   static const confirmSubmit = 'Подтвердить';
   static String bookingCreated(String service, String dateTime) =>
       'Вы записаны: $service, $dateTime';
+  static String bookingCreatedTicket(String ticket) =>
+      '. Талон $ticket — назовите или нарисуйте его по приходу';
   static const bookingReminderSuffix = '. Напомним за час до визита (демо)';
 
   // My bookings
@@ -185,6 +187,14 @@ abstract final class AppStrings {
   static const bookingsSwipeToCancel = 'Отменить';
   static const bookingStatusConfirmed = 'Подтверждена';
   static const bookingStatusCancelled = 'Отменена';
+  static const bookingStatusCheckedIn = 'Вы на месте';
+  static const bookingTicket = 'Талон';
+  static String bookingTicketShort(String ticket) => 'Талон $ticket';
+  static String bookingCheckedInAt(String time) => 'Вы на месте с $time';
+  static String bookingCheckInOpensAt(String time) =>
+      'Отметиться о приходе можно с $time';
+  static const bookingCheckInAction = 'Я на месте';
+  static const bookingsOpenCheckIn = 'Отметиться по талону';
   static const bookingDetailsTitle = 'Детали записи';
   static const bookingDetailsStatus = 'Статус';
   static const bookingDetailsCreatedAt = 'Создана';
@@ -250,8 +260,7 @@ abstract final class AppStrings {
   static const gestureLogScaleReset = 'Масштаб сброшен';
 
   // Ticket check-in
-  static const checkInTitle = 'Ввод талона';
-  static const checkInProfileHint = 'Рукописный ввод номера';
+  static const checkInTitle = 'Отметка о приходе';
   static const checkInTemplates = 'Как рисовать символы';
   static const checkInTemplatesHint =
       'Рисуйте крупно, одним или двумя штрихами. Точка — начало штриха. '
@@ -259,7 +268,8 @@ abstract final class AppStrings {
   static const checkInNumberLabel = 'Номер талона';
   static const checkInNumberPlaceholder = '—';
   static const checkInInstructions =
-      'Нарисуйте цифру и нажмите «Распознать». После номера нарисуйте S.';
+      'Нарисуйте номер талона по одной цифре и нажмите «Распознать». '
+      'В конце нарисуйте S.';
   static const checkInPadHint = 'Рисуйте здесь';
   static const checkInPadLabel = 'Поле для рукописного ввода';
   static const checkInRecognize = 'Распознать';
@@ -277,12 +287,21 @@ abstract final class AppStrings {
   static String checkInTooLong(int max) =>
       'Номер талона не длиннее $max цифр. Нарисуйте S или сотрите цифру.';
   static const checkInNumberEmpty = 'Сначала введите цифры номера, затем S.';
-  static const checkInSearching = 'Проверяем талон…';
-  static String checkInFound(String number) => 'Талон $number найден';
+  static const checkInSearching = 'Отмечаем приход…';
+  static String checkInSuccess(String number) =>
+      'Талон $number: приход отмечен';
+  static String checkInStartsAt(String time, String specialist) =>
+      'Начало в $time. $specialist пригласит вас.';
+  static String checkInAlready(String number, String time) =>
+      'Талон $number уже отмечен в $time.';
+  static String checkInTooEarly(String number, String time) =>
+      'Отметиться по талону $number можно с $time — за час до начала.';
+  static String checkInExpired(String number) =>
+      'Время визита по талону $number уже прошло. Запишитесь заново.';
+  static String checkInCancelled(String number) =>
+      'Запись по талону $number отменена.';
   static String checkInNotFound(String number) =>
       'Талон $number не найден. Проверьте номер и введите заново.';
-  static String checkInPeopleAhead(int count) => 'Перед вами: $count';
-  static const ticketWaiting = 'Ожидает вызова';
-  static const ticketCalled = 'Вас вызывают';
-  static const ticketCompleted = 'Обслуживание завершено';
+  static const checkInFailed =
+      'Не удалось отметить приход. Попробуйте ещё раз.';
 }
